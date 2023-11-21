@@ -1,8 +1,8 @@
 {
-  "name": "hmpps-template-typescript",
+  "name": "hmpps-change-someones-cell",
   "version": "0.0.1",
-  "description": "HMPPS Typescript Template",
-  "repository": "git@github.com:ministryofjustice/hmpps-template-typescript.git",
+  "description": "HMPPS Change Someone's Cell",
+  "repository": "git@github.com:ministryofjustice/hmpps-change-someones-cell.git",
   "license": "MIT",
   "scripts": {
     "prepare": "husky install",
