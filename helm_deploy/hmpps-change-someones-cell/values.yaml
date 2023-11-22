@@ -1,6 +1,6 @@
 generic-service:
   nameOverride: hmpps-change-someones-cell
-  productId: "UNASSIGNED" # productId for the product that this belongs too, i.e. DPS001, see README.md for details
+  productId: "DPS059" # productId for the product that this belongs too, i.e. DPS001, see README.md for details
 
   replicaCount: 4
 
@@ -48,9 +48,9 @@ generic-service:
       SYSTEM_CLIENT_ID: "SYSTEM_CLIENT_ID"
       SYSTEM_CLIENT_SECRET: "SYSTEM_CLIENT_SECRET"
       SESSION_SECRET: "SESSION_SECRET"
-    elasticache-redis:
-      REDIS_HOST: "primary_endpoint_address"
-      REDIS_AUTH_TOKEN: "auth_token"
+    csc-redis:
+      REDIS_HOST: "REDIS_HOST"
+      REDIS_AUTH_TOKEN: "REDIS_PASSWORD"
 
   allowlist:
     groups:
