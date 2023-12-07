@@ -1,9 +1,11 @@
 import { defineConfig } from 'cypress'
 import { resetStubs } from './integration_tests/mockApis/wiremock'
 import auth from './integration_tests/mockApis/auth'
-import manageUsersApi from './integration_tests/mockApis/manageUsersApi'
 import tokenVerification from './integration_tests/mockApis/tokenVerification'
 import components from './integration_tests/mockApis/components'
+import prisonApi from './integration_tests/mockApis/prisonApi'
+import users from './integration_tests/mockApis/users'
+import whereabouts from './integration_tests/mockApis/whereabouts'
 
 export default defineConfig({
   chromeWebSecurity: false,
@@ -20,9 +22,29 @@ export default defineConfig({
       on('task', {
         reset: resetStubs,
         ...auth,
-        ...manageUsersApi,
         ...tokenVerification,
         ...components,
+        ...prisonApi,
+        stubSignIn: ({ username = 'ITAG_USER', caseload = 'MDI', roles = ['ROLE_CELL_MOVE'], caseloads }) =>
+          Promise.all([
+            auth.stubSignIn(username, caseload, roles),
+            users.stubUserMe(username, 12345, 'James Stuart', caseload),
+            users.stubUserMeRoles(roles),
+            prisonApi.stubUserCaseloads(caseloads),
+            tokenVerification.stubVerifyToken(true),
+          ]),
+        stubAuthHealth: status => auth.stubHealth(status),
+        stubHealthAllHealthy: () =>
+          Promise.all([
+            auth.stubHealth(),
+            users.stubHealth(),
+            prisonApi.stubHealth(),
+            whereabouts.stubHealth(),
+            tokenVerification.stubHealth(),
+          ]),
+        stubLocationConfig: ({ agencyId, response }) => whereabouts.stubLocationConfig({ agencyId, response }),
+        stubSignInPage: auth.redirect,
+        stubUserMe: ({ username, staffId, name }) => users.stubUserMe(username, staffId, name),
       })
     },
     baseUrl: 'http://localhost:3007',

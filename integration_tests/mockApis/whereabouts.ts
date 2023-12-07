@@ -1,10 +1,25 @@
 import { stubFor } from './wiremock'
 
-export const stubHealth = (status = 200) => {
-  return stubFor({
+export const stubLocationConfig = ({ agencyId, response }) =>
+  stubFor({
     request: {
       method: 'GET',
-      urlPath: '/tokenverification/health/ping',
+      url: `/whereabouts/agencies/${agencyId}/locations/whereabouts`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: response,
+    },
+  })
+
+export const stubHealth = (status = 200) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPath: '/whereabouts/health/ping',
     },
     response: {
       status,
@@ -13,27 +28,8 @@ export const stubHealth = (status = 200) => {
       },
     },
   })
-}
-
-export const stubVerifyToken = active => {
-  return stubFor({
-    request: {
-      method: 'POST',
-      urlPattern: '/tokenverification/token/verify',
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: {
-        active,
-      },
-    },
-  })
-}
 
 export default {
+  stubLocationConfig,
   stubHealth,
-  stubVerifyToken,
 }

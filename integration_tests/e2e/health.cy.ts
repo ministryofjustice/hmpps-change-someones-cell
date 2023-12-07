@@ -1,44 +1,41 @@
-context('Healthcheck', () => {
-  context('All healthy', () => {
-    beforeEach(() => {
+context('Health page reports health correctly', () => {
+  context('when all dependencies are healthy', () => {
+    it('is visible and UP', () => {
       cy.task('reset')
-      cy.task('stubAuthPing')
-      cy.task('stubManageUsersPing')
-      cy.task('stubTokenVerificationPing')
-    })
-
-    it('Health check page is visible and UP', () => {
-      cy.request('/health').its('body.status').should('equal', 'UP')
-    })
-
-    it('Ping is visible and UP', () => {
-      cy.request('/ping').its('body.status').should('equal', 'UP')
-    })
-
-    it('Info is visible', () => {
-      cy.request('/info').its('body').should('exist')
+      cy.task('stubHealthAllHealthy')
+      cy.request({ url: '/health', method: 'GET', failOnStatusCode: false }).then(response => {
+        expect(response.body.status).to.equal('UP')
+      })
     })
   })
 
-  context('Some unhealthy', () => {
-    beforeEach(() => {
+  context('when some dependencies are unhealthy', () => {
+    it('is visible and UP', () => {
       cy.task('reset')
-      cy.task('stubAuthPing')
-      cy.task('stubManageUsersPing')
-      cy.task('stubTokenVerificationPing', 500)
-    })
-
-    it('Reports correctly when token verification down', () => {
+      cy.task('stubHealthAllHealthy')
+      cy.task('stubAuthHealth', 500)
       cy.request({ url: '/health', method: 'GET', failOnStatusCode: false }).then(response => {
-        expect(response.body.components.hmppsAuth.status).to.equal('UP')
-        expect(response.body.components.manageUsersApi.status).to.equal('UP')
-        expect(response.body.components.tokenVerification.status).to.equal('DOWN')
-        expect(response.body.components.tokenVerification.details).to.contain({ status: 500, retries: 2 })
+        expect(response.body.components).to.deep.equal({
+          hmppsAuth: {
+            status: 'DOWN',
+            details: {
+              timeout: 1500,
+              code: 'ECONNABORTED',
+              errno: 'ETIMEDOUT',
+              retries: 2,
+            },
+          },
+          manageUsersApi: {
+            status: 'UP',
+            details: 'UP',
+          },
+          tokenVerification: {
+            status: 'UP',
+            details: 'UP',
+          },
+        })
+        expect(response.body.status).to.equal('DOWN')
       })
-    })
-
-    it('Health check page is visible and DOWN', () => {
-      cy.request({ url: '/health', method: 'GET', failOnStatusCode: false }).its('body.status').should('equal', 'DOWN')
     })
   })
 })

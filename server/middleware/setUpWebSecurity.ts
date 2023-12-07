@@ -33,6 +33,8 @@ export default function setUpWebSecurity(): Router {
     fontSrc.push(config.apis.frontendComponents.url)
   }
 
+  styleSrc.push('https://code.jquery.com/*')
+
   router.use(
     helmet({
       contentSecurityPolicy: {

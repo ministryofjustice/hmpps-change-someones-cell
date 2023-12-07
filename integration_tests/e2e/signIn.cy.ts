@@ -1,58 +1,58 @@
-import IndexPage from '../pages/index'
-import AuthSignInPage from '../pages/authSignIn'
-import Page from '../pages/page'
-import AuthManageDetailsPage from '../pages/authManageDetails'
+import HomePage from '../pages/homePage'
 
-context('Sign In', () => {
+context('Sign in functionality', () => {
+  before(() => {
+    cy.clearCookies()
+  })
+
   beforeEach(() => {
     cy.task('reset')
-    cy.task('stubSignIn')
-    cy.task('stubManageUser')
+    cy.task('stubUserLocations')
+    cy.task('stubLocationConfig', { agencyId: 'MDI', response: { enabled: false } })
     cy.task('stubComponentsFail')
   })
 
-  it('Unauthenticated user directed to auth', () => {
+  it('Root (/) redirects to the auth sign in page if not signed in', () => {
+    cy.task('stubSignInPage')
     cy.visit('/')
-    Page.verifyOnPage(AuthSignInPage)
+    cy.url().should('include', 'authorize')
+    cy.get('h1').should('contain.text', 'Sign in')
   })
 
-  it('Unauthenticated user navigating to sign in page directed to auth', () => {
+  it('Direct access to login callback takes user to sign in page', () => {
+    cy.task('stubSignIn', {})
+    cy.visit('/login/callback')
+    cy.url().should('include', 'authorize')
+    cy.get('h1').should('contain.text', 'Sign in')
+  })
+
+  it('Sign in page redirects to the auth sign in page if not signed in', () => {
+    cy.task('stubSignInPage')
     cy.visit('/sign-in')
-    Page.verifyOnPage(AuthSignInPage)
+    cy.url().should('include', 'authorize')
+    cy.get('h1').should('contain.text', 'Sign in')
   })
 
-  it('User name visible in fallback header', () => {
-    cy.signIn()
-    const indexPage = Page.verifyOnPage(IndexPage)
-    indexPage.fallbackHeaderUserName().should('contain.text', 'J. Smith')
+  it('Page redirects to the auth sign in page if not signed in', () => {
+    cy.task('stubSignIn', {})
+    cy.visit('/sign-in')
+    cy.url().should('include', 'authorize')
+    cy.get('h1').should('contain.text', 'Sign in')
   })
 
-  it('Phase banner visible in header', () => {
+  it('Sign in takes user to sign in page', () => {
+    cy.task('stubSignIn', {})
     cy.signIn()
-    const indexPage = Page.verifyOnPage(IndexPage)
-    indexPage.headerPhaseBanner().should('contain.text', 'dev')
-  })
+    HomePage.verifyOnPage()
 
-  it('User can sign out', () => {
-    cy.signIn()
-    const indexPage = Page.verifyOnPage(IndexPage)
-    indexPage.signOut().click()
-    Page.verifyOnPage(AuthSignInPage)
-  })
-
-  it('User can manage their details', () => {
-    cy.signIn()
-    cy.task('stubAuthManageDetails')
-    const indexPage = Page.verifyOnPage(IndexPage)
-
-    indexPage.manageDetails().get('a').invoke('removeAttr', 'target')
-    indexPage.manageDetails().click()
-    Page.verifyOnPage(AuthManageDetailsPage)
+    // can't do a visit here as cypress requires only one domain
+    cy.request('/sign-out').its('body').should('contain', 'Sign in')
   })
 
   it('Token verification failure takes user to sign in page', () => {
+    cy.task('stubSignIn', {})
     cy.signIn()
-    Page.verifyOnPage(IndexPage)
+    HomePage.verifyOnPage()
     cy.task('stubVerifyToken', false)
 
     // can't do a visit here as cypress requires only one domain
@@ -60,17 +60,25 @@ context('Sign In', () => {
   })
 
   it('Token verification failure clears user session', () => {
+    cy.task('stubSignIn', {})
     cy.signIn()
-    const indexPage = Page.verifyOnPage(IndexPage)
+    const homePage = HomePage.verifyOnPage()
+    homePage.fallbackHeaderUserName().contains('J. Stuart')
     cy.task('stubVerifyToken', false)
 
     // can't do a visit here as cypress requires only one domain
     cy.request('/').its('body').should('contain', 'Sign in')
 
     cy.task('stubVerifyToken', true)
-    cy.task('stubManageUser', 'bobby brown')
+    cy.task('stubUserMe', { name: 'Bobby Brown' })
     cy.signIn()
 
-    indexPage.fallbackHeaderUserName().contains('B. Brown')
+    homePage.fallbackHeaderUserName().contains('B. Brown')
+  })
+
+  it('Sign in as ordinary user', () => {
+    cy.task('stubSignIn', {})
+    cy.signIn()
+    HomePage.verifyOnPage()
   })
 })

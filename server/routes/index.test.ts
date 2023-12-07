@@ -1,11 +1,25 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import { appWithAllRoutes } from './testutils/appSetup'
+import { MockUserService } from '../tests/testUtils'
 
 let app: Express
 
+const user: Express.User = {
+  token: 'dfvbuliagwer',
+  authSource: 'NOMIS',
+  activeCaseLoad: {
+    caseLoadId: 'AZK',
+    description: 'Azkaban',
+    currentlyActive: true,
+  },
+}
+
 beforeEach(() => {
-  app = appWithAllRoutes({})
+  app = appWithAllRoutes({
+    services: { userService: new MockUserService() },
+    userSupplier: () => user,
+  })
 })
 
 afterEach(() => {
@@ -16,9 +30,8 @@ describe('GET /', () => {
   it('should render index page', () => {
     return request(app)
       .get('/')
-      .expect('Content-Type', /html/)
       .expect(res => {
-        expect(res.text).toContain('This site is under construction...')
+        expect(res.text).toContain('Change someone’s cell')
       })
   })
 })

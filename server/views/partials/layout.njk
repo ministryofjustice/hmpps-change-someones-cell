@@ -1,3 +1,5 @@
+{% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
+
 {% extends "govuk/template.njk" %}
 
 {% block head %}
@@ -34,15 +36,15 @@
 
 {% block pageTitle %}{{pageTitle | default(applicationName)}}{% endblock %}
 
+{% block bodyStart %}
+{% endblock %}
+
 {% block header %}
   {% if feComponents.header %}
     {{ feComponents.header | safe }}
   {% else %}
     {% include "./header.njk" %}
   {% endif %}
-{% endblock %}
-
-{% block bodyStart %}
 {% endblock %}
 
 {% block footer %}
