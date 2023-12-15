@@ -99,4 +99,5 @@ export default {
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName: get('ENVIRONMENT_NAME', ''),
+  dpsUrl: get('DPS_URL', 'http://localhost:3000', requiredInProduction),
 }
