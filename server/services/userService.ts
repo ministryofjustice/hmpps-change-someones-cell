@@ -13,4 +13,8 @@ export default class UserService {
     const user = await this.manageUsersApiClient.getUser(token)
     return { ...user, displayName: convertToTitleCase(user.name) }
   }
+
+  async getUserRoles(token: string): Promise<string[]> {
+    return await this.manageUsersApiClient.getUserRoles(token)
+  }
 }

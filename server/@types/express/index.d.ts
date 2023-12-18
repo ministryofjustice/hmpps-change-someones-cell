@@ -1,3 +1,4 @@
+import { CaseLoad } from '../../api/prisonApi'
 import type { UserDetails } from '../../services/userService'
 
 export default {}
@@ -15,6 +16,7 @@ export declare global {
     interface User extends Partial<UserDetails> {
       token: string
       authSource: string
+      activeCaseLoad?: CaseLoad
     }
 
     interface Request {

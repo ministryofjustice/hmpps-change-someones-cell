@@ -1,18 +1,22 @@
-import IndexPage from '../pages/index'
-import Page from '../pages/page'
+import HomePage from '../pages/homePage'
 
-context('SignIn', () => {
+context('Common component functionality', () => {
+  before(() => {
+    cy.clearCookies()
+  })
+
   beforeEach(() => {
     cy.task('reset')
-    cy.task('stubSignIn')
-    cy.task('stubManageUser')
+    cy.task('stubUserLocations')
+    cy.task('stubLocationConfig', { agencyId: 'MDI', response: { enabled: false } })
     cy.task('stubComponents')
   })
 
-  it('Commmon components header and footer are displayed', () => {
+  it('Sign in takes user to sign in page', () => {
+    cy.task('stubSignIn', {})
     cy.signIn()
-    const indexPage = Page.verifyOnPage(IndexPage)
-    indexPage.commonComponentsHeader().should('exist')
-    indexPage.commonComponentsFooter().should('exist')
+    const page = HomePage.goTo()
+    page.commonComponentsHeader().should('exist')
+    page.commonComponentsFooter().should('exist')
   })
 })

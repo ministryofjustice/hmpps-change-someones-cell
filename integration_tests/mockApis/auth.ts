@@ -1,25 +1,24 @@
 import jwt from 'jsonwebtoken'
-import { Response } from 'superagent'
-
+import { stubUserMe, stubUser } from './users'
 import { stubFor, getMatchingRequests } from './wiremock'
-import tokenVerification from './tokenVerification'
+import { stubStaffRoles, stubUserLocations } from './prisonApi'
+import { stubLocationConfig } from './whereabouts'
 
-const createToken = (roles: string[] = []) => {
-  // authorities in the session are always prefixed by ROLE.
-  const authorities = roles.map(role => (role.startsWith('ROLE_') ? role : `ROLE_${role}`))
+const createToken = roles => {
   const payload = {
-    user_name: 'USER1',
-    scope: ['read'],
+    user_name: 'ITAG_USER',
+    scope: ['read', 'write'],
     auth_source: 'nomis',
-    authorities,
+    authorities: ['ROLE_GLOBAL_SEARCH', ...roles],
     jti: '83b50a10-cca6-41db-985f-e87efb303ddb',
-    client_id: 'clientid',
+    client_id: 'dev',
   }
 
-  return jwt.sign(payload, 'secret', { expiresIn: '1h' })
+  const token = jwt.sign(payload, 'secret', { expiresIn: '1h' })
+  return token
 }
 
-const getSignInUrl = (): Promise<string> =>
+const getSignInUrl = () =>
   getMatchingRequests({
     method: 'GET',
     urlPath: '/auth/oauth/authorize',
@@ -33,18 +32,7 @@ const favicon = () =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: '/favicon.ico',
-    },
-    response: {
-      status: 200,
-    },
-  })
-
-const ping = () =>
-  stubFor({
-    request: {
-      method: 'GET',
-      urlPattern: '/auth/health/ping',
+      url: '/favicon.ico',
     },
     response: {
       status: 200,
@@ -55,15 +43,15 @@ const redirect = () =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: '/auth/oauth/authorize\\?response_type=code&redirect_uri=.+?&state=.+?&client_id=clientid',
+      urlPattern: '/auth/oauth/authorize\\?response_type=code&redirect_uri=.+?&state=.+?&client_id=.+?',
     },
     response: {
       status: 200,
       headers: {
         'Content-Type': 'text/html',
-        Location: 'http://localhost:3007/sign-in/callback?code=codexxxx&state=stateyyyy',
+        Location: 'http://localhost:3008/sign-in/callback?code=codexxxx&state=stateyyyy',
       },
-      body: '<html><body>Sign in page<h1>Sign in</h1></body></html>',
+      body: '<html><body>Login page<h1>Sign in</h1></body></html>',
     },
   })
 
@@ -71,58 +59,95 @@ const signOut = () =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: '/auth/sign-out.*',
+      urlPath: '/auth/sign-out',
     },
     response: {
       status: 200,
       headers: {
         'Content-Type': 'text/html',
       },
-      body: '<html><body>Sign in page<h1>Sign in</h1></body></html>',
+      body: '<html><body>Login page<h1>Sign in</h1></body></html>',
     },
   })
 
-const manageDetails = () =>
-  stubFor({
-    request: {
-      method: 'GET',
-      urlPattern: '/auth/account-details.*',
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'text/html',
-      },
-      body: '<html><body><h1>Your account details</h1></body></html>',
-    },
-  })
-
-const token = (roles: string[] = []) =>
+const token = roles =>
   stubFor({
     request: {
       method: 'POST',
-      urlPattern: '/auth/oauth/token',
+      url: '/auth/oauth/token',
     },
     response: {
       status: 200,
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
-        Location: 'http://localhost:3007/sign-in/callback?code=codexxxx&state=stateyyyy',
+        Location: 'http://localhost:3008/sign-in/callback?code=codexxxx&state=stateyyyy',
       },
       jsonBody: {
         access_token: createToken(roles),
         token_type: 'bearer',
-        user_name: 'USER1',
-        expires_in: 599,
-        scope: 'read',
+        refresh_token: 'refresh',
+        user_name: 'TEST_USER',
+        expires_in: 600,
+        scope: 'read write',
         internalUser: true,
       },
     },
   })
+
+const stubHealth = (status = 200) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPath: '/auth/health/ping',
+    },
+    response: {
+      status,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      fixedDelayMilliseconds: status === 500 ? 3000 : '',
+    },
+  })
+
+const stubClientCredentialsRequest = () =>
+  stubFor({
+    request: {
+      method: 'POST',
+      url: '/auth/oauth/token',
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        access_token: 'EXAMPLE_ACCESS_TOKEN',
+        refresh_token: 'EXAMPLE_REFRESH_TOKEN',
+        expires_in: 43200,
+      },
+    },
+  })
+
 export default {
+  stubHealth,
   getSignInUrl,
-  stubAuthPing: ping,
-  stubAuthManageDetails: manageDetails,
-  stubSignIn: (roles: string[]): Promise<[Response, Response, Response, Response, Response]> =>
-    Promise.all([favicon(), redirect(), signOut(), token(roles), tokenVerification.stubVerifyToken()]),
+  stubSignIn: (username, caseloadId, roles = []) =>
+    Promise.all([
+      favicon(),
+      redirect(),
+      signOut(),
+      token(roles),
+      stubUserMe(username, 12345, 'James Stuart', caseloadId),
+      stubUser(username, caseloadId),
+      stubUserLocations(),
+      stubStaffRoles(),
+      stubLocationConfig({ agencyId: caseloadId, response: { enabled: false } }),
+    ]),
+  stubSignInCourt: () =>
+    Promise.all([
+      favicon(),
+      redirect(),
+      signOut(),
+      token(['ROLE_GLOBAL_SEARCH', 'ROLE_VIDEO_LINK_COURT_USER']),
+      stubUserMe(),
+    ]),
+  redirect,
+  stubClientCredentialsRequest,
 }

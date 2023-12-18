@@ -1,3 +1,8 @@
+const toNumber = (value: string | undefined): number | undefined => {
+  const result = parseInt(value, 10)
+  return Number.isSafeInteger(result) && result
+}
+
 const production = process.env.NODE_ENV === 'production'
 
 function get<T>(name: string, fallback: T, options = { requireInProduction: false }): T | string {
@@ -87,7 +92,12 @@ export default {
       agent: new AgentConfig(Number(get('COMPONENT_API_TIMEOUT_SECONDS', 10000))),
       enabled: get('COMMON_COMPONENTS_ENABLED', 'true') === 'true',
     },
+    prisonApi: {
+      url: process.env.API_ENDPOINT_URL || 'http://localhost:8080/',
+      timeoutSeconds: toNumber(process.env.API_ENDPOINT_TIMEOUT_SECONDS) || 30,
+    },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName: get('ENVIRONMENT_NAME', ''),
+  dpsUrl: get('DPS_URL', 'http://localhost:3000', requiredInProduction),
 }

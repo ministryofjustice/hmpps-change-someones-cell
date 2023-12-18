@@ -30,7 +30,7 @@ const stubComponentsFail = () =>
   stubFor({
     request: {
       method: 'GET',
-      urlPattern: '/components/header',
+      urlPattern: '/components/components\\?component=header&component=footer',
     },
     response: {
       status: 500,
