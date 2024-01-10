@@ -17,7 +17,15 @@ export const setTokens = ({ access_token, refresh_token, authSource = undefined 
 
 export const hasTokens = context => Boolean(context && context.access_token && context.refresh_token)
 
-export const getAccessToken = context => (context && context.access_token ? context.access_token : null)
+export const getAccessToken = context => {
+  if (!context) return null
+
+  if (context.access_token) return context.access_token
+
+  if (context.user?.token) return context.user.token
+
+  return null
+}
 
 export const getRefreshToken = context => (context && context.refresh_token ? context.refresh_token : null)
 

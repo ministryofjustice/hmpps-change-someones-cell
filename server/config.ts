@@ -35,6 +35,9 @@ export interface ApiConfig {
 }
 
 export default {
+  app: {
+    production: process.env.NODE_ENV === 'production',
+  },
   buildNumber: get('BUILD_NUMBER', '1_0_0', requiredInProduction),
   productId: get('PRODUCT_ID', 'UNASSIGNED', requiredInProduction),
   gitRef: get('GIT_REF', 'xxxxxxxxxxxxxxxxxxx', requiredInProduction),
@@ -43,7 +46,7 @@ export default {
   https: production,
   staticResourceCacheDuration: '1h',
   redis: {
-    host: get('REDIS_HOST', 'localhost', requiredInProduction),
+    host: get('REDIS_URL', 'localhost', requiredInProduction),
     port: parseInt(process.env.REDIS_PORT, 10) || 6379,
     password: process.env.REDIS_AUTH_TOKEN,
     tls_enabled: get('REDIS_TLS_ENABLED', 'false'),
@@ -100,4 +103,5 @@ export default {
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName: get('ENVIRONMENT_NAME', ''),
   dpsUrl: get('DPS_URL', 'http://localhost:3000', requiredInProduction),
+  prisonerProfileUrl: get('PRISONER_PROFILE_URL', 'http://localhost:3000', requiredInProduction),
 }

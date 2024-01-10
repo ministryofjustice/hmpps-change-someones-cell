@@ -45,4 +45,15 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('initialiseName', initialiseName)
 
   njkEnv.addGlobal('dpsUrl', config.dpsUrl)
+
+  njkEnv.addFilter('findError', (array, formFieldId) => {
+    if (!array) return null
+    const item = array.find(error => error.href === `#${formFieldId}`)
+    if (item) {
+      return {
+        text: item.text,
+      }
+    }
+    return null
+  })
 }

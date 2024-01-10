@@ -22,7 +22,7 @@ export default function setUpWebSecurity(): Router {
   // page by an attacker.
   const scriptSrc = ["'self'", (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`]
   const styleSrc = ["'self'", (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`]
-  const fontSrc = ["'self'"]
+  const fontSrc = ["'self'", 'data:']
   const imgSrc = ["'self'", 'data:']
   const formAction = [`'self' ${config.apis.hmppsAuth.externalUrl}`]
 

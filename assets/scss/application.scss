@@ -3,17 +3,25 @@ $path: "/assets/images/";
 
 $moj-page-width: 1170px;
 $govuk-page-width: $moj-page-width;
+$govuk-font-family-print: 'GDS Transport';
 
 @import 'govuk/all';
 @import 'moj/all';
 
 @import 'govuk-elements';
 
+@import 'fonts';
+@import 'horizontal-content';
+
 @import './components/header-bar';
 @import './components/footer';
 @import 'assets/scss/local';
 
+@import 'components/alert-flags';
 @import 'components/card';
+@import 'components/prisonerSearch/prisoner-search';
+@import 'components/prisonerSearch/prisoner-panel';
+@import 'components/sortable-table';
 
 @import 'pages/homepage';
 
@@ -38,5 +46,13 @@ h2 {
   margin-block-end: 0.83em;
   margin-inline-start: 0px;
   margin-inline-end: 0px;
+  font-weight: bold;
+}
+
+.pull-right {
+  text-align: right;
+}
+
+strong {
   font-weight: bold;
 }

@@ -1,7 +1,7 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import { appWithAllRoutes } from './testutils/appSetup'
-import { MockUserService } from '../tests/testUtils'
+import { defaultServices } from '../tests/testUtils'
 
 let app: Express
 
@@ -17,7 +17,7 @@ const user: Express.User = {
 
 beforeEach(() => {
   app = appWithAllRoutes({
-    services: { userService: new MockUserService() },
+    services: defaultServices,
     userSupplier: () => user,
   })
 })
