@@ -1,12 +1,12 @@
 import type { Express } from 'express'
 import request from 'supertest'
 import { appWithAllRoutes } from './routes/testutils/appSetup'
-import { MockUserService } from './tests/testUtils'
+import { defaultServices } from './tests/testUtils'
 
 let app: Express
 
 beforeEach(() => {
-  app = appWithAllRoutes({ services: { userService: new MockUserService() } })
+  app = appWithAllRoutes({ services: defaultServices })
 })
 
 afterEach(() => {
@@ -26,7 +26,7 @@ describe('GET 404', () => {
   })
 
   it('should render content without stack in production mode', () => {
-    return request(appWithAllRoutes({ production: true, services: { userService: new MockUserService() } }))
+    return request(appWithAllRoutes({ production: true, services: defaultServices }))
       .get('/unknown')
       .expect(404)
       .expect('Content-Type', /html/)

@@ -2,6 +2,7 @@ import clientFactory from './api/oauthEnabledClient'
 
 import config from './config'
 import { prisonApiFactory } from './api/prisonApi'
+import systemOauthClient from './api/systemOauthClient'
 
 export const prisonApi = prisonApiFactory(
   clientFactory({
@@ -12,4 +13,5 @@ export const prisonApi = prisonApiFactory(
 
 export default {
   prisonApi,
+  systemOauthClient,
 }

@@ -19,6 +19,14 @@ import getFrontendComponents from './middleware/getFeComponents'
 
 import routes from './routes'
 import type { Services } from './services'
+import {
+  clientCredsSetup,
+  enableLogDebugStatements,
+  getSystemOauthApiClient,
+  getTokenStore,
+} from './api/systemOauthClient'
+import config from './config'
+import setupApiRoutes from './setupApiRoutes'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -28,6 +36,7 @@ export default function createApp(services: Services): express.Application {
   app.set('port', process.env.PORT || 3000)
 
   app.use(metricsMiddleware)
+  clientCredsSetup(getTokenStore(config), getSystemOauthApiClient(config), enableLogDebugStatements(config))
   app.use(setUpHealthChecks(services.applicationInfo))
   app.use(setUpWebSecurity())
   app.use(setUpWebSession())
@@ -39,10 +48,11 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpCsrf())
   app.use(setUpCurrentUser(services))
   app.get('*', getFrontendComponents(services))
+  app.use(setupApiRoutes({ prisonApi: services.apis.prisonApi }))
 
   app.use(routes(services))
 
-  app.use((req, res, next) => next(createError(404, 'Not found')))
+  app.use((_req, _res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(process.env.NODE_ENV === 'production'))
 
   return app
