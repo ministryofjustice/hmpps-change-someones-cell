@@ -1,17 +1,18 @@
 import asyncMiddleware from '../middleware/asyncHandler'
 import log from '../../logger'
+import PrisonerDetailsService from '../services/prisonerDetailsService'
 
 const placeHolderImagePath = '/assets/images/image-missing.jpg'
 
-export const imageFactory = prisonApi => {
+export const imageFactory = (prisonerDetailsService: PrisonerDetailsService) => {
   const image = asyncMiddleware(async (req, res) => {
     const { imageId } = req.params
 
     if (!imageId) {
       res.redirect(placeHolderImagePath)
     } else {
-      prisonApi
-        .getImage(res.locals, imageId)
+      prisonerDetailsService
+        .getImage(res.locals.user.token, imageId)
         .then(data => {
           res.type('image/jpeg')
           data.pipe(res)
@@ -35,8 +36,8 @@ export const imageFactory = prisonApi => {
     if (!offenderNo || offenderNo === 'placeholder') {
       res.redirect(placeHolderImagePath)
     } else {
-      prisonApi
-        .getPrisonerImage(res.locals, offenderNo, fullSizeImage)
+      prisonerDetailsService
+        .getPrisonerImage(res.locals.user.token, offenderNo, fullSizeImage)
         .then(data => {
           res.set('Cache-control', 'private, max-age=86400')
           res.removeHeader('pragma')

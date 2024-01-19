@@ -1,13 +1,11 @@
-import prisonerSearchController from '../controllers/cellMove/cellMovePrisonerSearch'
+import { Offender } from '../../data/prisonApiClient'
+import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
+import prisonerSearchController from './cellMovePrisonerSearch'
+
+jest.mock('../../services/prisonerCellAllocationService')
 
 describe('Prisoner search', () => {
-  const prisonApi = {
-    getInmates: jest.fn(),
-  }
-
-  const systemOauthClient = {
-    getClientCredentialsTokens: jest.fn(),
-  }
+  const prisonerCellAllocationService = jest.mocked(new PrisonerCellAllocationService(undefined, undefined))
 
   let req
   let res
@@ -21,6 +19,7 @@ describe('Prisoner search', () => {
       query: {},
       body: {},
       session: { userDetails: { username: 'me' } },
+      user: { username: 'me' },
     }
     res = {
       locals: {
@@ -34,10 +33,10 @@ describe('Prisoner search', () => {
       status: jest.fn(),
     }
 
-    prisonApi.getInmates = jest.fn().mockReturnValue([])
-    systemOauthClient.getClientCredentialsTokens = jest.fn().mockResolvedValue({})
+    const offenders: Promise<Offender[]> = Promise.resolve([])
+    prisonerCellAllocationService.getInmates.mockReturnValue(offenders)
 
-    controller = prisonerSearchController({ systemOauthClient, prisonApi })
+    controller = prisonerSearchController({ prisonerCellAllocationService })
   })
 
   describe('index', () => {
@@ -48,24 +47,11 @@ describe('Prisoner search', () => {
 
       await controller(req, res)
 
-      expect(prisonApi.getInmates).toHaveBeenCalledWith(
-        {
-          requestHeaders: expect.objectContaining({
-            'Page-Limit': '5000',
-            'Sort-Fields': 'lastName,firstName',
-            'Sort-Order': 'ASC',
-          }),
-        },
-        'MDI',
-        {
-          keywords: 'Smith',
-          returnAlerts: 'true',
-        },
-      )
+      expect(prisonerCellAllocationService.getInmates).toHaveBeenCalledWith('me', 'MDI', 'Smith', true)
     })
 
     it('should render template with correct data when searched', async () => {
-      const inmates = [
+      const inmates: Offender[] = [
         {
           bookingId: 1,
           offenderNo: 'A1234BC',
@@ -76,9 +62,9 @@ describe('Prisoner search', () => {
           agencyId: 'MDI',
           assignedLivingUnitId: 1,
           assignedLivingUnitDesc: 'UNIT-1',
-          iepLevel: 'Standard',
           categoryCode: 'C',
           alertsDetails: ['XA', 'XVL'],
+          alertsCodes: ['XA', 'XVL'],
         },
         {
           bookingId: 2,
@@ -90,12 +76,12 @@ describe('Prisoner search', () => {
           agencyId: 'MDI',
           assignedLivingUnitId: 2,
           assignedLivingUnitDesc: 'CSWAP',
-          iepLevel: 'Standard',
           categoryCode: 'C',
           alertsDetails: ['RSS', 'XC'],
+          alertsCodes: ['RSS', 'XC'],
         },
       ]
-      prisonApi.getInmates = jest.fn().mockReturnValue(inmates)
+      prisonerCellAllocationService.getInmates.mockReturnValue(Promise.resolve(inmates))
 
       req.query = {
         keywords: 'Smith',
@@ -119,6 +105,7 @@ describe('Prisoner search', () => {
                   label: 'Arsonist',
                 },
               ],
+              alertsCodes: ['XA', 'XVL'],
               alertsDetails: ['XA', 'XVL'],
               assignedLivingUnitDesc: 'UNIT-1',
               assignedLivingUnitId: 1,
@@ -126,7 +113,6 @@ describe('Prisoner search', () => {
               categoryCode: 'C',
               dateOfBirth: '1990-10-12',
               firstName: 'JOHN',
-              iepLevel: 'Standard',
               lastName: 'SMITH',
               name: 'Smith, John',
               formattedName: 'John Smith',
@@ -138,6 +124,7 @@ describe('Prisoner search', () => {
               age: 30,
               agencyId: 'MDI',
               alerts: [],
+              alertsCodes: ['RSS', 'XC'],
               alertsDetails: ['RSS', 'XC'],
               assignedLivingUnitDesc: 'No cell allocated',
               assignedLivingUnitId: 2,
@@ -145,7 +132,6 @@ describe('Prisoner search', () => {
               categoryCode: 'C',
               dateOfBirth: '1989-11-12',
               firstName: 'STEVE',
-              iepLevel: 'Standard',
               lastName: 'SMITH',
               name: 'Smith, Steve',
               formattedName: 'Steve Smith',

@@ -1,17 +1,16 @@
 import { jwtDecode } from 'jwt-decode'
-import { CaseLoad } from '../api/prisonApi'
 import logger from '../../logger'
 import { forenameToInitial } from '../utils'
 import { Services } from '../services'
+import { CaseLoad } from '../data/prisonApiClient'
 
 export type User = {
   allCaseloads: CaseLoad[]
   displayName: string
   activeCaseLoad?: CaseLoad
 }
-export default ({ apis, userService }: Services) => {
-  const { prisonApi } = apis
 
+export default ({ userService }: Services) => {
   const getActiveCaseload = async (req, res) => {
     const { activeCaseLoadId, username } = req.session.userDetails
     const { allCaseloads: caseloads } = req.session
@@ -25,7 +24,7 @@ export default ({ apis, userService }: Services) => {
     if (potentialCaseLoad) {
       const firstCaseLoadId = potentialCaseLoad.caseLoadId
       logger.warn(`No active caseload set for user: ${username}: setting to ${firstCaseLoadId}`)
-      await prisonApi.setActiveCaseload(res.locals, potentialCaseLoad)
+      await userService.setActiveCaseload(res.locals.user.token, potentialCaseLoad)
 
       req.session.userDetails.activeCaseLoadId = firstCaseLoadId
 
@@ -53,8 +52,7 @@ export default ({ apis, userService }: Services) => {
     if (!req.xhr) {
       if (!req.session.userDetails) {
         const userDetails = await userService.getUser(res.locals.user.token)
-        res.locals.access_token = res.locals.user.token
-        const allCaseloads = await prisonApi.userCaseLoads(res.locals)
+        const allCaseloads = await userService.userCaseLoads(res.locals.user.token)
 
         req.session.userDetails = userDetails
         req.session.allCaseloads = allCaseloads

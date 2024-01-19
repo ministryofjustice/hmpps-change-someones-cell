@@ -4,9 +4,9 @@ import cellMovePrisonerSearch from '../controllers/cellMove/cellMovePrisonerSear
 
 const router = express.Router({ mergeParams: true })
 
-const controller = ({ systemOauthClient, prisonApi }) => {
+const controller = services => {
   router.get('/', cellMoveHomepage)
-  router.get('/prisoner-search', cellMovePrisonerSearch({ systemOauthClient, prisonApi }))
+  router.get('/prisoner-search', cellMovePrisonerSearch(services))
 
   return router
 }
