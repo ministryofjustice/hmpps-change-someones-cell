@@ -28,7 +28,7 @@ context('Cell move homepage', () => {
         .should('contain', 'Digital Prison Services')
         .should('have.attr', 'href')
         .then(href => {
-          expect(href).to.equal('https://digital-dev.prison.service.justice.gov.uk')
+          expect(href).to.equal('http://localhost:3100')
         })
     })
   })

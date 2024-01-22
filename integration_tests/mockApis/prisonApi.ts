@@ -106,10 +106,196 @@ export const stubHealth = (status = 200) =>
     },
   })
 
+export const stubInmates = ({ locationId, params, count, data = [] }) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPathPattern: `/api/locations/description/${locationId}/inmates`,
+      queryParameters: params,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+        'total-records': `${count}`,
+      },
+      jsonBody: data,
+    },
+  })
+
+export const stubOffenderFullDetails = details =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: `/api/bookings/offenderNo/.+?\\?fullInfo=true&csraSummary=true`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: details || {},
+    },
+  })
+
+export const stubMainOffence = (offence, status = 200) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/api/bookings/[0-9]+?/mainOffence',
+    },
+    response: {
+      status,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: offence || [],
+    },
+  })
+
+export const stubOffenderBasicDetails = offender =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: `/api/bookings/offenderNo/.+?\\?fullInfo=false&csraSummary=false`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: offender || {},
+    },
+  })
+
+export const stubCellAttributes = cellAttributes =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/api/reference-domains/domains/HOU_UNIT_ATT',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: cellAttributes,
+    },
+  })
+
+export const stubInmatesAtLocation = inmates =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPathPattern: '/api/locations/.+?/inmates',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: inmates || [],
+    },
+  })
+
+export const stubOffenderCellHistory = history =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPathPattern: '/api/bookings/[0-9]+?/cell-history',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: history || { content: [] },
+    },
+  })
+
+export const stubGetAlerts = ({ agencyId, alerts }) =>
+  stubFor({
+    request: {
+      method: 'POST',
+      urlPathPattern: `/api/bookings/offenderNo/${agencyId}/alerts`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: alerts || [],
+    },
+  })
+
+export const stubCsraAssessments = (offenderNumbers, assessments = []) =>
+  stubFor({
+    request: {
+      method: 'POST',
+      urlPattern: '/api/offender-assessments/csra/list',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: assessments,
+    },
+  })
+
+export const stubLocation = (locationId, locationData, status = 200) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      url: `/api/locations/${locationId}`,
+    },
+    response: {
+      status,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: locationData || {
+        locationId,
+        locationType: 'WING',
+        description: 'HB1',
+        agencyId: 'RNI',
+        currentOccupancy: 243,
+        locationPrefix: 'RNI-HB1',
+        internalLocationCode: 'HB1',
+      },
+    },
+  })
+
+export const stubCellsWithCapacity = cells =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPathPattern: '/api/agencies/.+?/cellsWithCapacity',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: cells,
+    },
+  })
+
 export default {
   stubUserCaseloads,
   stubUpdateCaseload,
   stubStaffRoles,
   stubUserLocations,
   stubHealth,
+  stubInmates,
+  stubOffenderFullDetails,
+  stubMainOffence,
+  stubOffenderBasicDetails,
+  stubCellAttributes,
+  stubInmatesAtLocation,
+  stubOffenderCellHistory,
+  stubGetAlerts,
+  stubCsraAssessments,
+  stubLocation,
+  stubCellsWithCapacity,
 }

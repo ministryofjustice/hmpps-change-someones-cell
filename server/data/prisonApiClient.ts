@@ -25,6 +25,39 @@ export interface Offender {
   legalStatus?: string
 }
 
+export interface Alert {
+  alertId: number
+  bookingId: number
+  offenderNo: string
+  alertType: string
+  alertTypeDescription: string
+  alertCode: string
+  alertCodeDescription: string
+  comment: string
+  dateCreated: string
+  dateExpires: string
+  modifiedDateTime: string
+  expired: boolean
+  active: boolean
+  addedByFirstName: string
+  addedByLastName: string
+  expiredByFirstName: string
+  expiredByLastName: string
+}
+
+export interface AssignedLivingUnit {
+  agencyId: string
+  locationId: number
+  description: string
+  agencyName: string
+}
+
+export interface OffenderDetails extends Offender {
+  alerts: Alert[]
+  assignedLivingUnit: AssignedLivingUnit
+  csraClassificationCode: string
+}
+
 export interface UserRole {
   roleCode: string
 }
@@ -74,5 +107,12 @@ export default class PrisonApiClient {
 
   userCaseLoads(token: string) {
     return PrisonApiClient.restClient(token).get<CaseLoad[]>({ path: '/api/users/me/caseLoads' })
+  }
+
+  getDetails(token: string, offenderNo: string, fullInfo = false) {
+    const fullInfoString = fullInfo ? 'true' : 'false'
+    return PrisonApiClient.restClient(token).get<OffenderDetails>({
+      path: `/api/bookings/offenderNo/${offenderNo}?fullInfo=${fullInfoString}&csraSummary=${fullInfoString}`,
+    })
   }
 }

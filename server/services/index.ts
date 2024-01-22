@@ -3,14 +3,25 @@ import UserService from './userService'
 import FeComponentsService from './feComponentsService'
 import PrisonerCellAllocationService from './prisonerCellAllocationService'
 import PrisonerDetailsService from './prisonerDetailsService'
+import LocationService from './locationService'
+import NonAssociationsService from './nonAssociationsService'
 
 export const services = () => {
-  const { applicationInfo, manageUsersApiClient, feComponentsClient, prisonApiClient, hmppsAuthClient } = dataAccess()
+  const {
+    applicationInfo,
+    manageUsersApiClient,
+    feComponentsClient,
+    prisonApiClient,
+    whereaboutsApiClient,
+    nonAssociationsApiClient,
+  } = dataAccess()
 
   const userService = new UserService(manageUsersApiClient, prisonApiClient)
   const feComponentsService = new FeComponentsService(feComponentsClient)
-  const prisonerCellAllocationService = new PrisonerCellAllocationService(prisonApiClient, hmppsAuthClient)
+  const prisonerCellAllocationService = new PrisonerCellAllocationService(prisonApiClient)
   const prisonerDetailsService = new PrisonerDetailsService(prisonApiClient)
+  const locationService = new LocationService(whereaboutsApiClient)
+  const nonAssociationsService = new NonAssociationsService(nonAssociationsApiClient)
 
   return {
     applicationInfo,
@@ -18,6 +29,8 @@ export const services = () => {
     feComponentsService,
     prisonerCellAllocationService,
     prisonerDetailsService,
+    locationService,
+    nonAssociationsService,
   }
 }
 

@@ -98,6 +98,22 @@ export default {
       },
       agent: new AgentConfig(Number(get('PRISON_API_TIMEOUT_RESPONSE', 10000))),
     },
+    nonAssociationsApi: {
+      url: get('NON_ASSOCIATIONS_API_URL', 'http://localhost:8088', requiredInProduction),
+      timeout: {
+        response: Number(get('NON_ASSOCIATIONS_API_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('NON_ASSOCIATIONS_API_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('NON_ASSOCIATIONS_API_TIMEOUT_RESPONSE', 10000))),
+    },
+    whereaboutsApi: {
+      url: get('WHEREABOUTS_API_URL', 'http://localhost:8082', requiredInProduction),
+      timeout: {
+        response: Number(get('WHEREABOUTS_API_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('WHEREABOUTS_API_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('WHEREABOUTS_API_TIMEOUT_RESPONSE', 10000))),
+    },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName: get('ENVIRONMENT_NAME', ''),

@@ -19,7 +19,7 @@ describe('User service', () => {
       userService = new UserService(manageUsersApiClient, prisonApiClient)
     })
 
-    it('Retrieves and formats user name', async () => {
+    it('retrieves and formats user name', async () => {
       manageUsersApiClient.getUser.mockResolvedValue({ name: 'john smith' } as User)
 
       const result = await userService.getUser(token)
@@ -27,10 +27,40 @@ describe('User service', () => {
       expect(result.displayName).toEqual('John Smith')
     })
 
-    it('Propagates error', async () => {
+    it('propagates error', async () => {
       manageUsersApiClient.getUser.mockRejectedValue(new Error('some error'))
 
       await expect(userService.getUser(token)).rejects.toEqual(new Error('some error'))
+    })
+  })
+
+  describe('userCaseLoads', () => {
+    beforeEach(() => {
+      manageUsersApiClient = new ManageUsersApiClient() as jest.Mocked<ManageUsersApiClient>
+      prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
+      userService = new UserService(manageUsersApiClient, prisonApiClient)
+    })
+
+    const caseLoads = [
+      {
+        caseLoadId: 'BXI',
+        description: 'Brixton (HMP)',
+        currentlyActive: true,
+      },
+    ]
+
+    it('retrieves user case loads', async () => {
+      prisonApiClient.userCaseLoads.mockResolvedValue(caseLoads)
+
+      const result = await userService.userCaseLoads(token)
+
+      expect(result).toEqual(caseLoads)
+    })
+
+    it('propagates error', async () => {
+      prisonApiClient.userCaseLoads.mockRejectedValue(new Error('some error'))
+
+      await expect(userService.userCaseLoads(token)).rejects.toEqual(new Error('some error'))
     })
   })
 })

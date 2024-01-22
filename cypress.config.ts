@@ -6,6 +6,7 @@ import components from './integration_tests/mockApis/components'
 import prisonApi from './integration_tests/mockApis/prisonApi'
 import users from './integration_tests/mockApis/users'
 import whereabouts from './integration_tests/mockApis/whereabouts'
+import nonAssociationsApi from './integration_tests/mockApis/nonAssociationsApi'
 
 export default defineConfig({
   chromeWebSecurity: false,
@@ -45,6 +46,23 @@ export default defineConfig({
         stubLocationConfig: ({ agencyId, response }) => whereabouts.stubLocationConfig({ agencyId, response }),
         stubSignInPage: auth.redirect,
         stubUserMe: ({ username, staffId, name }) => users.stubUserMe(username, staffId, name),
+        stubInmates: prisonApi.stubInmates,
+        stubOffenderFullDetails: fullDetails => Promise.all([prisonApi.stubOffenderFullDetails(fullDetails)]),
+        stubOffenderNonAssociationsLegacy: response => nonAssociationsApi.stubOffenderNonAssociationsLegacy(response),
+        stubGroups: caseload => whereabouts.stubGroups(caseload),
+        stubUserCaseLoads: caseloads => prisonApi.stubUserCaseloads(caseloads),
+        stubMainOffence: offence => prisonApi.stubMainOffence(offence),
+        stubOffenderBasicDetails: basicDetails => Promise.all([prisonApi.stubOffenderBasicDetails(basicDetails)]),
+        stubCellAttributes: prisonApi.stubCellAttributes,
+        stubInmatesAtLocation: ({ inmates }) => prisonApi.stubInmatesAtLocation(inmates),
+        stubOffenderCellHistory: ({ history }) => prisonApi.stubOffenderCellHistory(history),
+        stubGetAlerts: ({ agencyId, alerts }) => prisonApi.stubGetAlerts({ agencyId, alerts }),
+        stubCsraAssessments: ({ offenderNumbers, assessments }) =>
+          prisonApi.stubCsraAssessments(offenderNumbers, assessments),
+        stubLocation: ({ locationId, locationData }) => Promise.all([prisonApi.stubLocation(locationId, locationData)]),
+        stubCellsWithCapacity: ({ cells }) => prisonApi.stubCellsWithCapacity(cells),
+        stubCellsWithCapacityByGroupName: ({ agencyId, groupName, response }) =>
+          whereabouts.stubCellsWithCapacityByGroupName({ agencyId, groupName, response }),
       })
     },
     baseUrl: 'http://localhost:3007',
