@@ -5,14 +5,17 @@ import { Services } from '../services'
 import config from '../config'
 
 export default function getFrontendComponents({ feComponentsService }: Services): RequestHandler {
-  return async (req, res, next) => {
+  return async (_req, res, next) => {
     if (!config.apis.frontendComponents.enabled) {
       res.locals.feComponents = {}
       return next()
     }
 
     try {
-      const { header, footer } = await feComponentsService.getComponents(['header', 'footer'], res.locals.user.token)
+      const { header, footer } = await feComponentsService.getComponents(
+        ['header', 'footer'],
+        res.locals.systemClientToken,
+      )
 
       res.locals.feComponents = {
         header: header.html,

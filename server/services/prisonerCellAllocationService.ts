@@ -7,13 +7,7 @@ export default class PrisonerCellAllocationService {
     private readonly hmppsAuthClient: HmppsAuthClient,
   ) {}
 
-  async getInmates(
-    username: string,
-    locationId: string,
-    keywords: string,
-    returnAlerts?: boolean,
-  ): Promise<Offender[]> {
-    const token = await this.hmppsAuthClient.getSystemClientToken(username)
+  async getInmates(token: string, locationId: string, keywords: string, returnAlerts?: boolean): Promise<Offender[]> {
     return await this.prisonApiClient.getInmates(token, locationId, keywords, returnAlerts)
   }
 }
