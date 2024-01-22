@@ -1,8 +1,13 @@
 import { alertFlagLabels, cellMoveAlertCodes } from '../../shared/alertFlagValues'
 import { putLastNameFirst, formatLocation, formatName } from '../../utils'
 import config from '../../config'
+import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
 
-export default ({ systemOauthClient, prisonApi }) =>
+type Params = {
+  prisonerCellAllocationService: PrisonerCellAllocationService
+}
+
+export default ({ prisonerCellAllocationService }: Params) =>
   async (req, res) => {
     const {
       user: { activeCaseLoad },
@@ -23,20 +28,12 @@ export default ({ systemOauthClient, prisonApi }) =>
 
     const currentUserCaseLoad = activeCaseLoad && activeCaseLoad.caseLoadId
 
-    const systemContext = await systemOauthClient.getClientCredentialsTokens(req.session.userDetails.username)
-    const context = {
-      ...systemContext,
-      requestHeaders: {
-        'Page-Limit': '5000',
-        'Sort-Fields': 'lastName,firstName',
-        'Sort-Order': 'ASC',
-      },
-    }
-
-    const prisoners = await prisonApi.getInmates(context, currentUserCaseLoad, {
+    const prisoners = await prisonerCellAllocationService.getInmates(
+      req.user.username,
+      currentUserCaseLoad,
       keywords,
-      returnAlerts: 'true',
-    })
+      true,
+    )
 
     const results =
       prisoners &&

@@ -19,13 +19,6 @@ import getFrontendComponents from './middleware/getFeComponents'
 
 import routes from './routes'
 import type { Services } from './services'
-import {
-  clientCredsSetup,
-  enableLogDebugStatements,
-  getSystemOauthApiClient,
-  getTokenStore,
-} from './api/systemOauthClient'
-import config from './config'
 import setupApiRoutes from './setupApiRoutes'
 
 export default function createApp(services: Services): express.Application {
@@ -36,7 +29,6 @@ export default function createApp(services: Services): express.Application {
   app.set('port', process.env.PORT || 3000)
 
   app.use(metricsMiddleware)
-  clientCredsSetup(getTokenStore(config), getSystemOauthApiClient(config), enableLogDebugStatements(config))
   app.use(setUpHealthChecks(services.applicationInfo))
   app.use(setUpWebSecurity())
   app.use(setUpWebSession())
@@ -48,7 +40,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpCsrf())
   app.use(setUpCurrentUser(services))
   app.get('*', getFrontendComponents(services))
-  app.use(setupApiRoutes({ prisonApi: services.apis.prisonApi }))
+  app.use(setupApiRoutes(services))
 
   app.use(routes(services))
 

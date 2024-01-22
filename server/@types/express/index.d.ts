@@ -1,4 +1,4 @@
-import { CaseLoad } from '../../api/prisonApi'
+import { CaseLoad } from '../../data/prisonApiClient'
 import type { UserDetails } from '../../services/userService'
 
 export default {}

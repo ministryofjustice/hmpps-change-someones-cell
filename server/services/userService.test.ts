@@ -1,18 +1,22 @@
 import UserService from './userService'
 import ManageUsersApiClient, { type User } from '../data/manageUsersApiClient'
+import { PrisonApiClient } from '../data'
 
 jest.mock('../data/manageUsersApiClient')
+jest.mock('../data/prisonApiClient')
 
 const token = 'some token'
 
 describe('User service', () => {
   let manageUsersApiClient: jest.Mocked<ManageUsersApiClient>
+  let prisonApiClient: jest.Mocked<PrisonApiClient>
   let userService: UserService
 
   describe('getUser', () => {
     beforeEach(() => {
       manageUsersApiClient = new ManageUsersApiClient() as jest.Mocked<ManageUsersApiClient>
-      userService = new UserService(manageUsersApiClient)
+      prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
+      userService = new UserService(manageUsersApiClient, prisonApiClient)
     })
 
     it('Retrieves and formats user name', async () => {

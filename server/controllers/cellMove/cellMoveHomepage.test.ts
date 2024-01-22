@@ -1,4 +1,4 @@
-import cellMoveHomepageController from '../controllers/cellMove/cellMoveHomepage'
+import cellMoveHomepageController from './cellMoveHomepage'
 
 describe('Homepage', () => {
   const req: any = {}

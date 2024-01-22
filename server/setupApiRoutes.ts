@@ -1,11 +1,16 @@
 import express from 'express'
 
 import { imageFactory } from './controllers/images'
+import PrisonerDetailsService from './services/prisonerDetailsService'
 
 const router = express.Router()
 
-export const setup = ({ prisonApi }) => {
-  router.get('/app/images/:offenderNo/data', imageFactory(prisonApi).prisonerImage)
+type Params = {
+  prisonerDetailsService: PrisonerDetailsService
+}
+
+export const setup = ({ prisonerDetailsService }: Params) => {
+  router.get('/app/images/:offenderNo/data', imageFactory(prisonerDetailsService).prisonerImage)
 
   return router
 }

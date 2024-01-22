@@ -7,7 +7,7 @@ import changeSomeonesCellRouter from './changeSomeonesCellRouter'
 export default function routes(services: Services): Router {
   const router = Router()
 
-  router.use('/', changeSomeonesCellRouter(services.apis))
+  router.use('/', changeSomeonesCellRouter(services))
 
   return router
 }
