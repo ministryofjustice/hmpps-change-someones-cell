@@ -29,7 +29,7 @@ export default ({ prisonerCellAllocationService }: Params) =>
     const currentUserCaseLoad = activeCaseLoad && activeCaseLoad.caseLoadId
 
     const prisoners = await prisonerCellAllocationService.getInmates(
-      req.user.username,
+      res.locals.systemClientToken,
       currentUserCaseLoad,
       keywords,
       true,

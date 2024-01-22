@@ -12,7 +12,7 @@ export const imageFactory = (prisonerDetailsService: PrisonerDetailsService) => 
       res.redirect(placeHolderImagePath)
     } else {
       prisonerDetailsService
-        .getImage(res.locals.user.token, imageId)
+        .getImage(res.locals.systemClientToken, imageId)
         .then(data => {
           res.type('image/jpeg')
           data.pipe(res)
@@ -37,7 +37,7 @@ export const imageFactory = (prisonerDetailsService: PrisonerDetailsService) => 
       res.redirect(placeHolderImagePath)
     } else {
       prisonerDetailsService
-        .getPrisonerImage(res.locals.user.token, offenderNo, fullSizeImage)
+        .getPrisonerImage(res.locals.systemClientToken, offenderNo, fullSizeImage)
         .then(data => {
           res.set('Cache-control', 'private, max-age=86400')
           res.removeHeader('pragma')

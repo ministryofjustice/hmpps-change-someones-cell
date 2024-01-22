@@ -27,6 +27,7 @@ describe('Prisoner search', () => {
         responseHeaders: {
           'total-records': 0,
         },
+        systemClientToken: 'system_client_token',
       },
       render: jest.fn(),
       redirect: jest.fn(),
@@ -47,7 +48,7 @@ describe('Prisoner search', () => {
 
       await controller(req, res)
 
-      expect(prisonerCellAllocationService.getInmates).toHaveBeenCalledWith('me', 'MDI', 'Smith', true)
+      expect(prisonerCellAllocationService.getInmates).toHaveBeenCalledWith('system_client_token', 'MDI', 'Smith', true)
     })
 
     it('should render template with correct data when searched', async () => {
