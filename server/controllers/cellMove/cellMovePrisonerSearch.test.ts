@@ -5,7 +5,7 @@ import prisonerSearchController from './cellMovePrisonerSearch'
 jest.mock('../../services/prisonerCellAllocationService')
 
 describe('Prisoner search', () => {
-  const prisonerCellAllocationService = jest.mocked(new PrisonerCellAllocationService(undefined, undefined))
+  const prisonerCellAllocationService = jest.mocked(new PrisonerCellAllocationService(undefined))
 
   let req
   let res
@@ -15,7 +15,7 @@ describe('Prisoner search', () => {
     req = {
       protocol: 'http',
       get: jest.fn().mockReturnValue('localhost'),
-      baseUrl: '/change-someones-cell/prisoner-search',
+      baseUrl: '/prisoner-search',
       query: {},
       body: {},
       session: { userDetails: { username: 'me' } },

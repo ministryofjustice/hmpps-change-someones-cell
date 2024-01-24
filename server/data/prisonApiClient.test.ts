@@ -98,4 +98,18 @@ describe('prisonApiClient', () => {
       expect(output).toEqual(response)
     })
   })
+
+  describe('getDetails', () => {
+    it('should return data from api', async () => {
+      const response = { data: 'data' }
+
+      fakePrisonApiClient
+        .get('/api/bookings/offenderNo/A1234?fullInfo=true&csraSummary=true')
+        .matchHeader('authorization', `Bearer ${accessToken}`)
+        .reply(200, response)
+
+      const output = await prisonApiClient.getDetails(accessToken, 'A1234', true)
+      expect(output).toEqual(response)
+    })
+  })
 })

@@ -10,4 +10,8 @@ export default class PrisonerDetailsService {
   async getPrisonerImage(token: string, offenderNo: string, fullSizeImage = false) {
     return this.prisonApiClient.getPrisonerImage(token, offenderNo, fullSizeImage)
   }
+
+  async getDetails(token: string, offenderNo: string, fullInfo: boolean) {
+    return this.prisonApiClient.getDetails(token, offenderNo, fullInfo)
+  }
 }

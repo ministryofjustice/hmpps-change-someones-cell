@@ -1,4 +1,4 @@
-import { HmppsAuthClient, PrisonApiClient } from '../data'
+import { PrisonApiClient } from '../data'
 import { Offender } from '../data/prisonApiClient'
 import PrisonerCellAllocationService from './prisonerCellAllocationService'
 
@@ -8,15 +8,13 @@ jest.mock('../data/prisonApiClient')
 const token = 'some token'
 
 describe('Prisoner cell allocation service', () => {
-  let hmppsAuthClient: jest.Mocked<HmppsAuthClient>
   let prisonApiClient: jest.Mocked<PrisonApiClient>
   let prisonerCellAllocationService: PrisonerCellAllocationService
 
   describe('getInmates', () => {
     beforeEach(() => {
-      hmppsAuthClient = new HmppsAuthClient(undefined) as jest.Mocked<HmppsAuthClient>
       prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
-      prisonerCellAllocationService = new PrisonerCellAllocationService(prisonApiClient, hmppsAuthClient)
+      prisonerCellAllocationService = new PrisonerCellAllocationService(prisonApiClient)
     })
 
     const offenders: Offender[] = [

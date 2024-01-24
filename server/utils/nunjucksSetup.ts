@@ -45,6 +45,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('initialiseName', initialiseName)
 
   njkEnv.addGlobal('dpsUrl', config.dpsUrl)
+  njkEnv.addGlobal('prisonerProfileUrl', config.prisonerProfileUrl)
 
   njkEnv.addFilter('findError', (array, formFieldId) => {
     if (!array) return null

@@ -16,6 +16,8 @@ import { createRedisClient } from './redisClient'
 import TokenStore from './tokenStore'
 import FeComponentsClient from './feComponentsClient'
 import PrisonApiClient from './prisonApiClient'
+import WhereaboutsApiClient from './whereaboutsApiClient'
+import NonAssociationsApiClient from './nonAssociationsApiClient'
 
 type RestClientBuilder<T> = (token: string) => T
 
@@ -25,8 +27,17 @@ export const dataAccess = () => ({
   manageUsersApiClient: new ManageUsersApiClient(),
   feComponentsClient: new FeComponentsClient(),
   prisonApiClient: new PrisonApiClient(),
+  whereaboutsApiClient: new WhereaboutsApiClient(),
+  nonAssociationsApiClient: new NonAssociationsApiClient(),
 })
 
 export type DataAccess = ReturnType<typeof dataAccess>
 
-export { HmppsAuthClient, RestClientBuilder, ManageUsersApiClient, PrisonApiClient }
+export {
+  HmppsAuthClient,
+  RestClientBuilder,
+  ManageUsersApiClient,
+  PrisonApiClient,
+  WhereaboutsApiClient,
+  NonAssociationsApiClient,
+}
