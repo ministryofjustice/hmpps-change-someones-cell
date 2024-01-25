@@ -50,6 +50,16 @@ export const putLastNameFirst = (firstName: string, lastName: string): string =>
   return `${properCaseName(lastName)}, ${properCaseName(firstName)}`
 }
 
+export const hasLength = (array: unknown[]): boolean => array && array.length > 0
+
+export const groupBy = (array: any[], key: string): Record<string, unknown> =>
+  array &&
+  array.reduce((acc, current) => {
+    const group = current[key]
+
+    return { ...acc, [group]: [...(acc[group] || []), current] }
+  }, {})
+
 export default {
   arrayToQueryString,
   capitalize,
@@ -60,4 +70,6 @@ export default {
   mapToQueryString,
   properCaseName,
   putLastNameFirst,
+  hasLength,
+  groupBy,
 }

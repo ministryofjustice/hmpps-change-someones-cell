@@ -281,6 +281,21 @@ export const stubCellsWithCapacity = cells =>
     },
   })
 
+export const stubSpecificOffenderFullDetails = details =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: `/api/bookings/offenderNo/${details.offenderNo}\\?fullInfo=true&csraSummary=true`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: details || {},
+    },
+  })
+
 export default {
   stubUserCaseloads,
   stubUpdateCaseload,
@@ -298,4 +313,5 @@ export default {
   stubCsraAssessments,
   stubLocation,
   stubCellsWithCapacity,
+  stubSpecificOffenderFullDetails,
 }

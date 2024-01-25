@@ -5,7 +5,7 @@ import prisonerSearchController from './cellMovePrisonerSearch'
 jest.mock('../../services/prisonerCellAllocationService')
 
 describe('Prisoner search', () => {
-  const prisonerCellAllocationService = jest.mocked(new PrisonerCellAllocationService(undefined))
+  const prisonerCellAllocationService = jest.mocked(new PrisonerCellAllocationService(undefined, undefined))
 
   let req
   let res
@@ -102,7 +102,7 @@ describe('Prisoner search', () => {
                 {
                   alertCodes: ['XA'],
                   classes: 'alert-status alert-status--arsonist',
-                  img: '/images/Arsonist_icon.png',
+                  img: '/assets/images/Arsonist_icon.png',
                   label: 'Arsonist',
                 },
               ],

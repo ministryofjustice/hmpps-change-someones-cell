@@ -14,13 +14,13 @@ export const alertFlagLabels = [
     alertCodes: ['XA'],
     classes: 'alert-status alert-status--arsonist',
     label: 'Arsonist',
-    img: '/images/Arsonist_icon.png',
+    img: '/assets/images/Arsonist_icon.png',
   },
   {
     alertCodes: ['PEEP'],
     classes: 'alert-status alert-status--disability',
     label: 'PEEP',
-    img: '/images/Disability_icon.png',
+    img: '/assets/images/Disability_icon.png',
   },
   { alertCodes: ['XEL'], classes: 'alert-status alert-status--elist', label: 'E-list' },
   {
@@ -33,7 +33,7 @@ export const alertFlagLabels = [
     alertCodes: ['XCO'],
     classes: 'alert-status alert-status--corruptor',
     label: 'Corruptor',
-    img: '/images/CU_icon.png',
+    img: '/assets/images/CU_icon.png',
   },
   {
     alertCodes: ['XCA'],

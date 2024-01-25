@@ -63,6 +63,7 @@ export default defineConfig({
         stubCellsWithCapacity: ({ cells }) => prisonApi.stubCellsWithCapacity(cells),
         stubCellsWithCapacityByGroupName: ({ agencyId, groupName, response }) =>
           whereabouts.stubCellsWithCapacityByGroupName({ agencyId, groupName, response }),
+        stubSpecificOffenderFullDetails: prisonApi.stubSpecificOffenderFullDetails,
       })
     },
     baseUrl: 'http://localhost:3007',

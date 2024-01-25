@@ -18,9 +18,9 @@ export const services = () => {
 
   const userService = new UserService(manageUsersApiClient, prisonApiClient)
   const feComponentsService = new FeComponentsService(feComponentsClient)
-  const prisonerCellAllocationService = new PrisonerCellAllocationService(prisonApiClient)
+  const prisonerCellAllocationService = new PrisonerCellAllocationService(prisonApiClient, whereaboutsApiClient)
   const prisonerDetailsService = new PrisonerDetailsService(prisonApiClient)
-  const locationService = new LocationService(whereaboutsApiClient)
+  const locationService = new LocationService(prisonApiClient, whereaboutsApiClient)
   const nonAssociationsService = new NonAssociationsService(nonAssociationsApiClient)
 
   return {

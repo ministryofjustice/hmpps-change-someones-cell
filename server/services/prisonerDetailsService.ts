@@ -14,4 +14,12 @@ export default class PrisonerDetailsService {
   async getDetails(token: string, offenderNo: string, fullInfo: boolean) {
     return this.prisonApiClient.getDetails(token, offenderNo, fullInfo)
   }
+
+  async getAlerts(token: string, agencyId: string, offenderNumbers: string[]) {
+    return this.prisonApiClient.getAlerts(token, agencyId, offenderNumbers)
+  }
+
+  async getCsraAssessments(token: string, offenderNumbers: string[]) {
+    return this.prisonApiClient.getCsraAssessments(token, offenderNumbers)
+  }
 }
