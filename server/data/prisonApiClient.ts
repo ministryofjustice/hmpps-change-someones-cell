@@ -68,11 +68,57 @@ export interface CaseLoad extends Record<string, unknown> {
   currentlyActive: boolean
 }
 
+export interface Assessment {
+  bookingId: number
+  offenderNo: string
+  classificationCode: string
+  classification: string
+  assessmentCode: string
+  assessmentDescription: string
+  cellSharingAlertFlag: boolean
+  assessmentDate: string
+  nextReviewDate: string
+  approvalDate: string
+  assessmentAgencyId: string
+  assessmentStatus: string
+  assessmentSeq: number
+  assessmentComment: string
+  assessorId: number
+  assessorUser: string
+}
+
+export interface Location {
+  locationId: number
+  locationType: string
+  description: string
+  locationUsage: string
+  agencyId: string
+  parentLocationId: number
+  currentOccupancy: number
+  locationPrefix: string
+  operationalCapacity: number
+  userDescription: string
+  internalLocationCode: string
+  subLocations: boolean
+}
+
+export interface OffenderCell {
+  id: number
+  description: string
+  userDescription?: string
+  capacity: number
+  noOfOccupants: number
+  attributes: {
+    code: string
+    description: string
+  }[]
+}
+
 export default class PrisonApiClient {
   constructor() {}
 
-  private static restClient(token: string): RestClient {
-    return new RestClient('Prison Api Client', config.apis.prisonApi, token)
+  private static restClient(token: string, extraConfig: object = {}): RestClient {
+    return new RestClient('Prison Api Client', { ...config.apis.prisonApi, ...extraConfig }, token)
   }
 
   getInmates(token: string, locationId: string, keywords: string, returnAlerts: boolean = false): Promise<Offender[]> {
@@ -91,6 +137,12 @@ export default class PrisonApiClient {
     })
   }
 
+  getInmatesAtLocation(token: string, locationId: number): Promise<Offender[]> {
+    return PrisonApiClient.restClient(token).get<Offender[]>({
+      path: `/api/locations/${locationId}/inmates`,
+    })
+  }
+
   getImage(token: string, imageId: string) {
     return PrisonApiClient.restClient(token).stream({ path: `/api/images/${imageId}/data` })
   }
@@ -102,7 +154,7 @@ export default class PrisonApiClient {
   }
 
   setActiveCaseload(token: string, caseload: CaseLoad) {
-    return PrisonApiClient.restClient(token).put({ path: '/api/users/me/activeCaseLoad', data: caseload })
+    return PrisonApiClient.restClient(token).put<CaseLoad>({ path: '/api/users/me/activeCaseLoad', data: caseload })
   }
 
   userCaseLoads(token: string) {
@@ -113,6 +165,30 @@ export default class PrisonApiClient {
     const fullInfoString = fullInfo ? 'true' : 'false'
     return PrisonApiClient.restClient(token).get<OffenderDetails>({
       path: `/api/bookings/offenderNo/${offenderNo}?fullInfo=${fullInfoString}&csraSummary=${fullInfoString}`,
+    })
+  }
+
+  getAlerts(token: string, agencyId: string, offenderNumbers: string[]) {
+    return PrisonApiClient.restClient(token).post<Alert[]>({
+      path: `/api/bookings/offenderNo/${agencyId}/alerts`,
+      data: offenderNumbers,
+    })
+  }
+
+  getCsraAssessments(token: string, offenderNumbers: string[]) {
+    return PrisonApiClient.restClient(token).post<Assessment[]>({
+      path: '/api/offender-assessments/csra/list',
+      data: offenderNumbers,
+    })
+  }
+
+  getLocation(token: string, livingUnitId: number) {
+    return PrisonApiClient.restClient(token).get<Location>({ path: `/api/locations/${livingUnitId}` })
+  }
+
+  getCellsWithCapacity(token: string, agencyId: string) {
+    return PrisonApiClient.restClient(token, { timeout: { deadline: 30000 } }).get<OffenderCell[]>({
+      path: `/api/agencies/${agencyId}/cellsWithCapacity`,
     })
   }
 }

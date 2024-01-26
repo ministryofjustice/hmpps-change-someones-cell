@@ -57,4 +57,30 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
     }
     return null
   })
+
+  njkEnv.addFilter(
+    'setSelected',
+    (items, selected) =>
+      items &&
+      items.map(entry => ({
+        ...entry,
+        selected: entry && entry.value === selected,
+      })),
+  )
+
+  njkEnv.addFilter('addDefaultSelectedValue', (items, text, show) => {
+    if (!items) return null
+    const attributes: { hidden?: string } = {}
+    if (!show) attributes.hidden = ''
+
+    return [
+      {
+        text,
+        value: '',
+        selected: true,
+        attributes,
+      },
+      ...items,
+    ]
+  })
 }
