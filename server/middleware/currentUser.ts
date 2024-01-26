@@ -49,30 +49,28 @@ export default ({ userService }: Services) => {
   }
 
   return async (req, res, next) => {
-    if (!req.xhr) {
-      if (!req.session.userDetails) {
-        const userDetails = await userService.getUser(res.locals.user.token)
-        const allCaseloads = await userService.userCaseLoads(res.locals.user.token)
+    if (!req.session.userDetails) {
+      const userDetails = await userService.getUser(res.locals.user.token)
+      const allCaseloads = await userService.userCaseLoads(res.locals.user.token)
 
-        req.session.userDetails = userDetails
-        req.session.allCaseloads = allCaseloads
-      }
-
-      const userRoles = await getUserRoles(req, res)
-      const activeCaseLoad = await getActiveCaseload(req, res)
-
-      const user: User = {
-        ...res.locals.user,
-        username: req.session.userDetails.username,
-        userRoles,
-        allCaseloads: req.session.allCaseloads,
-        displayName: forenameToInitial(req.session.userDetails.name),
-        activeCaseLoad,
-        backLink: req.session.userBackLink,
-      }
-
-      res.locals.user = user
+      req.session.userDetails = userDetails
+      req.session.allCaseloads = allCaseloads
     }
+
+    const userRoles = await getUserRoles(req, res)
+    const activeCaseLoad = await getActiveCaseload(req, res)
+
+    const user: User = {
+      ...res.locals.user,
+      username: req.session.userDetails.username,
+      userRoles,
+      allCaseloads: req.session.allCaseloads,
+      displayName: forenameToInitial(req.session.userDetails.name),
+      activeCaseLoad,
+      backLink: req.session.userBackLink,
+    }
+
+    res.locals.user = user
 
     next()
   }

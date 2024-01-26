@@ -186,13 +186,13 @@
 {% endblock %}
 
 {% block pageScripts %}
-  <script src="/static/js/selectCell.js"></script>
+  <script src="/assets/js/selectCell.js"></script>
 {% endblock %}
 
 {% block bodyEnd %}
   {{ super() }}
   <script src="/assets/moj/components/sortable-table/sortable-table.js"></script>
-  <script>
+  <script nonce="{{ cspNonce }}">
   new MOJFrontend.SortableTable({
     table: $('table')[0],
   })
