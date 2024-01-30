@@ -36,7 +36,7 @@ export interface Alert {
   comment: string
   dateCreated: string
   dateExpires: string
-  modifiedDateTime: string
+  modifiedDateTime?: string
   expired: boolean
   active: boolean
   addedByFirstName: string
@@ -52,10 +52,19 @@ export interface AssignedLivingUnit {
   agencyName: string
 }
 
+export interface ProfileInformation {
+  type?: string
+  question?: string
+  resultValue?: string
+}
+
 export interface OffenderDetails extends Offender {
   alerts: Alert[]
   assignedLivingUnit: AssignedLivingUnit
   csraClassificationCode: string
+  profileInformation?: ProfileInformation[]
+  csra?: string
+  assessments: Assessment[]
 }
 
 export interface UserRole {

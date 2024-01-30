@@ -64,6 +64,8 @@ export default defineConfig({
         stubCellsWithCapacityByGroupName: ({ agencyId, groupName, response }) =>
           whereabouts.stubCellsWithCapacityByGroupName({ agencyId, groupName, response }),
         stubSpecificOffenderFullDetails: prisonApi.stubSpecificOffenderFullDetails,
+        stubPrisonerFullDetail: ({ prisonerDetail, offenderNo, fullInfo }) =>
+          prisonApi.stubPrisonerFullDetail(prisonerDetail, offenderNo, fullInfo),
       })
     },
     baseUrl: 'http://localhost:3007',

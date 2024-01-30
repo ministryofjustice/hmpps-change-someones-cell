@@ -182,6 +182,7 @@ describe('Cell move utils', () => {
       categoryCode: 'C',
       alertsDetails: ['XA', 'XVL'],
       alertsCodes: ['XA', 'XVL'],
+      assessments: [],
     })
   })
 

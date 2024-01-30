@@ -180,7 +180,7 @@ describe('select location', () => {
     const error = new Error('Network error')
     prisonerDetailsService.getDetails.mockImplementation(() => Promise.reject(error))
 
-    await expect(controller(req, res)).rejects.toThrowError(error)
+    await expect(controller(req, res)).rejects.toThrow(error)
 
     expect(res.locals.homeUrl).toBe(`http://localhost:3000/prisoner/${offenderNo}`)
   })

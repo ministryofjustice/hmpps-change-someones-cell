@@ -60,16 +60,30 @@ export const groupBy = (array: any[], key: string): Record<string, unknown> =>
     return { ...acc, [group]: [...(acc[group] || []), current] }
   }, {})
 
+export const indefiniteArticle = (string: string): string =>
+  ['a', 'e', 'i', 'o', 'u'].some(vowel => string.toLowerCase().startsWith(vowel)) ? 'an' : 'a'
+
+export const createStringFromList = (array: unknown[]): unknown => {
+  if (array.length > 1) {
+    const lastItem = array.pop()
+    return `${array.join(', ')} and ${lastItem}`
+  }
+
+  return array[0]
+}
+
 export default {
   arrayToQueryString,
   capitalize,
+  createStringFromList,
   forenameToInitial,
   formatLocation,
   formatName,
+  groupBy,
+  hasLength,
+  indefiniteArticle,
   isBlank,
   mapToQueryString,
   properCaseName,
   putLastNameFirst,
-  hasLength,
-  groupBy,
 }

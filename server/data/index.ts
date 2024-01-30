@@ -18,6 +18,7 @@ import FeComponentsClient from './feComponentsClient'
 import PrisonApiClient from './prisonApiClient'
 import WhereaboutsApiClient from './whereaboutsApiClient'
 import NonAssociationsApiClient from './nonAssociationsApiClient'
+import GoogleAnalyticsClient from './googleAnalyticsClient'
 
 type RestClientBuilder<T> = (token: string) => T
 
@@ -29,6 +30,7 @@ export const dataAccess = () => ({
   prisonApiClient: new PrisonApiClient(),
   whereaboutsApiClient: new WhereaboutsApiClient(),
   nonAssociationsApiClient: new NonAssociationsApiClient(),
+  googleAnalyticsClient: new GoogleAnalyticsClient(),
 })
 
 export type DataAccess = ReturnType<typeof dataAccess>
@@ -40,4 +42,5 @@ export {
   PrisonApiClient,
   WhereaboutsApiClient,
   NonAssociationsApiClient,
+  GoogleAnalyticsClient,
 }
