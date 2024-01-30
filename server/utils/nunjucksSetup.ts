@@ -46,6 +46,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
 
   njkEnv.addGlobal('dpsUrl', config.dpsUrl)
   njkEnv.addGlobal('prisonerProfileUrl', config.prisonerProfileUrl)
+  njkEnv.addGlobal('googleAnalyticsMeasurementId', config.googleAnalytics.measurementId)
 
   njkEnv.addFilter('findError', (array, formFieldId) => {
     if (!array) return null
@@ -83,4 +84,20 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
       ...items,
     ]
   })
+
+  njkEnv.addFilter(
+    'removePaddingBottom',
+    items =>
+      items &&
+      items.map(entry => ({
+        key: {
+          ...entry.key,
+          classes: `${entry.key.classes} govuk-!-padding-bottom-0`,
+        },
+        value: {
+          ...entry.value,
+          classes: `${entry.value.classes} govuk-!-padding-bottom-0`,
+        },
+      })),
+  )
 }
