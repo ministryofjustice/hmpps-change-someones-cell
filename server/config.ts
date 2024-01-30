@@ -119,4 +119,11 @@ export default {
   environmentName: get('ENVIRONMENT_NAME', ''),
   dpsUrl: get('DPS_URL', 'http://localhost:3000', requiredInProduction),
   prisonerProfileUrl: get('PRISONER_PROFILE_URL', 'http://localhost:3000', requiredInProduction),
+  googleAnalytics: {
+    measurementId: get('GOOGLE_ANALYTICS_MEASUREMENT_ID', ''),
+    measurementApi: {
+      secret: get('GOOGLE_ANALYTICS_MEASUREMENT_API_SECRET', ''),
+      url: 'https://www.google-analytics.com',
+    },
+  },
 }

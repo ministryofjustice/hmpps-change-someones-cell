@@ -296,6 +296,21 @@ export const stubSpecificOffenderFullDetails = details =>
     },
   })
 
+export const stubPrisonerFullDetail = (prisonerDetail, offenderNo, fullInfo = true) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      url: `/api/bookings/offenderNo/${offenderNo}?fullInfo=${fullInfo}&csraSummary=${fullInfo}`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: prisonerDetail || {},
+    },
+  })
+
 export default {
   stubUserCaseloads,
   stubUpdateCaseload,
@@ -314,4 +329,5 @@ export default {
   stubLocation,
   stubCellsWithCapacity,
   stubSpecificOffenderFullDetails,
+  stubPrisonerFullDetail,
 }

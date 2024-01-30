@@ -70,6 +70,7 @@ describe('Prisoner details service', () => {
       categoryCode: 'C',
       alertsDetails: ['XA', 'XVL'],
       alertsCodes: ['XA', 'XVL'],
+      assessments: [],
     }
 
     it('retrieves prisoner details', async () => {

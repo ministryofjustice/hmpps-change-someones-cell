@@ -7,6 +7,31 @@ const offenderFullDetails = require('../mockApis/responses/offenderFullDetails.j
 
 const offenderNo = 'A12345'
 
+const locationsResponse = [
+  {
+    attributes: [
+      { description: 'Special Cell', code: 'SPC' },
+      { description: 'Gated Cell', code: 'GC' },
+    ],
+    capacity: 2,
+    description: 'LEI-1-2',
+    id: 1,
+    noOfOccupants: 2,
+    userDescription: 'LEI-1-1',
+  },
+  {
+    attributes: [
+      { code: 'LC', description: 'Listener Cell' },
+      { description: 'Gated Cell', code: 'GC' },
+    ],
+    capacity: 3,
+    description: 'LEI-1-1',
+    id: 1,
+    noOfOccupants: 2,
+    userDescription: 'LEI-1-1',
+  },
+]
+
 context('A user can search for a cell', () => {
   before(() => {
     cy.clearCookies()
@@ -17,9 +42,18 @@ context('A user can search for a cell', () => {
   })
   beforeEach(() => {
     cy.task('stubOffenderFullDetails', offenderFullDetails)
-    cy.task('stubOffenderNonAssociationsLegacy', {})
+    cy.task('stubOffenderNonAssociationsLegacy', {
+      agencyDescription: 'HMP Moorland',
+      offenderNo: 'G3878UK',
+      nonAssociations: [],
+    })
     cy.task('stubGroups', { id: 'MDI' })
     cy.task('stubUserCaseLoads')
+    cy.task('stubCellsWithCapacity', { cells: locationsResponse })
+    cy.task('stubCellsWithCapacityByGroupName', { agencyId: 'MDI', groupName: 1, response: locationsResponse })
+    cy.task('stubLocation', { locationId: 1, locationData: { parentLocationId: 2, description: 'MDI-1-1' } })
+    cy.task('stubLocation', { locationId: 2, locationData: { parentLocationId: 3 } })
+    cy.task('stubLocation', { locationId: 3, locationData: { locationPrefix: 'MDI-1' } })
   })
 
   it('Shows the correct data for no non-associations and no csra comment', () => {
@@ -124,7 +158,7 @@ context('A user can search for a cell', () => {
     })
   })
 
-  it.skip('Passes the correct data to the select a cell page', () => {
+  it('Passes the correct data to the select a cell page', () => {
     cy.visit(`/prisoner/${offenderNo}/cell-move/search-for-cell`)
     const page = SearchForCellPage.verifyOnPage()
     const form = page.form()

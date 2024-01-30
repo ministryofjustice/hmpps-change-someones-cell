@@ -24,6 +24,7 @@ export default function setUpWebSecurity(): Router {
   const styleSrc = ["'self'", (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`]
   const fontSrc = ["'self'", 'data:']
   const imgSrc = ["'self'", 'data:']
+  const connectSrc = ["'self'"]
   const formAction = [`'self' ${config.apis.hmppsAuth.externalUrl}`]
 
   if (config.apis.frontendComponents.url) {
@@ -31,6 +32,12 @@ export default function setUpWebSecurity(): Router {
     styleSrc.push(config.apis.frontendComponents.url)
     imgSrc.push(config.apis.frontendComponents.url)
     fontSrc.push(config.apis.frontendComponents.url)
+  }
+
+  if (config.googleAnalytics.measurementId) {
+    const gaHosts = ['*.googletagmanager.com', '*.google-analytics.com', '*.analytics.google.com']
+    scriptSrc.push(...gaHosts)
+    connectSrc.push(...gaHosts)
   }
 
   styleSrc.push('https://code.jquery.com/*')
@@ -44,6 +51,7 @@ export default function setUpWebSecurity(): Router {
           styleSrc,
           fontSrc,
           imgSrc,
+          connectSrc,
           formAction,
         },
       },
