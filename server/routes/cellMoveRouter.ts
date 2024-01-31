@@ -4,6 +4,7 @@ import selectCellController from '../controllers/cellMove/selectCell'
 import considerRisksController from '../controllers/cellMove/considerRisks'
 import confirmCellMoveController from '../controllers/cellMove/confirmCellMove'
 import cellMoveConfirmationController from '../controllers/cellMove/cellMoveConfirmation'
+import spaceCreatedController from '../controllers/cellMove/spaceCreated'
 
 const router = express.Router({ mergeParams: true })
 
@@ -18,6 +19,7 @@ const controller = services => {
   router.get('/confirm-cell-move', confirmCellMoveIndex)
   router.post('/confirm-cell-move', confirmCellMovePost)
   router.get('/confirmation', cellMoveConfirmationController(services))
+  router.get('/space-created', spaceCreatedController(services))
 
   return router
 }
