@@ -1,4 +1,4 @@
-import { stubFor } from './wiremock'
+import { stubFor, verifyPosts } from './wiremock'
 
 export const stubLocationConfig = ({ agencyId, response }) =>
   stubFor({
@@ -152,9 +152,28 @@ export const stubCellsWithCapacityByGroupName = ({ agencyId, groupName, response
     },
   })
 
+export const stubMoveToCell = () =>
+  stubFor({
+    request: {
+      method: 'POST',
+      urlPath: '/whereabouts/cell/make-cell-move',
+    },
+    response: {
+      status: 201,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
+export const verifyMoveToCell = body => verifyPosts('/whereabouts/cell/make-cell-move', body)
+
 export default {
   stubLocationConfig,
   stubHealth,
   stubGroups,
   stubCellsWithCapacityByGroupName,
+  stubMoveToCell,
+  verifyMoveToCell,
 }

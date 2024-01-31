@@ -123,6 +123,19 @@ export interface OffenderCell {
   }[]
 }
 
+export interface ReferenceCode {
+  domain: string
+  code: string
+  description: string
+  parentDomain?: string
+  parentCode?: string
+  activeFlag: 'Y' | 'N'
+  listSeq?: number
+  systemDataFlag?: 'Y' | 'N'
+  expiredDate?: string
+  subCodes?: ReferenceCode[]
+}
+
 export default class PrisonApiClient {
   constructor() {}
 
@@ -198,6 +211,27 @@ export default class PrisonApiClient {
   getCellsWithCapacity(token: string, agencyId: string) {
     return PrisonApiClient.restClient(token, { timeout: { deadline: 30000 } }).get<OffenderCell[]>({
       path: `/api/agencies/${agencyId}/cellsWithCapacity`,
+    })
+  }
+
+  getCellMoveReasonTypes(token: string) {
+    const headers = { 'Page-Limit': '1000' }
+
+    return PrisonApiClient.restClient(token).get<ReferenceCode[]>({
+      path: '/api/reference-domains/domains/CHG_HOUS_RSN',
+      headers,
+    })
+  }
+
+  getAttributesForLocation(token: string, locationId: number) {
+    return PrisonApiClient.restClient(token).get<OffenderCell>({
+      path: `/api/cell/${locationId}/attributes`,
+    })
+  }
+
+  moveToCellSwap(token: string, bookingId: number) {
+    return PrisonApiClient.restClient(token).put<OffenderDetails>({
+      path: `/api/bookings/${bookingId}/move-to-cell-swap`,
     })
   }
 }

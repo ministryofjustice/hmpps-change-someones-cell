@@ -48,4 +48,26 @@ describe('whereaboutsApiClient', () => {
       expect(output).toEqual(response)
     })
   })
+
+  describe('moveToCell', () => {
+    it('should return data from api', async () => {
+      const requestData = {
+        bookingId: 300,
+        offenderNo: 'AB4000C',
+        internalLocationDescriptionDestination: 'blah',
+        cellMoveReasonCode: 'bleh',
+        commentText: 'cool',
+      }
+
+      const response = { data: 'data' }
+
+      fakeWhereaboutsApiClient
+        .post('/cell/make-cell-move', requestData)
+        .matchHeader('authorization', `Bearer ${accessToken}`)
+        .reply(200, response)
+
+      const output = await whereaboutsApiClient.moveToCell(accessToken, 300, 'AB4000C', 'blah', 'bleh', 'cool')
+      expect(output).toEqual(response)
+    })
+  })
 })

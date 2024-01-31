@@ -25,4 +25,30 @@ export default class PrisonerCellAllocationService {
     const groupName = subLocation ? `${location}_${subLocation}` : location
     return await this.whereaboutsApiClient.getCellsWithCapacity(token, agencyId, groupName)
   }
+
+  async getCellMoveReasonTypes(token: string) {
+    return await this.prisonApiClient.getCellMoveReasonTypes(token)
+  }
+
+  async moveToCell(
+    token: string,
+    bookingId: number,
+    offenderNo: string,
+    internalLocationDescriptionDestination: string,
+    cellMoveReasonCode: string,
+    commentText: string,
+  ) {
+    return await this.whereaboutsApiClient.moveToCell(
+      token,
+      bookingId,
+      offenderNo,
+      internalLocationDescriptionDestination,
+      cellMoveReasonCode,
+      commentText,
+    )
+  }
+
+  async moveToCellSwap(token: string, bookingId: number) {
+    return await this.prisonApiClient.moveToCellSwap(token, bookingId)
+  }
 }
