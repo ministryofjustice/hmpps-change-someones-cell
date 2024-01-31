@@ -184,4 +184,48 @@ describe('prisonApiClient', () => {
       expect(output).toEqual(response)
     })
   })
+
+  describe('getCellMoveReasonTypes', () => {
+    it('should return data from api', async () => {
+      const response = { data: 'data' }
+
+      fakePrisonApiClient
+        .get('/api/reference-domains/domains/CHG_HOUS_RSN')
+        .matchHeader('authorization', `Bearer ${accessToken}`)
+        .matchHeader('Page-Limit', '1000')
+        .reply(200, response)
+
+      const output = await prisonApiClient.getCellMoveReasonTypes(accessToken)
+      expect(output).toEqual(response)
+    })
+  })
+
+  describe('getAttributesForLocation', () => {
+    it('should return data from api', async () => {
+      const response = { data: 'data' }
+
+      fakePrisonApiClient
+        .get('/api/cell/123/attributes')
+        .matchHeader('authorization', `Bearer ${accessToken}`)
+        .reply(200, response)
+
+      const output = await prisonApiClient.getAttributesForLocation(accessToken, 123)
+      expect(output).toEqual(response)
+    })
+  })
+
+  describe('moveToCellSwap', () => {
+    it('should request the move to cell swap', async () => {
+      const response = { data: 'data' }
+      const bookingId = 432
+
+      fakePrisonApiClient
+        .put(`/api/bookings/${bookingId}/move-to-cell-swap`, {})
+        .matchHeader('authorization', `Bearer ${accessToken}`)
+        .reply(200, response)
+
+      const output = await prisonApiClient.moveToCellSwap(accessToken, bookingId)
+      expect(output).toEqual(response)
+    })
+  })
 })

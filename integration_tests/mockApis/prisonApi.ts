@@ -1,4 +1,4 @@
-import { stubFor } from './wiremock'
+import { stubFor, verifyPut } from './wiremock'
 
 export const stubUserCaseloads = caseloads =>
   stubFor({
@@ -311,6 +311,68 @@ export const stubPrisonerFullDetail = (prisonerDetail, offenderNo, fullInfo = tr
     },
   })
 
+export const stubBookingDetails = details =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/api/bookings/offenderNo/.+?',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: details || {},
+    },
+  })
+
+export const stubCellMoveTypes = types =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPattern: '/api/reference-domains/domains/CHG_HOUS_RSN',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: types,
+    },
+  })
+
+export const stubMoveToCellSwap = () =>
+  stubFor({
+    request: {
+      method: 'PUT',
+      urlPathPattern: '/api/bookings/[0-9]+?/move-to-cell-swap',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {},
+    },
+  })
+
+export const stubAttributesForLocation = locationAttributes =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPathPattern: '/api/cell/[0-9]+?/attributes',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: locationAttributes || {},
+    },
+  })
+
+export const verifyMoveToCellSwap = ({ bookingId }) => verifyPut(`/api/bookings/${bookingId}/move-to-cell-swap`)
+
 export default {
   stubUserCaseloads,
   stubUpdateCaseload,
@@ -330,4 +392,9 @@ export default {
   stubCellsWithCapacity,
   stubSpecificOffenderFullDetails,
   stubPrisonerFullDetail,
+  stubBookingDetails,
+  stubCellMoveTypes,
+  stubMoveToCellSwap,
+  stubAttributesForLocation,
+  verifyMoveToCellSwap,
 }

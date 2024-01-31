@@ -66,6 +66,13 @@ export default defineConfig({
         stubSpecificOffenderFullDetails: prisonApi.stubSpecificOffenderFullDetails,
         stubPrisonerFullDetail: ({ prisonerDetail, offenderNo, fullInfo }) =>
           prisonApi.stubPrisonerFullDetail(prisonerDetail, offenderNo, fullInfo),
+        stubBookingDetails: details => prisonApi.stubBookingDetails(details),
+        stubCellMoveTypes: type => prisonApi.stubCellMoveTypes(type),
+        stubMoveToCell: () => whereabouts.stubMoveToCell(),
+        stubMoveToCellSwap: () => prisonApi.stubMoveToCellSwap(),
+        stubAttributesForLocation: locationAttributes => prisonApi.stubAttributesForLocation(locationAttributes),
+        verifyMoveToCell: body => whereabouts.verifyMoveToCell(body),
+        verifyMoveToCellSwap: ({ bookingId }) => prisonApi.verifyMoveToCellSwap({ bookingId }),
       })
     },
     baseUrl: 'http://localhost:3007',

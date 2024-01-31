@@ -1,5 +1,6 @@
 import ConsiderRisksPage from '../pages/considerRisksPage'
 import SelectCellPage from '../pages/selectCellPage'
+import ConfirmCellMovePage from '../pages/confirmCellMovePage'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const offenderFullDetails = require('../mockApis/responses/offenderFullDetails.json')
@@ -368,20 +369,33 @@ context('A user can see conflicts in cell', () => {
     cy.url().should('include', '/select-cell')
   })
 
-  it.skip('should redirect to confirm cell move on continue', () => {
+  it('should redirect to confirm cell move on continue', () => {
     stubPrisonDetails()
     const page = ConsiderRisksPage.goTo(offenderNo, 1)
 
     cy.task('stubBookingDetails', { firstName: 'Bob', lastName: 'Doe' })
     cy.task('stubLocation', { locationId: 1, locationDetails: { description: 'MDI-1-1' } })
+    cy.task('stubCellMoveTypes', [
+      {
+        code: 'ADM',
+        activeFlag: 'Y',
+        description: 'Administrative',
+      },
+      {
+        code: 'BEH',
+        activeFlag: 'Y',
+        description: 'Behaviour',
+      },
+    ])
 
     page.form().confirmationYes().click()
 
     page.form().submitButton().click()
 
-    // ConfirmCellMovePage.verifyOnPage('Bob Doe', 'HB1')
+    ConfirmCellMovePage.verifyOnPage('Bob Doe', 'HB1')
   })
-  it.skip('should redirect to confirm cell when there are no warnings', () => {
+
+  it('should redirect to confirm cell when there are no warnings', () => {
     cy.task('stubInmatesAtLocation', {
       inmates: [],
     })
@@ -394,9 +408,22 @@ context('A user can see conflicts in cell', () => {
       bookingId: 1234,
     })
 
+    cy.task('stubCellMoveTypes', [
+      {
+        code: 'ADM',
+        activeFlag: 'Y',
+        description: 'Administrative',
+      },
+      {
+        code: 'BEH',
+        activeFlag: 'Y',
+        description: 'Behaviour',
+      },
+    ])
+
     cy.visit(`/prisoner/${offenderNo}/cell-move/consider-risks?cellId=1`)
 
-    // ConfirmCellMovePage.verifyOnPage('Bob Doe', 'MDI-1-1')
+    ConfirmCellMovePage.verifyOnPage('Bob Doe', 'MDI-1-1')
   })
 
   it('should not show CSRA messages and have the correct confirmation label', () => {

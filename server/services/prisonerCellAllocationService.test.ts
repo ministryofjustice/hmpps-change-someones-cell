@@ -1,5 +1,6 @@
 import { PrisonApiClient, WhereaboutsApiClient } from '../data'
-import { Offender, OffenderCell } from '../data/prisonApiClient'
+import { Offender, OffenderCell, OffenderDetails, ReferenceCode } from '../data/prisonApiClient'
+import { CellMoveResponse } from '../data/whereaboutsApiClient'
 import PrisonerCellAllocationService from './prisonerCellAllocationService'
 
 jest.mock('../data/prisonApiClient')
@@ -130,6 +131,103 @@ describe('Prisoner cell allocation service', () => {
       await expect(prisonerCellAllocationService.getCellsWithCapacity(token, 'LEI', 'ALL')).rejects.toEqual(
         new Error('some error'),
       )
+    })
+  })
+
+  describe('getCellMoveReasonTypes', () => {
+    const reasonCodes: ReferenceCode[] = [
+      {
+        domain: 'CHG_HOUS_RSN',
+        code: 'ADM',
+        description: 'Administrative',
+        activeFlag: 'N',
+        listSeq: 1,
+        systemDataFlag: 'N',
+        subCodes: [],
+      },
+    ]
+
+    it('Retrieves cell move reasons reference data', async () => {
+      prisonApiClient.getCellMoveReasonTypes.mockResolvedValue(reasonCodes)
+
+      const result = await prisonerCellAllocationService.getCellMoveReasonTypes(token)
+
+      expect(result).toEqual(reasonCodes)
+    })
+
+    it('Propagates error', async () => {
+      prisonApiClient.getCellMoveReasonTypes.mockRejectedValue(new Error('some error'))
+
+      await expect(prisonerCellAllocationService.getCellMoveReasonTypes(token)).rejects.toEqual(new Error('some error'))
+    })
+  })
+
+  describe('moveToCell', () => {
+    const cellMoveResponse: CellMoveResponse = {
+      cellMoveResult: {
+        bookingId: 300,
+        agencyId: 'BXI',
+        assignedLivingUnitId: 400,
+        assignedLivingUnitDesc: '1-1-400',
+        bedAssignmentHistorySequence: 0,
+        caseNoteId: 0,
+      },
+    }
+
+    it('performs cell move via Whereabouts API', async () => {
+      whereaboutsApiClient.moveToCell.mockResolvedValue(cellMoveResponse)
+      const result = await prisonerCellAllocationService.moveToCell(token, 300, 'AB1000C', '1-1-400', 'blah', 'yup')
+
+      expect(whereaboutsApiClient.moveToCell).toHaveBeenCalledWith(token, 300, 'AB1000C', '1-1-400', 'blah', 'yup')
+      expect(result).toEqual(cellMoveResponse)
+    })
+
+    it('propagates error', async () => {
+      whereaboutsApiClient.moveToCell.mockRejectedValue(new Error('some error'))
+
+      await expect(
+        prisonerCellAllocationService.moveToCell(token, 300, 'AB1000C', '1-1-400', 'blah', 'yup'),
+      ).rejects.toEqual(new Error('some error'))
+    })
+  })
+
+  describe('moveToCellSwap', () => {
+    const details: OffenderDetails = {
+      bookingId: 1234,
+      offenderNo: 'A1234',
+      firstName: 'Test',
+      lastName: 'User',
+      csraClassificationCode: 'HI',
+      agencyId: 'MDI',
+      assignedLivingUnit: {
+        agencyId: 'BXI',
+        locationId: 5432,
+        description: '1-1-001',
+        agencyName: 'Brixton (HMP)',
+      },
+      alerts: [],
+      dateOfBirth: '1990-10-12',
+      age: 29,
+      assignedLivingUnitId: 5432,
+      assignedLivingUnitDesc: '1-1-001',
+      categoryCode: 'C',
+      alertsDetails: ['XA', 'XVL'],
+      alertsCodes: ['XA', 'XVL'],
+      assessments: [],
+    }
+
+    it('performs cell move via Prison API', async () => {
+      prisonApiClient.moveToCellSwap.mockResolvedValue(details)
+      const result = await prisonerCellAllocationService.moveToCellSwap(token, 1234)
+
+      expect(prisonApiClient.moveToCellSwap).toHaveBeenCalledWith(token, 1234)
+      expect(result).toEqual(details)
+    })
+
+    it('propagates error', async () => {
+      prisonApiClient.moveToCellSwap.mockRejectedValue(new Error('some error'))
+
+      await expect(prisonerCellAllocationService.moveToCellSwap(token, 1234)).rejects.toEqual(new Error('some error'))
     })
   })
 })
