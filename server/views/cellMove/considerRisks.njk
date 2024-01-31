@@ -10,7 +10,8 @@
 {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
 {%- from "moj/components/banner/macro.njk" import mojBanner -%}
 
-{% set title = "You must consider the risks of the prisoners involved" %}
+{% set pageTitle = applicationName + ' - You must consider the risks of the prisoners involved' %}
+{% set title = 'You must consider the risks of the prisoners involved' %}
 
 {% macro alertDetails(alert) %}
   <p class="govuk-body" data-test="alert-comment">{{ alert.comment or "No details entered" | safe }}</p>
