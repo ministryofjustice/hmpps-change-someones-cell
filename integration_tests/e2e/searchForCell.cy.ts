@@ -249,7 +249,7 @@ context('A user can search for a cell', () => {
       })
     })
 
-    context.skip('When the user clicked back from the select cell page', () => {
+    context('When the user clicked back from the select cell page', () => {
       const response = [
         {
           attributes: [
