@@ -48,7 +48,9 @@
 
 {% endblock %}
 
-{% block pageTitle %}{{pageTitle | default(applicationName)}}{% endblock %}
+{% block pageTitle %}
+  {{pageTitle | default(applicationName + ' - ' + title if title else applicationName)}}
+{% endblock %}
 
 {% block bodyStart %}
 {% endblock %}
