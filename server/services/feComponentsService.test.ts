@@ -1,5 +1,5 @@
 import FeComponentsService from './feComponentsService'
-import FeComponentsClient, { AvailableComponent, Component } from '../data/feComponentsClient'
+import FeComponentsClient, { FeComponentsResponse } from '../data/feComponentsClient'
 
 jest.mock('../data/feComponentsClient')
 
@@ -16,7 +16,15 @@ describe('Components service', () => {
     })
 
     it('Retrieves and returns requested component', async () => {
-      const componentValue: Record<AvailableComponent, Component> = {
+      const caseLoad = {
+        caseLoadId: 'LEI',
+        description: 'Leeds (HMP)',
+        type: 'INST',
+        caseloadFunction: 'GENERAL',
+        currentlyActive: true,
+      }
+
+      const componentValue: FeComponentsResponse = {
         header: {
           html: '<header></header>',
           css: [],
@@ -26,6 +34,11 @@ describe('Components service', () => {
           html: '<footer></footer>',
           css: [],
           javascript: [],
+        },
+        meta: {
+          activeCaseLoad: caseLoad,
+          caseLoads: [caseLoad],
+          services: [],
         },
       }
 

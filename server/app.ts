@@ -41,9 +41,9 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpAuthentication())
   app.use(authorisationMiddleware(['ROLE_CELL_MOVE']))
   app.use(setUpCsrf())
+  app.get('*', getFrontendComponents(services))
   app.use(setUpCurrentUser(services))
   app.use(populateClientToken())
-  app.get('*', getFrontendComponents(services))
   app.use(setupApiRoutes(services))
 
   app.use(routes(services))

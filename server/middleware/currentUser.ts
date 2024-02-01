@@ -3,6 +3,7 @@ import logger from '../../logger'
 import { forenameToInitial } from '../utils'
 import { Services } from '../services'
 import { CaseLoad } from '../data/prisonApiClient'
+import { FeComponentsMeta } from '../data/feComponentsClient'
 
 export type User = {
   allCaseloads: CaseLoad[]
@@ -51,14 +52,24 @@ export default ({ userService }: Services) => {
   return async (req, res, next) => {
     if (!req.session.userDetails) {
       const userDetails = await userService.getUser(res.locals.user.token)
-      const allCaseloads = await userService.userCaseLoads(res.locals.user.token)
-
       req.session.userDetails = userDetails
+    }
+
+    let activeCaseLoad
+    let allCaseloads
+    const feMeta: FeComponentsMeta = res.locals.feComponents?.meta
+
+    if (feMeta) {
+      allCaseloads = feMeta.caseLoads
+      activeCaseLoad = feMeta.activeCaseLoad
       req.session.allCaseloads = allCaseloads
+    } else {
+      allCaseloads = await userService.userCaseLoads(res.locals.user.token)
+      req.session.allCaseloads = allCaseloads
+      activeCaseLoad = await getActiveCaseload(req, res)
     }
 
     const userRoles = await getUserRoles(req, res)
-    const activeCaseLoad = await getActiveCaseload(req, res)
 
     const user: User = {
       ...res.locals.user,
