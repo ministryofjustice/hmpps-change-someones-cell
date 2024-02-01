@@ -1,5 +1,6 @@
 import moment from 'moment'
 import SelectCellPage from '../pages/selectCellPage'
+import ConsiderRisksPage from '../pages/considerRisksPage'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const offenderFullDetails = require('../mockApis/responses/offenderFullDetails.json')
@@ -292,7 +293,7 @@ context('A user can select a cell', () => {
         })
       })
 
-      context.skip('When the user clicked back from the consider risks page', () => {
+      context('When the user clicked back from the consider risks page', () => {
         beforeEach(() => {
           cy.task('stubOffenderFullDetails', offenderFullDetails)
           cy.task('stubOffenderNonAssociationsLegacy', {})
@@ -313,7 +314,7 @@ context('A user can select a cell', () => {
             nonAssociations: [],
           })
 
-          // ConsiderRisksPage.goTo(offenderNo, 1)
+          ConsiderRisksPage.goTo(offenderNo, 1)
           cy.contains('Back').click()
           cy.contains('Select an available cell')
         })
