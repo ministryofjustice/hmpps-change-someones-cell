@@ -1,4 +1,3 @@
-import logger from '../../logger'
 import config from '../config'
 import RestClient from './restClient'
 
@@ -143,9 +142,11 @@ export default class PrisonApiClient {
     return new RestClient('Prison Api Client', { ...config.apis.prisonApi, ...extraConfig }, token)
   }
 
-  getInmates(token: string, locationId: string, keywords: string, returnAlerts: boolean = false): Promise<Offender[]> {
-    logger.info('Getting inmates: calling Prison Api')
-    const returnAlertsString = returnAlerts ? 'true' : 'false'
+  getInmates(token: string, locationId: string, keywords?: string, returnAlerts: boolean = false): Promise<Offender[]> {
+    const query: Record<string, string> = { returnAlerts: returnAlerts ? 'true' : 'false' }
+    if (keywords) {
+      query.keywords = keywords
+    }
     const headers = {
       'Page-Limit': '5000',
       'Sort-Fields': 'lastName,firstName',
@@ -154,7 +155,7 @@ export default class PrisonApiClient {
 
     return PrisonApiClient.restClient(token).get<Offender[]>({
       path: `/api/locations/description/${locationId}/inmates`,
-      query: { keywords, returnAlerts: returnAlertsString },
+      query,
       headers,
     })
   }

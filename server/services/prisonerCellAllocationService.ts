@@ -7,7 +7,7 @@ export default class PrisonerCellAllocationService {
     private readonly whereaboutsApiClient: WhereaboutsApiClient,
   ) {}
 
-  async getInmates(token: string, locationId: string, keywords: string, returnAlerts?: boolean): Promise<Offender[]> {
+  async getInmates(token: string, locationId: string, keywords?: string, returnAlerts?: boolean): Promise<Offender[]> {
     return await this.prisonApiClient.getInmates(token, locationId, keywords, returnAlerts)
   }
 

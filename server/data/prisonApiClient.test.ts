@@ -22,7 +22,23 @@ describe('prisonApiClient', () => {
   })
 
   describe('getInmates', () => {
-    it('should return data from api', async () => {
+    it('should return inmates', async () => {
+      const response = { data: 'data' }
+
+      fakePrisonApiClient
+        .get('/api/locations/description/BXI/inmates')
+        .query({ returnAlerts: 'true' })
+        .matchHeader('authorization', `Bearer ${accessToken}`)
+        .matchHeader('Page-Limit', '5000')
+        .matchHeader('Sort-Fields', 'lastName,firstName')
+        .matchHeader('Sort-Order', 'ASC')
+        .reply(200, response)
+
+      const output = await prisonApiClient.getInmates(accessToken, 'BXI', null, true)
+      expect(output).toEqual(response)
+    })
+
+    it('should search for inmates by name', async () => {
       const response = { data: 'data' }
 
       fakePrisonApiClient
