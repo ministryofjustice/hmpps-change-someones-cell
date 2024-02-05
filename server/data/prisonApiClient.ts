@@ -155,6 +155,53 @@ export interface OffenceDetail {
   statuteCode: string
 }
 
+export interface Telephone {
+  phoneId?: number
+  number: string
+  type: string
+  ext?: string
+}
+
+export interface Address {
+  addressId?: number
+  addressType?: string
+  flat?: string
+  premise?: string
+  street?: string
+  locality?: string
+  town?: string
+  postalCode?: string
+  county?: string
+  country?: string
+  comment?: string
+  primary: boolean
+  noFixedAddress: boolean
+  startDate?: string
+  endDate?: string
+  phones?: Telephone[]
+  addressUsages?: {
+    addressId?: number
+    addressUsage?: string
+    addressUsageDescription?: string
+    activeFlag?: boolean
+  }[]
+}
+
+export interface Agency {
+  agencyId: string
+  description: string
+  longDescription?: string
+  agencyType: string
+  active: boolean
+  courtType?: string
+  deactivationDate?: string
+  addresses?: Address[]
+  phones?: Telephone[]
+  emails?: {
+    email: string
+  }[]
+}
+
 export default class PrisonApiClient {
   constructor() {}
 
@@ -259,6 +306,12 @@ export default class PrisonApiClient {
   getMainOffence(token: string, bookingId: number) {
     return PrisonApiClient.restClient(token).get<OffenceDetail[]>({
       path: `/api/bookings/${bookingId}/mainOffence`,
+    })
+  }
+
+  getAgencyDetails(token: string, agencyId: string) {
+    return PrisonApiClient.restClient(token).get<Agency>({
+      path: `/api/agencies/${agencyId}?activeOnly=false`,
     })
   }
 }

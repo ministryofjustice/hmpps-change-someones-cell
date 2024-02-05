@@ -373,6 +373,21 @@ export const stubAttributesForLocation = locationAttributes =>
 
 export const verifyMoveToCellSwap = ({ bookingId }) => verifyPut(`/api/bookings/${bookingId}/move-to-cell-swap`)
 
+export const stubAgencyDetails = (agencyId, details, status = 200) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      url: `/api/agencies/${agencyId}?activeOnly=false`,
+    },
+    response: {
+      status,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: details || {},
+    },
+  })
+
 export default {
   stubUserCaseloads,
   stubUpdateCaseload,
@@ -397,4 +412,5 @@ export default {
   stubMoveToCellSwap,
   stubAttributesForLocation,
   verifyMoveToCellSwap,
+  stubAgencyDetails,
 }
