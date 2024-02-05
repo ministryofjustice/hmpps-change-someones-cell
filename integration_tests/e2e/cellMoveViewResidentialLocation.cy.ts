@@ -1,4 +1,4 @@
-context('Cell move prisoner search', () => {
+context('Cell move view residential location', () => {
   const toOffender = $cell => ({
     name: $cell[1]?.textContent,
     prisonNo: $cell[2]?.textContent,
@@ -43,34 +43,43 @@ context('Cell move prisoner search', () => {
 
   context('When there are no search values', () => {
     beforeEach(() => {
-      cy.task('stubUserLocations')
+      cy.task('stubGroups', { id: 'MDI' })
     })
 
-    it('should display the search box only', () => {
-      cy.visit('/prisoner-search')
+    it('should display the search box with the expected data only', () => {
+      cy.visit('/view-residential-location')
 
-      cy.get('[data-test="prisoner-search-form"]').should('be.visible')
+      cy.get('[data-test="prisoner-search-form"]')
+        .should('be.visible')
+        .within(() => {
+          cy.get('[data-test="prisoner-search-location"]')
+            .children('option')
+            .then(options => {
+              const actual = options.toArray().map(o => o.value)
+              expect(actual).to.deep.eq(['SELECT', '1', '2', '3'])
+            })
+        })
+      cy.get('[data-test="prisoner-search-results-table"]').should('not.exist')
     })
   })
 
-  context('When there are search values', () => {
+  context('When there are search values submitted', () => {
     beforeEach(() => {
-      cy.task('stubUserLocations')
+      cy.task('stubGroups', { id: 'MDI' })
     })
 
     it('should have correct data pre filled from search query', () => {
       cy.task('stubInmates', {
-        locationId: 'MDI',
+        locationId: 'MDI-1',
         count: 2,
         data: [inmate1, inmate2],
       })
-      cy.visit('/prisoner-search?keywords=SMITH')
+      cy.visit('/view-residential-location?location=1')
 
-      cy.get<HTMLTableElement>('[data-test="prisoner-search-results-table"]')
+      cy.get('[data-test="prisoner-search-results-table"]').find('tr').its('length').should('eq', 3)
+      cy.get('[data-test="prisoner-search-results-table"]')
         .find('tr')
         .then($tableRows => {
-          expect($tableRows.length).to.eq(3) // 2 results plus table header
-
           const offenders = Array.from($tableRows).map($row => toOffender($row.cells))
 
           expect(offenders[1].name).to.contain('Smith, John')
@@ -90,11 +99,11 @@ context('Cell move prisoner search', () => {
 
     it('should have the correct link to the cell history and select cell links', () => {
       cy.task('stubInmates', {
-        locationId: 'MDI',
+        locationId: 'MDI-2',
         count: 1,
         data: [inmate1],
       })
-      cy.visit('/prisoner-search?keywords=A1234BC')
+      cy.visit('/view-residential-location?location=2')
 
       cy.get('[data-test="prisoner-cell-history-link"]').its('length').should('eq', 1)
       cy.get('[data-test="prisoner-cell-history-link"]')
@@ -110,20 +119,5 @@ context('Cell move prisoner search', () => {
         .should('have.attr', 'href')
         .should('include', '/prisoner/A1234BC/cell-move/search-for-cell')
     })
-  })
-})
-
-context('When the user does not have the correct cell move roles', () => {
-  beforeEach(() => {
-    cy.clearCookies()
-    cy.task('reset')
-    cy.task('stubComponents')
-    cy.task('stubSignIn', { username: 'ITAG_USER', caseload: 'MDI', roles: ['ROLE_SOMETHING_ELSE'] })
-  })
-
-  it('should display authorisation error', () => {
-    cy.signIn({ failOnStatusCode: false })
-
-    cy.get('h1').contains('Authorisation Error')
   })
 })

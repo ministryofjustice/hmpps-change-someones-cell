@@ -1,6 +1,6 @@
 import { PrisonApiClient, WhereaboutsApiClient } from '../data'
 import { Location, OffenderCell } from '../data/prisonApiClient'
-import { LocationGroup } from '../data/whereaboutsApiClient'
+import { LocationGroup, LocationPrefix } from '../data/whereaboutsApiClient'
 
 export default class LocationService {
   constructor(
@@ -18,5 +18,16 @@ export default class LocationService {
 
   async getAttributesForLocation(token: string, locationId: number): Promise<OffenderCell> {
     return await this.prisonApiClient.getAttributesForLocation(token, locationId)
+  }
+
+  async getAgencyGroupLocationPrefix(token: string, agencyId: string, groupName: string): Promise<LocationPrefix> {
+    try {
+      return await this.whereaboutsApiClient.getAgencyGroupLocationPrefix(token, agencyId, groupName)
+    } catch (error) {
+      if (error.status === 404) {
+        return null
+      }
+      throw error
+    }
   }
 }

@@ -22,6 +22,10 @@ export interface CellMoveResponse {
   }
 }
 
+export interface LocationPrefix {
+  locationPrefix: string
+}
+
 export default class WhereaboutsApiClient {
   constructor() {}
 
@@ -58,6 +62,12 @@ export default class WhereaboutsApiClient {
         cellMoveReasonCode,
         commentText,
       },
+    })
+  }
+
+  async getAgencyGroupLocationPrefix(token: string, agencyId: string, groupName: string): Promise<LocationPrefix> {
+    return WhereaboutsApiClient.restClient(token).get<LocationPrefix>({
+      path: `/locations/${agencyId}/${groupName}/location-prefix`,
     })
   }
 }

@@ -1,7 +1,8 @@
 import { PrisonApiClient, WhereaboutsApiClient } from '../data'
 import { Location, OffenderCell } from '../data/prisonApiClient'
-import { LocationGroup } from '../data/whereaboutsApiClient'
+import { LocationGroup, LocationPrefix } from '../data/whereaboutsApiClient'
 import LocationService from './locationService'
+import { SanitisedError } from '../sanitisedError'
 
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/whereaboutsApiClient')
@@ -98,6 +99,43 @@ describe('Location service', () => {
       prisonApiClient.getAttributesForLocation.mockRejectedValue(new Error('some error'))
 
       await expect(locationService.getAttributesForLocation(token, 6352)).rejects.toEqual(new Error('some error'))
+    })
+  })
+
+  describe('getAgencyGroupLocationPrefix', () => {
+    const locationPrefix: LocationPrefix = {
+      locationPrefix: 'MDI-1-',
+    }
+
+    it('retrieves location prefix', async () => {
+      whereaboutsApiClient.getAgencyGroupLocationPrefix.mockResolvedValue(locationPrefix)
+
+      const result = await locationService.getAgencyGroupLocationPrefix(token, 'MDI', 'Houseblock 1')
+
+      expect(result).toEqual(locationPrefix)
+    })
+
+    it('returns null when not found', async () => {
+      const notFoundError: SanitisedError = {
+        message: '404 Not Found',
+        name: '404 Not Found',
+        stack: 'stack',
+        status: 404,
+      }
+
+      whereaboutsApiClient.getAgencyGroupLocationPrefix.mockRejectedValue(notFoundError)
+
+      const result = await locationService.getAgencyGroupLocationPrefix(token, 'MDI', 'Houseblock 1')
+
+      expect(result).toEqual(null)
+    })
+
+    it('propagates other errors', async () => {
+      whereaboutsApiClient.getAgencyGroupLocationPrefix.mockRejectedValue(new Error('some error'))
+
+      await expect(locationService.getAgencyGroupLocationPrefix(token, 'MDI', 'Houseblock 1')).rejects.toEqual(
+        new Error('some error'),
+      )
     })
   })
 })
