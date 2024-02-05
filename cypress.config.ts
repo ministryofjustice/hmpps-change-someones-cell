@@ -73,6 +73,7 @@ export default defineConfig({
         stubAttributesForLocation: locationAttributes => prisonApi.stubAttributesForLocation(locationAttributes),
         verifyMoveToCell: body => whereabouts.verifyMoveToCell(body),
         verifyMoveToCellSwap: ({ bookingId }) => prisonApi.verifyMoveToCellSwap({ bookingId }),
+        stubAgencyDetails: ({ agencyId, details }) => Promise.all([prisonApi.stubAgencyDetails(agencyId, details)]),
       })
     },
     baseUrl: 'http://localhost:3007',

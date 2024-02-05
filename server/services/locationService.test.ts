@@ -1,5 +1,5 @@
 import { PrisonApiClient, WhereaboutsApiClient } from '../data'
-import { Location, OffenderCell } from '../data/prisonApiClient'
+import { Agency, Location, OffenderCell } from '../data/prisonApiClient'
 import { LocationGroup, LocationPrefix } from '../data/whereaboutsApiClient'
 import LocationService from './locationService'
 import { SanitisedError } from '../sanitisedError'
@@ -136,6 +136,80 @@ describe('Location service', () => {
       await expect(locationService.getAgencyGroupLocationPrefix(token, 'MDI', 'Houseblock 1')).rejects.toEqual(
         new Error('some error'),
       )
+    })
+  })
+
+  describe('getAgencyDetails', () => {
+    const agency: Agency = {
+      agencyId: 'MDI',
+      description: 'Moorland (HMP & YOI)',
+      longDescription: 'Moorland (HMP & YOI)',
+      agencyType: 'INST',
+      active: true,
+      courtType: 'CC',
+      deactivationDate: '2012-01-12',
+      addresses: [
+        {
+          addressId: 543524,
+          addressType: 'BUS',
+          flat: '3B',
+          premise: 'Liverpool Prison',
+          street: 'Slinn Street',
+          locality: 'Brincliffe',
+          town: 'Liverpool',
+          postalCode: 'LI1 5TH',
+          county: 'HEREFORD',
+          country: 'ENG',
+          comment: 'This is a comment text',
+          primary: false,
+          noFixedAddress: false,
+          startDate: '2005-05-12',
+          endDate: '2021-02-12',
+          phones: [
+            {
+              phoneId: 2234232,
+              number: '0114 2345678',
+              type: 'TEL',
+              ext: '123',
+            },
+          ],
+          addressUsages: [
+            {
+              addressId: 23422313,
+              addressUsage: 'HDC',
+              addressUsageDescription: 'HDC Address',
+              activeFlag: true,
+            },
+          ],
+        },
+      ],
+      phones: [
+        {
+          phoneId: 2234232,
+          number: '0114 2345678',
+          type: 'TEL',
+          ext: '123',
+        },
+      ],
+      emails: [
+        {
+          email: 'string',
+        },
+      ],
+    }
+
+    it('retrieves the agency', async () => {
+      prisonApiClient.getAgencyDetails.mockResolvedValue(agency)
+
+      const results = await locationService.getAgencyDetails(token, 'MDI')
+
+      expect(results).toEqual(agency)
+    })
+
+    it('Propagates error', async () => {
+      prisonApiClient.getAgencyDetails.mockRejectedValue(new Error('some error'))
+
+      await expect(locationService.getAgencyDetails(token, 'MDI')).rejects.toEqual(new Error('some error'))
     })
   })
 })
