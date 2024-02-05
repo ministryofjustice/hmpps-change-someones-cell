@@ -22,4 +22,8 @@ export default class PrisonerDetailsService {
   async getCsraAssessments(token: string, offenderNumbers: string[]) {
     return this.prisonApiClient.getCsraAssessments(token, offenderNumbers)
   }
+
+  async getMainOffence(token: string, bookingId: number) {
+    return this.prisonApiClient.getMainOffence(token, bookingId)
+  }
 }

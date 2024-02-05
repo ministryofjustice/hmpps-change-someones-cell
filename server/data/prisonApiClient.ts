@@ -64,6 +64,19 @@ export interface OffenderDetails extends Offender {
   profileInformation?: ProfileInformation[]
   csra?: string
   assessments: Assessment[]
+  religion?: string
+  physicalAttributes?: {
+    sexCode?: string
+    gender?: string
+    raceCode?: string
+    ethnicity?: string
+    heightFeet?: number
+    heightInches?: number
+    heightMetres?: number
+    heightCentimetres?: number
+    weightPounds?: number
+    weightKilograms?: number
+  }
 }
 
 export interface UserRole {
@@ -133,6 +146,13 @@ export interface ReferenceCode {
   systemDataFlag?: 'Y' | 'N'
   expiredDate?: string
   subCodes?: ReferenceCode[]
+}
+
+export interface OffenceDetail {
+  bookingId: number
+  offenceDescription: string
+  offenceCode: string
+  statuteCode: string
 }
 
 export default class PrisonApiClient {
@@ -233,6 +253,12 @@ export default class PrisonApiClient {
   moveToCellSwap(token: string, bookingId: number) {
     return PrisonApiClient.restClient(token).put<OffenderDetails>({
       path: `/api/bookings/${bookingId}/move-to-cell-swap`,
+    })
+  }
+
+  getMainOffence(token: string, bookingId: number) {
+    return PrisonApiClient.restClient(token).get<OffenceDetail[]>({
+      path: `/api/bookings/${bookingId}/mainOffence`,
     })
   }
 }

@@ -6,6 +6,7 @@ import confirmCellMoveController from '../controllers/cellMove/confirmCellMove'
 import cellMoveConfirmationController from '../controllers/cellMove/cellMoveConfirmation'
 import spaceCreatedController from '../controllers/cellMove/spaceCreated'
 import cellNotAvailable from '../controllers/cellMove/cellNotAvailable'
+import offenderDetailsController from '../controllers/cellMove/viewOffenderDetails'
 
 const router = express.Router({ mergeParams: true })
 
@@ -22,6 +23,7 @@ const controller = services => {
   router.get('/confirmation', cellMoveConfirmationController(services))
   router.get('/space-created', spaceCreatedController(services))
   router.get('/cell-not-available', cellNotAvailable())
+  router.get('/prisoner-details', offenderDetailsController(services))
 
   return router
 }
