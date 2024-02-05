@@ -1,7 +1,7 @@
 import { Readable } from 'stream'
 import { PrisonApiClient } from '../data'
 import PrisonerDetailsService from './prisonerDetailsService'
-import { Alert, Assessment, OffenderDetails } from '../data/prisonApiClient'
+import { Alert, Assessment, OffenceDetail, OffenderDetails } from '../data/prisonApiClient'
 
 jest.mock('../data/prisonApiClient')
 
@@ -173,6 +173,37 @@ describe('Prisoner details service', () => {
       prisonApiClient.getCsraAssessments.mockRejectedValue(new Error('some error'))
 
       await expect(prisonerDetailsService.getCsraAssessments(token, ['A1234'])).rejects.toEqual(new Error('some error'))
+    })
+  })
+
+  describe('getMainOffence', () => {
+    beforeEach(() => {
+      prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
+      prisonerDetailsService = new PrisonerDetailsService(prisonApiClient)
+    })
+
+    const offences: OffenceDetail[] = [
+      {
+        bookingId: 1123456,
+        offenceDescription: 'string',
+        offenceCode: 'RR84070',
+        statuteCode: 'RR84',
+      },
+    ]
+
+    it('retrieves alerts', async () => {
+      prisonApiClient.getMainOffence.mockResolvedValue(offences)
+
+      const results = await prisonerDetailsService.getMainOffence(token, 456)
+
+      expect(prisonApiClient.getMainOffence).toHaveBeenCalledWith(token, 456)
+      expect(results).toEqual(offences)
+    })
+
+    it('propagates error', async () => {
+      prisonApiClient.getMainOffence.mockRejectedValue(new Error('some error'))
+
+      await expect(prisonerDetailsService.getMainOffence(token, 456)).rejects.toEqual(new Error('some error'))
     })
   })
 })
