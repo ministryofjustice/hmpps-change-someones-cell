@@ -56,6 +56,7 @@ export default function setUpWebSecurity(): Router {
         },
       },
       crossOriginEmbedderPolicy: true,
+      referrerPolicy: { policy: 'no-referrer-when-downgrade' },
     }),
   )
   return router
