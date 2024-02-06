@@ -16,7 +16,7 @@ describe('Move someone temporarily out of a cell', () => {
     req = {
       protocol: 'http',
       get: jest.fn().mockReturnValue('localhost'),
-      baseUrl: '/change-someones-cell/temporary-move',
+      baseUrl: '/temporary-move',
       query: {},
       body: {},
       session: { userDetails: { username: 'me' } },
