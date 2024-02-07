@@ -51,4 +51,12 @@ export default class PrisonerCellAllocationService {
   async moveToCellSwap(token: string, bookingId: number) {
     return await this.prisonApiClient.moveToCellSwap(token, bookingId)
   }
+
+  async getHistoryByDate(token: string, agencyId: string, assignmentDate: string) {
+    return await this.prisonApiClient.getHistoryByDate(token, agencyId, assignmentDate)
+  }
+
+  async getOffenderCellHistory(token: string, bookingId: number) {
+    return await this.prisonApiClient.getOffenderCellHistory(token, bookingId)
+  }
 }

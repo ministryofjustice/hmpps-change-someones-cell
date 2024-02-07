@@ -1,7 +1,7 @@
 import { Readable } from 'stream'
 import { PrisonApiClient } from '../data'
 import PrisonerDetailsService from './prisonerDetailsService'
-import { Alert, Assessment, OffenceDetail, OffenderDetails } from '../data/prisonApiClient'
+import { Alert, Assessment, OffenceDetail, OffenderDetails, PrisonerDetail } from '../data/prisonApiClient'
 
 jest.mock('../data/prisonApiClient')
 
@@ -11,12 +11,12 @@ describe('Prisoner details service', () => {
   let prisonApiClient: jest.Mocked<PrisonApiClient>
   let prisonerDetailsService: PrisonerDetailsService
 
-  describe('getImage', () => {
-    beforeEach(() => {
-      prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
-      prisonerDetailsService = new PrisonerDetailsService(prisonApiClient)
-    })
+  beforeEach(() => {
+    prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
+    prisonerDetailsService = new PrisonerDetailsService(prisonApiClient)
+  })
 
+  describe('getImage', () => {
     it('uses prison api to request image data', async () => {
       prisonApiClient.getImage.mockResolvedValue(Readable.from('image data'))
 
@@ -28,11 +28,6 @@ describe('Prisoner details service', () => {
   })
 
   describe('getPrisonerImage', () => {
-    beforeEach(() => {
-      prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
-      prisonerDetailsService = new PrisonerDetailsService(prisonApiClient)
-    })
-
     it('uses prison api to request image data', async () => {
       prisonApiClient.getPrisonerImage.mockResolvedValue(Readable.from('image data'))
 
@@ -44,11 +39,6 @@ describe('Prisoner details service', () => {
   })
 
   describe('getDetails', () => {
-    beforeEach(() => {
-      prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
-      prisonerDetailsService = new PrisonerDetailsService(prisonApiClient)
-    })
-
     const details: OffenderDetails = {
       bookingId: 1234,
       offenderNo: 'A1234',
@@ -90,11 +80,6 @@ describe('Prisoner details service', () => {
   })
 
   describe('getAlerts', () => {
-    beforeEach(() => {
-      prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
-      prisonerDetailsService = new PrisonerDetailsService(prisonApiClient)
-    })
-
     const alerts: Alert[] = [
       {
         active: true,
@@ -134,11 +119,6 @@ describe('Prisoner details service', () => {
   })
 
   describe('getCsraAssessments', () => {
-    beforeEach(() => {
-      prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
-      prisonerDetailsService = new PrisonerDetailsService(prisonApiClient)
-    })
-
     const assessments: Assessment[] = [
       {
         bookingId: 123456,
@@ -177,11 +157,6 @@ describe('Prisoner details service', () => {
   })
 
   describe('getMainOffence', () => {
-    beforeEach(() => {
-      prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
-      prisonerDetailsService = new PrisonerDetailsService(prisonApiClient)
-    })
-
     const offences: OffenceDetail[] = [
       {
         bookingId: 1123456,
@@ -204,6 +179,61 @@ describe('Prisoner details service', () => {
       prisonApiClient.getMainOffence.mockRejectedValue(new Error('some error'))
 
       await expect(prisonerDetailsService.getMainOffence(token, 456)).rejects.toEqual(new Error('some error'))
+    })
+  })
+
+  describe('getPrisoners', () => {
+    const offenderNos = ['A1234BC', 'B1234CD']
+
+    const prisoners: PrisonerDetail[] = [
+      {
+        offenderNo: 'A0000AA',
+        title: 'Earl',
+        suffix: 'Mac',
+        firstName: 'Thorfinn',
+        middleNames: 'Skull-splitter',
+        lastName: 'Torf-Einarsson',
+        dateOfBirth: '1960-02-29',
+        gender: 'Female',
+        sexCode: 'F',
+        nationalities: 'Scottish',
+        currentlyInPrison: 'N',
+        latestBookingId: 1,
+        latestLocationId: 'WRI',
+        latestLocation: 'Whitemoor (HMP)',
+        internalLocation: 'WRI-B-3-018',
+        pncNumber: '01/000000A',
+        croNumber: '01/0001/01A',
+        ethnicity: 'White: British',
+        ethnicityCode: 'W1',
+        birthCountry: 'Norway',
+        religion: 'Pagan',
+        religionCode: 'PAG',
+        convictedStatus: 'Convicted',
+        legalStatus: 'REMAND',
+        imprisonmentStatus: 'LIFE',
+        imprisonmentStatusDesc: 'Service Life Imprisonment',
+        receptionDate: '1980-01-01',
+        maritalStatus: 'Single',
+        currentWorkingFirstName: 'Thorfinn',
+        currentWorkingLastName: 'Torf-Einarsson',
+        currentWorkingBirthDate: '1960-02-29',
+      },
+    ]
+
+    it('retrieves prisoners', async () => {
+      prisonApiClient.getPrisoners.mockResolvedValue(prisoners)
+
+      const results = await prisonerDetailsService.getPrisoners(token, offenderNos)
+
+      expect(prisonApiClient.getPrisoners).toHaveBeenCalledWith(token, offenderNos)
+      expect(results).toEqual(prisoners)
+    })
+
+    it('propagates error', async () => {
+      prisonApiClient.getPrisoners.mockRejectedValue(new Error('some error'))
+
+      await expect(prisonerDetailsService.getPrisoners(token, offenderNos)).rejects.toEqual(new Error('some error'))
     })
   })
 })

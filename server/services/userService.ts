@@ -29,4 +29,15 @@ export default class UserService {
   async userCaseLoads(token: string) {
     return await this.prisonApiClient.userCaseLoads(token)
   }
+
+  async getStaffDetails(token: string, username: string) {
+    try {
+      return await this.prisonApiClient.getStaffDetails(token, username)
+    } catch (error) {
+      if (error.status === 404) {
+        return null
+      }
+      throw error
+    }
+  }
 }

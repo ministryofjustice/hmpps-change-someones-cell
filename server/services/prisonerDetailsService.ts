@@ -26,4 +26,8 @@ export default class PrisonerDetailsService {
   async getMainOffence(token: string, bookingId: number) {
     return this.prisonApiClient.getMainOffence(token, bookingId)
   }
+
+  async getPrisoners(token: string, offenderNos: string[]) {
+    return this.prisonApiClient.getPrisoners(token, offenderNos)
+  }
 }

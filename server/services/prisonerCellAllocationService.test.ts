@@ -1,5 +1,5 @@
 import { PrisonApiClient, WhereaboutsApiClient } from '../data'
-import { Offender, OffenderCell, OffenderDetails, ReferenceCode } from '../data/prisonApiClient'
+import { BedAssignment, Offender, OffenderCell, OffenderDetails, Page, ReferenceCode } from '../data/prisonApiClient'
 import { CellMoveResponse } from '../data/whereaboutsApiClient'
 import PrisonerCellAllocationService from './prisonerCellAllocationService'
 
@@ -228,6 +228,103 @@ describe('Prisoner cell allocation service', () => {
       prisonApiClient.moveToCellSwap.mockRejectedValue(new Error('some error'))
 
       await expect(prisonerCellAllocationService.moveToCellSwap(token, 1234)).rejects.toEqual(new Error('some error'))
+    })
+  })
+
+  describe('getHistoryByDate', () => {
+    const history: BedAssignment[] = [
+      {
+        bookingId: 1234134,
+        livingUnitId: 123123,
+        assignmentDate: '2020-10-12',
+        assignmentDateTime: '2021-07-05T10:35:17',
+        assignmentReason: 'ADM',
+        assignmentEndDate: '2020-11-12',
+        assignmentEndDateTime: '2021-07-05T10:35:17',
+        agencyId: 'MDI',
+        description: 'MDI-1-1-2',
+        bedAssignmentHistorySequence: 2,
+        movementMadeBy: 'KQJ74F',
+        offenderNo: 'A1234AA',
+      },
+    ]
+
+    it('Retrieves cell move reasons reference data', async () => {
+      prisonApiClient.getHistoryByDate.mockResolvedValue(history)
+
+      const result = await prisonerCellAllocationService.getHistoryByDate(token, 'BXI', '2024-01-01')
+
+      expect(result).toEqual(history)
+    })
+
+    it('Propagates error', async () => {
+      prisonApiClient.getHistoryByDate.mockRejectedValue(new Error('some error'))
+
+      await expect(prisonerCellAllocationService.getHistoryByDate(token, 'BXI', '2024-01-01')).rejects.toEqual(
+        new Error('some error'),
+      )
+    })
+  })
+
+  describe('getOffenderCellHistory', () => {
+    const results: Page<BedAssignment> = {
+      totalPages: 1,
+      totalElements: 1,
+      first: true,
+      last: true,
+      size: 1,
+      content: [
+        {
+          bookingId: 1234134,
+          livingUnitId: 123123,
+          assignmentDate: '2020-10-12',
+          assignmentDateTime: '2021-07-05T10:35:17',
+          assignmentReason: 'ADM',
+          assignmentEndDate: '2020-11-12',
+          assignmentEndDateTime: '2021-07-05T10:35:17',
+          agencyId: 'MDI',
+          description: 'MDI-1-1-2',
+          bedAssignmentHistorySequence: 2,
+          movementMadeBy: 'KQJ74F',
+          offenderNo: 'A1234AA',
+        },
+      ],
+      number: 1,
+      sort: {
+        empty: false,
+        sorted: true,
+        unsorted: false,
+      },
+      numberOfElements: 1,
+      pageable: {
+        offset: 0,
+        sort: {
+          empty: false,
+          sorted: true,
+          unsorted: false,
+        },
+        pageSize: 0,
+        pageNumber: 0,
+        paged: true,
+        unpaged: false,
+      },
+      empty: false,
+    }
+
+    it('Retrieves cell move reasons reference data', async () => {
+      prisonApiClient.getOffenderCellHistory.mockResolvedValue(results)
+
+      const result = await prisonerCellAllocationService.getOffenderCellHistory(token, 1234)
+
+      expect(result).toEqual(results)
+    })
+
+    it('Propagates error', async () => {
+      prisonApiClient.getOffenderCellHistory.mockRejectedValue(new Error('some error'))
+
+      await expect(prisonerCellAllocationService.getOffenderCellHistory(token, 1234)).rejects.toEqual(
+        new Error('some error'),
+      )
     })
   })
 })

@@ -72,6 +72,18 @@ export const createStringFromList = (array: unknown[]): unknown => {
   return array[0]
 }
 
+export const stripAgencyPrefix = (location: string, agency: string): string => {
+  const parts = location && location.split('-')
+  if (parts && parts.length > 0) {
+    const index = parts.findIndex(p => p === agency)
+    if (index >= 0) {
+      return location.substring(parts[index].length + 1, location.length)
+    }
+  }
+
+  return null
+}
+
 export default {
   arrayToQueryString,
   capitalize,
@@ -86,4 +98,5 @@ export default {
   mapToQueryString,
   properCaseName,
   putLastNameFirst,
+  stripAgencyPrefix,
 }

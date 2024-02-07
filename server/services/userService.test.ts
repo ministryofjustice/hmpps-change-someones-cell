@@ -1,6 +1,8 @@
 import UserService from './userService'
 import ManageUsersApiClient, { type User } from '../data/manageUsersApiClient'
 import { PrisonApiClient } from '../data'
+import { SanitisedError } from '../sanitisedError'
+import { UserDetail } from '../data/prisonApiClient'
 
 jest.mock('../data/manageUsersApiClient')
 jest.mock('../data/prisonApiClient')
@@ -61,6 +63,52 @@ describe('User service', () => {
       prisonApiClient.userCaseLoads.mockRejectedValue(new Error('some error'))
 
       await expect(userService.userCaseLoads(token)).rejects.toEqual(new Error('some error'))
+    })
+  })
+
+  describe('getStaffDetails', () => {
+    const userDetail: UserDetail = {
+      staffId: 231232,
+      username: 'SGAMGEE_GEN',
+      firstName: 'John',
+      lastName: 'Smith',
+      thumbnailId: 2342341224,
+      activeCaseLoadId: 'MDI',
+      accountStatus: 'ACTIVE',
+      lockDate: '2021-07-05T10:35:17',
+      expiryDate: '2021-07-05T10:35:17',
+      lockedFlag: false,
+      expiredFlag: true,
+      active: true,
+    }
+
+    it('retrieves staff details', async () => {
+      prisonApiClient.getStaffDetails.mockResolvedValue(userDetail)
+
+      const result = await userService.getStaffDetails(token, 'SGAMGEE_GEN')
+
+      expect(result).toEqual(userDetail)
+    })
+
+    it('returns null when not found', async () => {
+      const notFoundError: SanitisedError = {
+        message: '404 Not Found',
+        name: '404 Not Found',
+        stack: 'stack',
+        status: 404,
+      }
+
+      prisonApiClient.getStaffDetails.mockRejectedValue(notFoundError)
+
+      const result = await userService.getStaffDetails(token, 'SGAMGEE_GEN')
+
+      expect(result).toEqual(null)
+    })
+
+    it('propagates other errors', async () => {
+      prisonApiClient.getStaffDetails.mockRejectedValue(new Error('some error'))
+
+      await expect(userService.getStaffDetails(token, 'SGAMGEE_GEN')).rejects.toEqual(new Error('some error'))
     })
   })
 })

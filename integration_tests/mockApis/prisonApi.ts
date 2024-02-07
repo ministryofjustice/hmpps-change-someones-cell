@@ -388,6 +388,55 @@ export const stubAgencyDetails = (agencyId, details, status = 200) =>
     },
   })
 
+export const stubCellMoveHistory = ({ assignmentDate, agencyId, cellMoves }) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPath: `/api/cell/${agencyId}/history/${assignmentDate}`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: cellMoves,
+    },
+  })
+
+export const stubGetPrisoners = body =>
+  stubFor({
+    request: {
+      method: 'POST',
+      urlPattern: '/api/prisoners',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: body,
+    },
+  })
+
+export const stubStaff = (staffId, details) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      url: `/api/users/${encodeURIComponent(staffId)}`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: details || {
+        firstName: 'JAMES',
+        lastName: 'STUART',
+        activeCaseLoadId: 'MDI',
+      },
+    },
+  })
+
 export default {
   stubUserCaseloads,
   stubUpdateCaseload,
@@ -413,4 +462,7 @@ export default {
   stubAttributesForLocation,
   verifyMoveToCellSwap,
   stubAgencyDetails,
+  stubCellMoveHistory,
+  stubGetPrisoners,
+  stubStaff,
 }
