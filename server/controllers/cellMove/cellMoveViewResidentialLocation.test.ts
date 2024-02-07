@@ -19,7 +19,7 @@ describe('View Residential Location', () => {
     req = {
       protocol: 'http',
       get: jest.fn().mockReturnValue('localhost'),
-      baseUrl: '/change-someones-cell/view-residential-location',
+      baseUrl: '/view-residential-location',
       query: {},
       body: {},
       session: { userDetails: { username: 'me' } },

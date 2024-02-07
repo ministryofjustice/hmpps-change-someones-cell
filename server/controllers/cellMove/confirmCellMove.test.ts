@@ -305,11 +305,11 @@ describe('Change cell play back details', () => {
     })
 
     test.each`
-      referer                                                   | backLinkText
-      ${'/prisoner/A12345/cell-move/select-cell'}               | ${'Select another cell'}
-      ${'/prisoner/A12345/cell-move/consider-risks'}            | ${'Select another cell'}
-      ${'/prisoner/A12345/cell-move/search-for-cell'}           | ${'Cancel'}
-      ${'/change-someones-cell/temporary-move?keywords=A12345'} | ${'Cancel'}
+      referer                                         | backLinkText
+      ${'/prisoner/A12345/cell-move/select-cell'}     | ${'Select another cell'}
+      ${'/prisoner/A12345/cell-move/consider-risks'}  | ${'Select another cell'}
+      ${'/prisoner/A12345/cell-move/search-for-cell'} | ${'Cancel'}
+      ${'/temporary-move?keywords=A12345'}            | ${'Cancel'}
     `(
       'The back link button content is $backLinkText when the referer is $referer',
       async ({ referer, backLinkText }) => {
