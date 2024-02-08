@@ -74,6 +74,10 @@ export default defineConfig({
         verifyMoveToCell: body => whereabouts.verifyMoveToCell(body),
         verifyMoveToCellSwap: ({ bookingId }) => prisonApi.verifyMoveToCellSwap({ bookingId }),
         stubAgencyDetails: ({ agencyId, details }) => Promise.all([prisonApi.stubAgencyDetails(agencyId, details)]),
+        stubCellMoveHistory: ({ assignmentDate, agencyId, cellMoves }) =>
+          prisonApi.stubCellMoveHistory({ assignmentDate, agencyId, cellMoves }),
+        stubGetPrisoners: response => prisonApi.stubGetPrisoners(response),
+        stubStaff: ({ staffId, details }) => Promise.all([prisonApi.stubStaff(staffId, details)]),
       })
     },
     baseUrl: 'http://localhost:3007',

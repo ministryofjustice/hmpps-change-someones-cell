@@ -202,6 +202,118 @@ export interface Agency {
   }[]
 }
 
+export interface BedAssignment {
+  bookingId: number
+  livingUnitId: number
+  assignmentDate: string
+  assignmentDateTime: string
+  assignmentReason: string
+  assignmentEndDate: string
+  assignmentEndDateTime: string
+  agencyId: string
+  description: string
+  bedAssignmentHistorySequence: number
+  movementMadeBy: string
+  offenderNo: string
+}
+
+export interface UserDetail {
+  staffId: number
+  username: string
+  firstName: string
+  lastName: string
+  thumbnailId: number
+  activeCaseLoadId: string
+  accountStatus: string
+  lockDate: string
+  expiryDate: string
+  lockedFlag: boolean
+  expiredFlag: boolean
+  active: boolean
+}
+
+export interface PrisonerDetailSearchCriteria {
+  offenderNos?: string[]
+  firstName?: string
+  gender?: string
+  middleNames?: string
+  lastName?: string
+  location?: string
+  pncNumber?: string
+  croNumber?: string
+  dob?: string
+  dobFrom?: string
+  dobTo?: string
+  maxYearsRange?: number
+  includeAliases?: boolean
+  partialNameMatch?: boolean
+  anyMatch?: boolean
+  prioritisedMatch?: boolean
+}
+
+export interface PrisonerDetail {
+  offenderNo: string
+  title?: string
+  suffix?: string
+  firstName: string
+  middleNames?: string
+  lastName: string
+  dateOfBirth: string
+  gender: string
+  sexCode: string
+  nationalities?: string
+  currentlyInPrison: string
+  latestBookingId?: number
+  latestLocationId?: string
+  latestLocation?: string
+  internalLocation?: string
+  pncNumber?: string
+  croNumber?: string
+  ethnicity?: string
+  ethnicityCode?: string
+  birthCountry?: string
+  religion?: string
+  religionCode?: string
+  convictedStatus?: string
+  legalStatus?: string
+  imprisonmentStatus?: string
+  imprisonmentStatusDesc?: string
+  receptionDate?: string
+  maritalStatus?: string
+  currentWorkingFirstName: string
+  currentWorkingLastName: string
+  currentWorkingBirthDate: string
+}
+
+export interface Page<T> {
+  totalPages: number
+  totalElements: number
+  first: boolean
+  last: boolean
+  size: number
+  content: T[]
+  number: number
+  sort: {
+    empty: boolean
+    sorted: boolean
+    unsorted: boolean
+  }
+  numberOfElements: number
+  pageable: {
+    offset: number
+    sort: {
+      empty: boolean
+      sorted: boolean
+      unsorted: boolean
+    }
+    pageSize: number
+    pageNumber: number
+    paged: boolean
+    unpaged: boolean
+  }
+  empty: boolean
+}
+
 export default class PrisonApiClient {
   constructor() {}
 
@@ -312,6 +424,38 @@ export default class PrisonApiClient {
   getAgencyDetails(token: string, agencyId: string) {
     return PrisonApiClient.restClient(token).get<Agency>({
       path: `/api/agencies/${agencyId}?activeOnly=false`,
+    })
+  }
+
+  getHistoryByDate(token: string, agencyId: string, assignmentDate: string) {
+    return PrisonApiClient.restClient(token).get<BedAssignment[]>({
+      path: `/api/cell/${agencyId}/history/${assignmentDate}`,
+    })
+  }
+
+  getStaffDetails(token: string, username: string) {
+    return PrisonApiClient.restClient(token).get<UserDetail>({
+      path: `/api/users/${username}`,
+    })
+  }
+
+  getPrisoners(token: string, offenderNos: string[]) {
+    const searchCriteria: PrisonerDetailSearchCriteria = { offenderNos }
+    const headers = {
+      'Page-Offset': '0',
+      'Page-Limit': String(offenderNos.length),
+    }
+    return PrisonApiClient.restClient(token).post<PrisonerDetail[]>({
+      path: '/api/prisoners',
+      data: searchCriteria,
+      headers,
+    })
+  }
+
+  getOffenderCellHistory(token: string, bookingId: number) {
+    return PrisonApiClient.restClient(token).get<Page<BedAssignment>>({
+      path: `/api/bookings/${bookingId}/cell-history`,
+      query: { page: 0, size: 20 },
     })
   }
 }
