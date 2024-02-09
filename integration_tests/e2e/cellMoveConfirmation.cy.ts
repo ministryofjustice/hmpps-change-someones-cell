@@ -1,4 +1,5 @@
 import cellConfirmationPage from '../pages/cellMoveConfirmationPage'
+import homePage from '../pages/homePage'
 
 const offenderNo = 'A1234A'
 const cellId = 1
@@ -29,17 +30,15 @@ context('A user get confirmation of a cell move', () => {
     const page = cellConfirmationPage.goTo({ offenderNo, cellId, cellDescription: 'MDI-1-1', name: 'Bob Doe' })
 
     cy.title().should('eq', `Change Someone's Cell - The prisoner’s cell has been changed`)
-    page
-      .backToStart()
-      .invoke('attr', 'href')
-      .then(href => {
-        expect(href).to.equal('/back-to-start')
-      })
 
     cy.get("[data-test='exit-survey-link']")
       .invoke('attr', 'href')
       .then(href => {
         expect(href).to.equal('https://eu.surveymonkey.com/r/3JHPDDD')
       })
+
+    page.backToStart().click()
+
+    homePage.verifyOnPage()
   })
 })
