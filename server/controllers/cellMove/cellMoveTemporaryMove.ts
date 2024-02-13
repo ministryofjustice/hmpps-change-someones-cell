@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { putLastNameFirst, formatLocation, formatName } from '../../utils'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
+import config from '../../config'
 
 type Params = {
   prisonerCellAllocationService: PrisonerCellAllocationService
@@ -42,8 +43,9 @@ export default ({ prisonerCellAllocationService }: Params) =>
         assignedLivingUnitDesc: formatLocation(prisoner.assignedLivingUnitDesc),
         name: putLastNameFirst(prisoner.firstName, prisoner.lastName),
         formattedName: formatName(prisoner.firstName, prisoner.lastName),
-        cellHistoryUrl: `/prisoner/${prisoner.offenderNo}/cell-history`,
+        cellHistoryUrl: `${config.prisonerProfileUrl}/prisoner/${prisoner.offenderNo}/location-details`,
         cellMoveUrl: `/prisoner/${prisoner.offenderNo}/cell-move/confirm-cell-move?cellId=C-SWAP`,
+        profileUrl: `${config.prisonerProfileUrl}/prisoner/${prisoner.offenderNo}`,
       }))
 
     return res.render('cellMove/cellMoveTemporaryMove.njk', {

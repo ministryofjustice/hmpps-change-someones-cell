@@ -11,6 +11,7 @@ import PrisonerCellAllocationService from '../../services/prisonerCellAllocation
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import NonAssociationsService from '../../services/nonAssociationsService'
 import logger from '../../../logger'
+import config from '../../config'
 
 const activeCellMoveAlertsExcludingDisabled = alert =>
   !alert.expired && cellMoveAlertCodes.includes(alert.alertCode) && alert.alertCode !== 'PEEP'
@@ -216,8 +217,8 @@ export default ({
         backUrl: `${profileUrl}/cell-move/select-cell`,
       })
     } catch (error) {
-      res.locals.redirectUrl = `/prisoner/${offenderNo}/cell-history`
-      res.locals.homeUrl = `/prisoner/${offenderNo}`
+      res.locals.redirectUrl = `${config.prisonerProfileUrl}/prisoner/${offenderNo}/location-details`
+      res.locals.homeUrl = `${config.prisonerProfileUrl}/prisoner/${offenderNo}`
       throw error
     }
   }

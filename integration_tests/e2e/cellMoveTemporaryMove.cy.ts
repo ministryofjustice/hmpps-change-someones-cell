@@ -101,7 +101,7 @@ context('Move someone temporarily out of a cell', () => {
         .first()
         .should('have.text', 'View cell history for John Smith')
         .should('have.attr', 'href')
-        .should('include', '/prisoner/A1234BC/cell-history')
+        .should('include', 'http://localhost:3101/prisoner/A1234BC/location-details')
 
       cy.get('[data-test="prisoner-cell-move-link"]').its('length').should('eq', 1)
       cy.get('[data-test="prisoner-cell-move-link"]')
