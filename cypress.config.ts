@@ -78,6 +78,11 @@ export default defineConfig({
           prisonApi.stubCellMoveHistory({ assignmentDate, agencyId, cellMoves }),
         stubGetPrisoners: response => prisonApi.stubGetPrisoners(response),
         stubStaff: ({ staffId, details }) => Promise.all([prisonApi.stubStaff(staffId, details)]),
+        stubGlobalAlerts: prisonApi.stubGlobalAlerts,
+        stubReceptionWithCapacity: ({ agencyId, reception }) =>
+          prisonApi.stubReceptionWithCapacity(agencyId, reception),
+        stubOffendersInReception: ({ agencyId, inReception }) =>
+          prisonApi.stubOffendersInReception(agencyId, inReception),
       })
     },
     baseUrl: 'http://localhost:3007',

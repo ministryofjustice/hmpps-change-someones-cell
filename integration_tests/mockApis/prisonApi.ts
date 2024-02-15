@@ -437,6 +437,51 @@ export const stubStaff = (staffId, details) =>
     },
   })
 
+export const stubGlobalAlerts = alerts =>
+  stubFor({
+    request: {
+      method: 'POST',
+      url: '/api/bookings/offenderNo/alerts',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: alerts || [],
+    },
+  })
+
+export const stubReceptionWithCapacity = (agencyId, reception) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPathPattern: `/api/agencies/${agencyId}/receptionsWithCapacity`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: reception || {},
+    },
+  })
+
+export const stubOffendersInReception = (agencyId, inReception) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPathPattern: `/api/movements/rollcount/${agencyId}/in-reception`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: inReception || {},
+    },
+  })
+
 export default {
   stubUserCaseloads,
   stubUpdateCaseload,
@@ -465,4 +510,7 @@ export default {
   stubCellMoveHistory,
   stubGetPrisoners,
   stubStaff,
+  stubGlobalAlerts,
+  stubReceptionWithCapacity,
+  stubOffendersInReception,
 }

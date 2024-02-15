@@ -314,6 +314,14 @@ export interface Page<T> {
   empty: boolean
 }
 
+export interface OffenderInReception {
+  offenderNo: string
+  bookingId: number
+  dateOfBirth: string
+  firstName: string
+  lastName: string
+}
+
 export default class PrisonApiClient {
   constructor() {}
 
@@ -456,6 +464,25 @@ export default class PrisonApiClient {
     return PrisonApiClient.restClient(token).get<Page<BedAssignment>>({
       path: `/api/bookings/${bookingId}/cell-history`,
       query: { page: 0, size: 20 },
+    })
+  }
+
+  getReceptionsWithCapacity(token: string, agencyId: string) {
+    return PrisonApiClient.restClient(token, { timeout: { deadline: 30000 } }).get<OffenderCell[]>({
+      path: `/api/agencies/${agencyId}/receptionsWithCapacity`,
+    })
+  }
+
+  getOffendersInReception(token: string, agencyId: string) {
+    return PrisonApiClient.restClient(token).get<OffenderInReception[]>({
+      path: `/api/movements/rollcount/${agencyId}/in-reception`,
+    })
+  }
+
+  getAlertsGlobal(token: string, offenderNos: string[]) {
+    return PrisonApiClient.restClient(token).post<Alert[]>({
+      path: '/api/bookings/offenderNo/alerts',
+      data: offenderNos,
     })
   }
 }
