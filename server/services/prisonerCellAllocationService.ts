@@ -1,5 +1,9 @@
 import { PrisonApiClient, WhereaboutsApiClient } from '../data'
-import { Offender } from '../data/prisonApiClient'
+import { Alert, Offender, OffenderInReception } from '../data/prisonApiClient'
+
+export interface OffenderWithAlerts extends OffenderInReception {
+  alerts?: string[]
+}
 
 export default class PrisonerCellAllocationService {
   constructor(
@@ -58,5 +62,38 @@ export default class PrisonerCellAllocationService {
 
   async getOffenderCellHistory(token: string, bookingId: number) {
     return await this.prisonApiClient.getOffenderCellHistory(token, bookingId)
+  }
+
+  async getReceptionsWithCapacity(token: string, agencyId: string) {
+    return await this.prisonApiClient.getReceptionsWithCapacity(token, agencyId)
+  }
+
+  async getOffendersInReception(token: string, agencyId: string): Promise<OffenderWithAlerts[]> {
+    const offenders = await this.prisonApiClient.getOffendersInReception(token, agencyId)
+
+    if (!offenders) return []
+
+    const offenderNumbers = offenders.map(o => o.offenderNo)
+    const alerts = await this.getActiveAlerts(token, offenderNumbers)
+
+    return this.addAlerts(offenders, alerts)
+  }
+
+  private async getActiveAlerts(token: string, offenderNumbers: string[]) {
+    const alerts = await this.prisonApiClient.getAlertsGlobal(token, offenderNumbers)
+    return alerts?.filter(alert => !alert.expired)
+  }
+
+  private addAlerts(objects: OffenderInReception[], alerts: Alert[]) {
+    return alerts
+      ? objects.map(obj => ({
+          ...obj,
+          alerts: this.alertCodesForOffenderNo(alerts, obj.offenderNo),
+        }))
+      : objects
+  }
+
+  private alertCodesForOffenderNo(alerts: Alert[], offenderNo: string) {
+    return alerts.filter(alert => alert.offenderNo === offenderNo).map(alert => alert.alertCode)
   }
 }

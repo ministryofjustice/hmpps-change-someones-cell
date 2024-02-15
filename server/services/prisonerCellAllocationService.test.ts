@@ -1,5 +1,13 @@
 import { PrisonApiClient, WhereaboutsApiClient } from '../data'
-import { BedAssignment, Offender, OffenderCell, OffenderDetails, Page, ReferenceCode } from '../data/prisonApiClient'
+import {
+  BedAssignment,
+  Offender,
+  OffenderCell,
+  OffenderDetails,
+  OffenderInReception,
+  Page,
+  ReferenceCode,
+} from '../data/prisonApiClient'
 import { CellMoveResponse } from '../data/whereaboutsApiClient'
 import PrisonerCellAllocationService from './prisonerCellAllocationService'
 
@@ -323,6 +331,87 @@ describe('Prisoner cell allocation service', () => {
       prisonApiClient.getOffenderCellHistory.mockRejectedValue(new Error('some error'))
 
       await expect(prisonerCellAllocationService.getOffenderCellHistory(token, 1234)).rejects.toEqual(
+        new Error('some error'),
+      )
+    })
+  })
+
+  describe('getReceptionsWithCapacity', () => {
+    const cells: OffenderCell[] = [
+      {
+        id: 1,
+        description: 'LEI-1-1',
+        userDescription: 'LEI-1-1',
+        capacity: 2,
+        noOfOccupants: 2,
+        attributes: [
+          {
+            code: 'LC',
+            description: 'Listener Cell',
+          },
+        ],
+      },
+    ]
+
+    it('retrieves receptions with available capacity', async () => {
+      prisonApiClient.getReceptionsWithCapacity.mockResolvedValue(cells)
+
+      const result = await prisonerCellAllocationService.getReceptionsWithCapacity(token, 'LEI')
+
+      expect(result).toEqual(cells)
+    })
+
+    it('Propagates error', async () => {
+      prisonApiClient.getReceptionsWithCapacity.mockRejectedValue(new Error('some error'))
+
+      await expect(prisonerCellAllocationService.getReceptionsWithCapacity(token, 'LEI')).rejects.toEqual(
+        new Error('some error'),
+      )
+    })
+  })
+
+  describe('getOffendersInReception', () => {
+    const offender: OffenderInReception = {
+      offenderNo: 'G3878UK',
+      bookingId: 1234,
+      dateOfBirth: '1990-02-12',
+      firstName: 'Garry',
+      lastName: 'Kasparov',
+    }
+
+    it('retrieves offenders in reception with alerts', async () => {
+      prisonApiClient.getOffendersInReception.mockResolvedValue([offender])
+      prisonApiClient.getAlertsGlobal.mockResolvedValue([
+        {
+          active: true,
+          addedByFirstName: 'John',
+          addedByLastName: 'Smith',
+          alertCode: 'XGANG',
+          alertCodeDescription: 'Gang member',
+          alertId: 1,
+          alertType: 'X',
+          alertTypeDescription: 'Security',
+          bookingId: 14,
+          comment: 'silly',
+          dateCreated: '2019-08-25',
+          dateExpires: '2019-09-20',
+          expired: false,
+          expiredByFirstName: 'Jane',
+          expiredByLastName: 'Smith',
+          modifiedDateTime: '2021-07-05T10:35:17',
+          offenderNo: 'G3878UK',
+        },
+      ])
+
+      const result = await prisonerCellAllocationService.getOffendersInReception(token, 'LEI')
+
+      expect(result).toEqual([{ ...offender, alerts: ['XGANG'] }])
+    })
+
+    it('Propagates error', async () => {
+      prisonApiClient.getOffendersInReception.mockRejectedValue(new Error('some error'))
+
+      await expect(prisonerCellAllocationService.getOffendersInReception(token, 'LEI')).rejects.toEqual(
         new Error('some error'),
       )
     })

@@ -333,4 +333,47 @@ describe('prisonApiClient', () => {
       expect(output).toEqual(response)
     })
   })
+
+  describe('getReceptionsWithCapacity', () => {
+    it('should return data from api', async () => {
+      const response = { data: 'data' }
+
+      fakePrisonApiClient
+        .get('/api/agencies/BXI/receptionsWithCapacity')
+        .matchHeader('authorization', `Bearer ${accessToken}`)
+        .reply(200, response)
+
+      const output = await prisonApiClient.getReceptionsWithCapacity(accessToken, 'BXI')
+      expect(output).toEqual(response)
+    })
+  })
+
+  describe('getOffendersInReception', () => {
+    it('should return data from api', async () => {
+      const response = { data: 'data' }
+
+      fakePrisonApiClient
+        .get('/api/movements/rollcount/BXI/in-reception')
+        .matchHeader('authorization', `Bearer ${accessToken}`)
+        .reply(200, response)
+
+      const output = await prisonApiClient.getOffendersInReception(accessToken, 'BXI')
+      expect(output).toEqual(response)
+    })
+  })
+
+  describe('getAlertsGlobal', () => {
+    it('should query the API for alerts', async () => {
+      const response = { data: 'data' }
+      const offenderNumbers = ['A1234', 'B4321']
+
+      fakePrisonApiClient
+        .post('/api/bookings/offenderNo/alerts', offenderNumbers)
+        .matchHeader('authorization', `Bearer ${accessToken}`)
+        .reply(200, response)
+
+      const output = await prisonApiClient.getAlertsGlobal(accessToken, offenderNumbers)
+      expect(output).toEqual(response)
+    })
+  })
 })
