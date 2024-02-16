@@ -272,7 +272,7 @@ before(() => {
   cy.task('stubMoveToCell')
 })
 
-context.skip('Successful reception move journey', () => {
+context('Successful reception move journey', () => {
   it('should complete a reception move', () => {
     const page = considerRisksPage.goTo(offenderNo)
 
@@ -280,7 +280,7 @@ context.skip('Successful reception move journey', () => {
     page.nonAssociationsLink().should('exist')
     page.form().confirmMoveYes().click()
     page.form().submitButton().click()
-    cy.title().should('eq', 'Confirm reception move - Digital Prison Services')
+    cy.title().should('eq', `Change Someone's Cell - Confirm reception move`)
     page.form().submitButton().click()
     page
       .errorSummary()
@@ -295,7 +295,7 @@ context.skip('Successful reception move journey', () => {
       .moveReason()
       .type('{backspace}{backspace}{backspace}{backspace}Transfer due to staff conflict of interest')
     page.form().submitButton().click()
-    cy.title().should('eq', 'This person has been moved to reception - Digital Prison Services')
+    cy.title().should('eq', `Change Someone's Cell - This person has been moved to reception`)
   })
 })
 
