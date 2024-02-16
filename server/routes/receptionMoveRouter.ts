@@ -2,6 +2,7 @@ import express from 'express'
 import considerRisksController from '../controllers/cellMove/considerRisksReception'
 import confirmReceptionMoveController from '../controllers/cellMove/confirmReceptionMove'
 import confirmationController from '../controllers/cellMove/confirmationReception'
+import receptionFullController from '../controllers/cellMove/receptionFull'
 
 const router = express.Router({ mergeParams: true })
 
@@ -16,6 +17,7 @@ const controller = services => {
   router.post('/confirm-reception-move', confirmReceptionMovePost)
 
   router.get('/confirmation', confirmationController(services))
+  router.get('/reception-full', receptionFullController(services))
 
   return router
 }

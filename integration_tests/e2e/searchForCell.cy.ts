@@ -231,7 +231,7 @@ context('A user can search for a cell', () => {
       })
     })
 
-    context.skip('When referred from the view residential location page', () => {
+    context('When referred from the view residential location page', () => {
       beforeEach(() => {
         cy.task('stubInmates', {
           locationId: 'MDI-1',

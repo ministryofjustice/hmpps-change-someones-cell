@@ -151,7 +151,7 @@ describe('Reception confirm move page ', () => {
   })
 })
 
-describe.skip('Reception full journey', () => {
+describe('Reception full journey', () => {
   it('should redirect to reception full page', () => {
     cy.task('stubReceptionWithCapacity', {
       agencyId: 'MDI',
@@ -163,16 +163,16 @@ describe.skip('Reception full journey', () => {
     page.form().moveReason().type('Urgent medical appointment')
     page.form().submitButton().click()
 
-    cy.title().should('eq', 'No space available in reception - Digital Prison Services')
+    cy.title().should('eq', `Change Someone's Cell - No space available in reception`)
     cy.get('.govuk-back-link')
       .invoke('attr', 'href')
       .then(href => {
-        expect(href).to.equal('http://localhost:3008/prisoner/G3878UK/reception-move/confirm-reception-move')
+        expect(href).to.include('/prisoner/G3878UK/reception-move/confirm-reception-move')
       })
     cy.get('[data-test="location-details-link"]')
       .invoke('attr', 'href')
       .then(href => {
-        expect(href).to.equal('/prisoner/G3878UK/location-details')
+        expect(href).to.equal('http://localhost:3101/prisoner/G3878UK/location-details')
       })
   })
 })
