@@ -56,7 +56,7 @@ export default ({ locationService, nonAssociationsService, prisonerDetailsServic
         },
       }
 
-      let backUrl = req.headers.referer
+      let backUrl = req.session?.referrerUrl
       // If the referrer is a later page in the journey (i.e. the user already clicked back to get here), make the back
       // link point to the prisoner search page instead
       if (!backUrl || backUrl.endsWith('/cell-move/select-cell') || backUrl.endsWith('/cell-move/confirm-cell-move')) {

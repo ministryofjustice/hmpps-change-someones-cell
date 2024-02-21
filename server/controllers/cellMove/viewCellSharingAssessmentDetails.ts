@@ -3,6 +3,7 @@ import { putLastNameFirst, hasLength } from '../../utils'
 import { getBackLinkData, translateCsra } from './cellMoveUtils'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import LocationService from '../../services/locationService'
+import config from '../../config'
 
 type Params = {
   locationService: LocationService
@@ -41,11 +42,11 @@ export default ({ locationService, prisonerDetailsService }: Params) =>
             moment(mostRecentAssessment.assessmentDate, 'YYYY-MM-DD').format('D MMMM YYYY')) ||
           'Not entered',
         comment: (mostRecentAssessment && mostRecentAssessment.assessmentComment) || 'Not entered',
-        ...getBackLinkData(req.headers.referer, offenderNo),
+        ...getBackLinkData(req.session?.referrerUrl, offenderNo),
       })
     } catch (error) {
       res.locals.redirectUrl = `/prisoner/${offenderNo}/cell-move/search-for-cell`
-      res.locals.homeUrl = `/prisoner/${offenderNo}`
+      res.locals.homeUrl = `${config.prisonerProfileUrl}/prisoner/${offenderNo}`
       throw error
     }
   }

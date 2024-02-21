@@ -497,6 +497,15 @@ context('A user can see conflicts in cell', () => {
         cy.contains('Back').click()
         cy.contains('Select an available cell')
       })
+
+      it('should still have the correct back link when validation errors are shown', () => {
+        stubPrisonDetails()
+        const page = ConsiderRisksPage.goTo(offenderNo, 1)
+        page.form().submitButton().click()
+        page.errorSummary().contains('Select yes if you are sure you want to select the cell')
+        cy.contains('Back').click()
+        cy.contains('Select an available cell')
+      })
     })
   })
 })

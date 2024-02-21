@@ -3,6 +3,7 @@ import logger from '../../../logger'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import { OffenderCell, ReferenceCode } from '../../data/prisonApiClient'
+import config from '../../config'
 
 jest.mock('../../services/prisonerCellAllocationService')
 jest.mock('../../services/prisonerDetailsService')
@@ -18,13 +19,13 @@ describe('Confirm reception move', () => {
 
   const systemClientToken = 'system_token'
 
-  const req = {
+  const req: any = {
     originalUrl: 'http://localhost',
     params: { offenderNo: 'A12345' },
     query: {},
-    headers: { referer: '' },
     flash: jest.fn(),
     body: {},
+    session: {},
   }
   const res = {
     locals: {
@@ -90,7 +91,7 @@ describe('Confirm reception move', () => {
     })
 
     it('Should set backUrl to the previous page', async () => {
-      req.headers.referer = '/prisoner/A12345/reception-move/consider-risks-reception'
+      req.session.referrerUrl = '/prisoner/A12345/reception-move/consider-risks-reception'
       await controller.view(req, res)
 
       expect(res.render).toHaveBeenCalledWith(
@@ -99,7 +100,7 @@ describe('Confirm reception move', () => {
       )
     })
     it('Should set backUrl to null', async () => {
-      req.headers.referer = null
+      req.session.referrerUrl = null
       await controller.view(req, res)
       expect(res.render).toHaveBeenCalledWith(
         'receptionMove/confirmReceptionMove.njk',
@@ -174,12 +175,12 @@ describe('Confirm reception move', () => {
       )
     })
     it('should render complete set of render data', async () => {
-      req.headers.referer = '/prisoner/A12345/reception-move/consider-risks-reception'
+      req.session.referrerUrl = '/prisoner/A12345/reception-move/consider-risks-reception'
       await controller.view(req, res)
 
       expect(res.render).toHaveBeenCalledWith('receptionMove/confirmReceptionMove.njk', {
         backUrl: '/prisoner/A12345/reception-move/consider-risks-reception',
-        cancelLinkHref: '/prisoner/A12345/location-details',
+        cancelLinkHref: `${config.prisonerProfileUrl}/prisoner/A12345/location-details`,
         errors: undefined,
         formValues: { comment: undefined },
         offenderName: 'Bob Doe',

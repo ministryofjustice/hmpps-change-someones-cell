@@ -6,6 +6,7 @@ import { logError } from '../../logError'
 import NonAssociationsService from '../../services/nonAssociationsService'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
+import config from '../../config'
 
 type Params = {
   nonAssociationsService: NonAssociationsService
@@ -144,7 +145,7 @@ export default ({ nonAssociationsService, prisonerCellAllocationService, prisone
         csraDetailsUrl: `/prisoner/${offenderNo}/cell-move/cell-sharing-risk-assessment-details`,
         displayLinkToPrisonersMostRecentCsra,
         convertedCsra: translateCsra(prisonerDetails.csraClassificationCode),
-        backUrl: `/prisoners/${offenderNo}/location-details`,
+        backUrl: `${config.prisonerProfileUrl}/prisoner/${offenderNo}/location-details`,
         hasNonAssociations: nonAssociationsInEstablishment?.length > 0,
         nonAssociationsRows,
         offendersInReception: otherOffenders,
@@ -153,7 +154,7 @@ export default ({ nonAssociationsService, prisonerCellAllocationService, prisone
       })
     } catch (error) {
       logError(req.originalUrl, error, 'error getting consider-risks-reception')
-      res.locals.homeUrl = `/prisoner/${offenderNo}`
+      res.locals.homeUrl = `${config.prisonerProfileUrl}/prisoner/${offenderNo}`
       throw error
     }
   }
@@ -172,7 +173,7 @@ export default ({ nonAssociationsService, prisonerCellAllocationService, prisone
     if (considerRisksReception === 'yes') {
       return res.redirect(`/prisoner/${offenderNo}/reception-move/confirm-reception-move`)
     }
-    return res.redirect(`/prisoner/${offenderNo}/location-details`)
+    return res.redirect(`${config.prisonerProfileUrl}/prisoner/${offenderNo}/location-details`)
   }
 
   return { view, submit }

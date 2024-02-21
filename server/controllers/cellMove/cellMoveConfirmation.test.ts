@@ -1,6 +1,7 @@
 import cellMoveConfirmation from './cellMoveConfirmation'
 import LocationService from '../../services/locationService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
+import config from '../../config'
 
 jest.mock('../../services/locationService')
 jest.mock('../../services/prisonerDetailsService')
@@ -57,6 +58,6 @@ describe('Cell move confirmation', () => {
     await expect(controller(req, res)).rejects.toThrow(error)
 
     expect(res.locals.redirectUrl).toBe(`/prisoner/${offenderNo}/cell-move/search-for-cell`)
-    expect(res.locals.homeUrl).toBe(`/prisoner/${offenderNo}`)
+    expect(res.locals.homeUrl).toBe(`${config.prisonerProfileUrl}/prisoner/${offenderNo}`)
   })
 })

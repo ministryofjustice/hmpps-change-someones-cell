@@ -4,6 +4,7 @@ import NonAssociationsService from '../../services/nonAssociationsService'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import { Assessment } from '../../data/prisonApiClient'
+import config from '../../config'
 
 jest.mock('../../services/nonAssociationsService')
 jest.mock('../../services/prisonerCellAllocationService')
@@ -226,7 +227,7 @@ describe('Consider risks reception', () => {
       expect(res.render).toHaveBeenCalledWith(
         'receptionMove/considerRisksReception.njk',
         expect.objectContaining({
-          backUrl: '/prisoners/A12345/location-details',
+          backUrl: `${config.prisonerProfileUrl}/prisoner/A12345/location-details`,
           csraDetailsUrl: '/prisoner/A12345/cell-move/cell-sharing-risk-assessment-details',
           displayLinkToPrisonersMostRecentCsra: 'comment 1',
           nonAssociationLink: '/prisoner/A12345/cell-move/non-associations',
@@ -254,14 +255,16 @@ describe('Consider risks reception', () => {
     it('should redirect to previous page', async () => {
       req.body = { considerRisksReception: 'no' }
       await controller.submit(req, res)
-      expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${someOffenderNumber}/location-details`)
+      expect(res.redirect).toHaveBeenCalledWith(
+        `${config.prisonerProfileUrl}/prisoner/${someOffenderNumber}/location-details`,
+      )
     })
 
     it('should throw error when call to upstream api rejects', async () => {
       const error = new Error('Network error')
       prisonerDetailsService.getCsraAssessments.mockRejectedValue(error)
       await expect(controller.view(req, res)).rejects.toThrow(error)
-      expect(res.locals.homeUrl).toBe(`/prisoner/${someOffenderNumber}`)
+      expect(res.locals.homeUrl).toBe(`${config.prisonerProfileUrl}/prisoner/${someOffenderNumber}`)
     })
   })
 })

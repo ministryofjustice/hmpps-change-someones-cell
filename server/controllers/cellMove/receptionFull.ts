@@ -15,7 +15,7 @@ export default ({ prisonerDetailsService }: Params) => {
     const data = {
       offenderName: formatName(firstName, lastName),
       offenderNo,
-      backUrl: req.headers.referer,
+      backUrl: req.session?.referrerUrl,
     }
 
     return res.render('receptionMove/receptionFull.njk', data)

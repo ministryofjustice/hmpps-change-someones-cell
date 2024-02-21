@@ -37,12 +37,12 @@ export default ({ prisonerDetailsService }: Params) =>
         sexualOrientation: getValueByType('SEXO', profileInformation, 'resultValue') || 'Not entered',
         smokerOrVaper: getValueByType('SMOKE', profileInformation, 'resultValue') || 'Not entered',
         mainOffence: (mainOffence && mainOffence[0] && mainOffence[0].offenceDescription) || 'Not entered',
-        ...getBackLinkData(req.headers.referer, offenderNo),
+        ...getBackLinkData(req.session?.referrerUrl, offenderNo),
         profileUrl: `${config.prisonerProfileUrl}/prisoner/${offenderNo}`,
       })
     } catch (error) {
       res.locals.redirectUrl = `/prisoner/${offenderNo}/cell-move/search-for-cell`
-      res.locals.homeUrl = `/prisoner/${offenderNo}`
+      res.locals.homeUrl = `${config.prisonerProfileUrl}/prisoner/${offenderNo}`
       throw error
     }
   }

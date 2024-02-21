@@ -1,3 +1,4 @@
+import config from '../../config'
 import LocationService from '../../services/locationService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import { formatName } from '../../utils'
@@ -22,7 +23,7 @@ export default ({ locationService, prisonerDetailsService }: Params) =>
       })
     } catch (error) {
       res.locals.redirectUrl = `/prisoner/${offenderNo}/cell-move/search-for-cell`
-      res.locals.homeUrl = `/prisoner/${offenderNo}`
+      res.locals.homeUrl = `${config.prisonerProfileUrl}/prisoner/${offenderNo}`
       throw error
     }
   }

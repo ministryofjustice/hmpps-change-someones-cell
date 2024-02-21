@@ -1,4 +1,5 @@
 import logger from '../../../logger'
+import config from '../../config'
 import AnalyticsService from '../../services/analyticsService'
 import LocationService from '../../services/locationService'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
@@ -57,7 +58,7 @@ export default ({
       ? undefined
       : await cellMoveReasons(systemClientToken, prisonerCellAllocationService, reason)
 
-    const { backLink, backLinkText } = getConfirmBackLinkData(req.headers.referer, offenderNo)
+    const { backLink, backLinkText } = getConfirmBackLinkData(req.session?.referrerUrl, offenderNo)
     return res.render('cellMove/confirmCellMove.njk', {
       showWarning: !isCellSwap,
       offenderNo,
@@ -187,7 +188,7 @@ export default ({
     } catch (error) {
       res.locals.logMessagev = `Failed to make cell move to ${cellId}`
       res.locals.redirectUrl = `/prisoner/${offenderNo}/cell-move/select-cell`
-      res.locals.homeUrl = `/prisoner/${offenderNo}`
+      res.locals.homeUrl = `${config.prisonerProfileUrl}/prisoner/${offenderNo}`
       throw error
     }
   }

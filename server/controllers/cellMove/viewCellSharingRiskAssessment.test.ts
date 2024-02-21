@@ -1,6 +1,7 @@
 import viewCellSharingRiskAssessmentDetails from './viewCellSharingAssessmentDetails'
 import LocationService from '../../services/locationService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
+import config from '../../config'
 
 Reflect.deleteProperty(process.env, 'APPINSIGHTS_INSTRUMENTATIONKEY')
 
@@ -110,7 +111,7 @@ describe('view CSRA details', () => {
     await expect(controller(req, res)).rejects.toThrowError(error)
 
     expect(res.locals.redirectUrl).toBe('/prisoner/ABC123/cell-move/search-for-cell')
-    expect(res.locals.homeUrl).toBe('/prisoner/ABC123')
+    expect(res.locals.homeUrl).toBe(`${config.prisonerProfileUrl}/prisoner/ABC123`)
   })
 
   it('populates the data correctly', async () => {
@@ -132,7 +133,7 @@ describe('view CSRA details', () => {
   })
 
   it('sets the back link and text correctly when referer data is present', async () => {
-    req = { ...req, headers: { referer: `/prisoner/${offenderNo}/cell-move/select-cell` } }
+    req = { ...req, session: { referrerUrl: `/prisoner/${offenderNo}/cell-move/select-cell` } }
     await controller(req, res)
 
     expect(res.render).toHaveBeenCalledWith(

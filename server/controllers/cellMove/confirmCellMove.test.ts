@@ -4,6 +4,7 @@ import AnalyticsService from '../../services/analyticsService'
 import LocationService from '../../services/locationService'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
+import config from '../../config'
 
 jest.mock('../../services/analyticsService')
 jest.mock('../../services/locationService')
@@ -20,7 +21,7 @@ describe('Change cell play back details', () => {
 
   const systemClientToken = 'system_token'
 
-  const req = {
+  const req: any = {
     originalUrl: 'http://localhost',
     params: { offenderNo: 'A12345' },
     query: {},
@@ -313,7 +314,7 @@ describe('Change cell play back details', () => {
     `(
       'The back link button content is $backLinkText when the referer is $referer',
       async ({ referer, backLinkText }) => {
-        req.headers = { referer }
+        req.session = { referrerUrl: referer }
 
         await controller.index(req, res)
 
@@ -440,7 +441,7 @@ describe('Change cell play back details', () => {
       await expect(controller.post(req, res)).rejects.toThrowError(error)
 
       expect(res.locals.redirectUrl).toBe(`/prisoner/${offenderNo}/cell-move/select-cell`)
-      expect(res.locals.homeUrl).toBe(`/prisoner/${offenderNo}`)
+      expect(res.locals.homeUrl).toBe(`${config.prisonerProfileUrl}/prisoner/${offenderNo}`)
     })
 
     it('should raise an analytics event', async () => {

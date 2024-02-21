@@ -3,6 +3,7 @@ import { putLastNameFirst, formatName } from '../../utils'
 import { getBackLinkData, getNonAssociationsInEstablishment } from './cellMoveUtils'
 import NonAssociationsService from '../../services/nonAssociationsService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
+import config from '../../config'
 
 type Params = {
   nonAssociationsService: NonAssociationsService
@@ -55,10 +56,10 @@ export default ({ prisonerDetailsService, nonAssociationsService }: Params) =>
         prisonerName: formatName(firstName, lastName),
         searchForCellLink: `/prisoner/${offenderNo}/cell-move/search-for-cell`,
         offenderNo,
-        ...getBackLinkData(req.headers.referer, offenderNo),
+        ...getBackLinkData(req.session?.referrerUrl, offenderNo),
       })
     } catch (error) {
-      res.locals.homeUrl = `/prisoner/${offenderNo}`
+      res.locals.homeUrl = `${config.prisonerProfileUrl}/prisoner/${offenderNo}`
       throw error
     }
   }
