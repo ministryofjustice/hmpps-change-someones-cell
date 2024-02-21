@@ -320,4 +320,19 @@ context('Reception full journey', () => {
         expect(href).to.equal('http://localhost:3101/prisoner/G3878UK/location-details')
       })
   })
+
+  context('when validation errors are shown', () => {
+    it('should still have the correct back links', () => {
+      const page = considerRisksPage.goTo(offenderNo)
+
+      page.form().submitButton().click()
+      page.errorSummary().should('contain', 'There is a problem').and('contain', 'Select yes or no')
+
+      cy.get('.govuk-back-link')
+        .invoke('attr', 'href')
+        .then(href => {
+          expect(href).to.equal('http://localhost:3101/prisoner/G3878UK/location-details')
+        })
+    })
+  })
 })

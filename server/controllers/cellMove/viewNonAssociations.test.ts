@@ -2,6 +2,7 @@ import moment from 'moment'
 import viewNonAssociations from './viewNonAssociations'
 import NonAssociationsService from '../../services/nonAssociationsService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
+import config from '../../config'
 
 Reflect.deleteProperty(process.env, 'APPINSIGHTS_INSTRUMENTATIONKEY')
 
@@ -162,7 +163,7 @@ describe('view non associations', () => {
 
     await expect(controller(req, res)).rejects.toThrow(error)
 
-    expect(res.locals.homeUrl).toBe('/prisoner/ABC123')
+    expect(res.locals.homeUrl).toBe(`${config.prisonerProfileUrl}/prisoner/ABC123`)
   })
 
   it('populates the data correctly', async () => {
@@ -206,7 +207,7 @@ describe('view non associations', () => {
   })
 
   it('sets the back link and text correctly when referer data is present', async () => {
-    req = { ...req, headers: { referer: `/prisoner/${offenderNo}/cell-move/select-cell` } }
+    req = { ...req, session: { referrerUrl: `/prisoner/${offenderNo}/cell-move/select-cell` } }
     await controller(req, res)
 
     expect(res.render).toHaveBeenCalledWith(

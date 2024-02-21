@@ -43,10 +43,10 @@ describe('Reception full', () => {
     prisonerDetailsService.getDetails.mockResolvedValue(details)
 
     req = {
-      headers: { referer: 'refering-url' },
       params: {
         offenderNo: someOffenderNumber,
       },
+      session: { referrerUrl: 'refering-url' },
     }
 
     res = {

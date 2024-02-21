@@ -1,3 +1,5 @@
+import config from '../../config'
+
 export default () => async (req, res) => {
   const { offenderNo } = req.params
   const { cellDescription } = req.query
@@ -11,7 +13,7 @@ export default () => async (req, res) => {
     })
   } catch (error) {
     res.locals.redirectUrl = `/prisoner/${offenderNo}/cell-move/search-for-cell`
-    res.locals.homeUrl = `/prisoner/${offenderNo}`
+    res.locals.homeUrl = `${config.prisonerProfileUrl}/prisoner/${offenderNo}`
     throw error
   }
 }

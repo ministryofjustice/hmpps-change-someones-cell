@@ -178,14 +178,12 @@ export default ({
         return res.redirect(`/prisoner/${offenderNo}/cell-move/confirm-cell-move?cellId=${cellId}`)
       }
 
-      const profileUrl = `/prisoner/${offenderNo}`
-
       return res.render('cellMove/considerRisks.njk', {
         offenderNo,
         currentOffenderName,
         prisonerNameForBreadcrumb: putLastNameFirst(currentOffenderDetails.firstName, currentOffenderDetails.lastName),
-        profileUrl,
-        selectCellUrl: `${profileUrl}/cell-move/select-cell`,
+        profileUrl: `${config.prisonerProfileUrl}/prisoner/${offenderNo}`,
+        selectCellUrl: `/prisoner/${offenderNo}/cell-move/select-cell`,
         showOffendersNamesWithCsra,
         confirmationQuestionLabel: hasOccupants
           ? `Are you sure you want to move ${currentOffenderName} into a cell with ${createStringFromList(
@@ -214,7 +212,7 @@ export default ({
           currentOccupantsWithFormattedActiveAlerts.length > 0 ||
           categoryWarning,
         errors,
-        backUrl: `${profileUrl}/cell-move/select-cell`,
+        backUrl: `/prisoner/${offenderNo}/cell-move/select-cell`,
       })
     } catch (error) {
       res.locals.redirectUrl = `${config.prisonerProfileUrl}/prisoner/${offenderNo}/location-details`
@@ -288,7 +286,7 @@ export default ({
       return res.redirect(redirectUrl)
     } catch (error) {
       res.locals.redirectUrl = redirectUrl
-      res.locals.homeUrl = `/prisoner/${offenderNo}`
+      res.locals.homeUrl = `${config.prisonerProfileUrl}/prisoner/${offenderNo}`
       throw error
     }
   }

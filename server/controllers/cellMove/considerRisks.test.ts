@@ -6,6 +6,7 @@ import NonAssociationsService from '../../services/nonAssociationsService'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import { OffenderDetails } from '../../data/prisonApiClient'
+import config from '../../config'
 
 Reflect.deleteProperty(process.env, 'APPINSIGHTS_INSTRUMENTATIONKEY')
 
@@ -621,7 +622,7 @@ describe('move validation', () => {
         'Occupant Two is CSRA Standard.',
       ],
       prisonerNameForBreadcrumb: 'User, Test',
-      profileUrl: '/prisoner/ABC123',
+      profileUrl: `${config.prisonerProfileUrl}/prisoner/ABC123`,
       selectCellUrl: '/prisoner/ABC123/cell-move/select-cell',
       showOffendersNamesWithCsra: true,
       showRisks: true,
@@ -885,6 +886,6 @@ describe('move validation', () => {
 
     await expect(controller.post(req, res)).rejects.toThrow(error)
     expect(res.locals.redirectUrl).toBe(`/prisoner/${offenderNo}/cell-move/select-cell`)
-    expect(res.locals.homeUrl).toBe(`/prisoner/${offenderNo}`)
+    expect(res.locals.homeUrl).toBe(`${config.prisonerProfileUrl}/prisoner/${offenderNo}`)
   })
 })

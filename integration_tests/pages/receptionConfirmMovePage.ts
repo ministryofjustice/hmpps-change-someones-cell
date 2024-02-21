@@ -20,14 +20,14 @@ const receptionConfirmMovePage: () => any = () =>
         .get('[data-test="cancel-link"]')
         .invoke('attr', 'href')
         .then(href => {
-          expect(href).to.equal('/prisoner/G3878UK/location-details')
+          expect(href).to.equal('http://localhost:3101/prisoner/G3878UK/location-details')
         }),
     locationDetailsLink: () =>
       cy
         .get('[data-test="location-details-link"]')
         .invoke('attr', 'href')
         .then(href => {
-          expect(href).to.equal('/prisoner/G3878UK/location-details')
+          expect(href).to.equal('http://localhost:3101/prisoner/G3878UK/location-details')
         }),
   })
 

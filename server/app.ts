@@ -23,6 +23,7 @@ import routes from './routes'
 import type { Services } from './services'
 import setupApiRoutes from './setupApiRoutes'
 import returnUrl from './middleware/returnUrl'
+import referrerUrl from './middleware/referrerUrl'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -46,6 +47,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpCurrentUser(services))
   app.use(populateClientToken())
   app.use(returnUrl())
+  app.use(referrerUrl())
   app.use(setupApiRoutes(services))
 
   app.use(routes(services))

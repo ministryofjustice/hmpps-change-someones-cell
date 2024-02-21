@@ -1,6 +1,7 @@
 import spaceCreatedController from './spaceCreated'
 import { OffenderDetails } from '../../data/prisonApiClient'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
+import config from '../../config'
 
 jest.mock('../../services/prisonerDetailsService')
 
@@ -81,7 +82,7 @@ describe('Space created', () => {
 
       await expect(controller(req, res)).rejects.toThrowError(error)
       expect(res.locals.redirectUrl).toBe(`/prisoner/${offenderNo}/cell-move/search-for-cell`)
-      expect(res.locals.homeUrl).toBe(`/prisoner/${offenderNo}`)
+      expect(res.locals.homeUrl).toBe(`${config.prisonerProfileUrl}/prisoner/${offenderNo}`)
     })
   })
 })

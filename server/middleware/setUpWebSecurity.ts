@@ -25,7 +25,7 @@ export default function setUpWebSecurity(): Router {
   const fontSrc = ["'self'", 'data:']
   const imgSrc = ["'self'", 'data:']
   const connectSrc = ["'self'"]
-  const formAction = [`'self' ${config.apis.hmppsAuth.externalUrl}`]
+  const formAction = ["'self'", config.apis.hmppsAuth.externalUrl, config.prisonerProfileUrl]
 
   if (config.apis.frontendComponents.url) {
     scriptSrc.push(config.apis.frontendComponents.url)

@@ -1,3 +1,4 @@
+import config from '../../config'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import viewOffenderDetails from './viewOffenderDetails'
 
@@ -82,7 +83,7 @@ describe('view offender details', () => {
     await expect(controller(req, res)).rejects.toThrowError(error)
 
     expect(res.locals.redirectUrl).toBe('/prisoner/ABC123/cell-move/search-for-cell')
-    expect(res.locals.homeUrl).toBe('/prisoner/ABC123')
+    expect(res.locals.homeUrl).toBe(`${config.prisonerProfileUrl}/prisoner/ABC123`)
   })
 
   it('populates the data correctly when all present', async () => {
@@ -156,7 +157,7 @@ describe('view offender details', () => {
   })
 
   it('sets the back link and text correctly when referer data is present', async () => {
-    req = { ...req, headers: { referer: `/prisoner/${offenderNo}/cell-move/select-cell` } }
+    req = { ...req, session: { referrerUrl: `/prisoner/${offenderNo}/cell-move/select-cell` } }
     await controller(req, res)
 
     expect(res.render).toHaveBeenCalledWith(

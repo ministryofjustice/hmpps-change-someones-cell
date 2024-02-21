@@ -377,8 +377,8 @@ describe('select location', () => {
         await controller(
           {
             ...req,
-            headers: {
-              referer: 'http://dps/prisoner/G0637UO/cell-move/select-cell',
+            session: {
+              referrerUrl: 'http://dps/prisoner/G0637UO/cell-move/select-cell',
             },
           },
           res,
@@ -396,8 +396,8 @@ describe('select location', () => {
         await controller(
           {
             ...req,
-            headers: {
-              referer: 'http://dps/prisoner/G0637UO/cell-move/confirm-cell-move',
+            session: {
+              referrerUrl: 'http://dps/prisoner/G0637UO/cell-move/confirm-cell-move',
             },
           },
           res,
@@ -415,8 +415,8 @@ describe('select location', () => {
         await controller(
           {
             ...req,
-            headers: {
-              referer: '/dps/some/other/page',
+            session: {
+              referrerUrl: '/dps/some/other/page',
             },
           },
           res,

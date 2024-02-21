@@ -3,6 +3,7 @@ import { properCaseName } from '../../utils'
 import logger from '../../../logger'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
+import config from '../../config'
 
 const sortOnListSeq = (a, b) => a.listSeq - b.listSeq
 
@@ -53,14 +54,14 @@ export default ({ prisonerCellAllocationService, prisonerDetailsService }: Param
 
     let backUrl = `/prisoner/${offenderNo}/reception-move/consider-risks-reception`
 
-    if (!req.headers.referer) {
+    if (!req.session?.referrerUrl) {
       backUrl = null
     }
 
     const formValues = req.flash('formValues') as any[]
     const { reason, comment } = (formValues && formValues[0]) || {}
     const receptionMoveReasonRadioValues = await receptionMoveReasons(systemClientToken, reason)
-    const cancelLinkHref = `/prisoner/${offenderNo}/location-details`
+    const cancelLinkHref = `${config.prisonerProfileUrl}/prisoner/${offenderNo}/location-details`
 
     const data = {
       offenderName: `${properCaseName(firstName)} ${properCaseName(lastName)}`,
