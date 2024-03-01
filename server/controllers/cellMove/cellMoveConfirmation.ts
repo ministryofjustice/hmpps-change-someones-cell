@@ -19,6 +19,7 @@ export default ({ locationService, prisonerDetailsService }: Params) =>
       const { description } = await locationService.getLocation(systemClientToken, cellId)
 
       return res.render('cellMove/confirmation.njk', {
+        backToStartUrl: `/back-to-start?serviceUrlParams[offenderNo]=${offenderNo}`,
         confirmationMessage: `${formatName(firstName, lastName)} has been moved to cell ${description}`,
       })
     } catch (error) {

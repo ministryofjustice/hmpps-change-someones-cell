@@ -9,6 +9,7 @@ declare module 'express-session' {
     returnTo: string
     nowInMinutes: number
     referrerUrl?: string
+    returnToService?: string
   }
 }
 

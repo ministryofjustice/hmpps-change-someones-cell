@@ -189,7 +189,7 @@ describe('View Residential Location', () => {
               formattedName: 'John Smith',
               offenderNo: 'A1234BC',
               cellHistoryUrl: 'http://localhost:3000/prisoner/A1234BC/location-details',
-              cellSearchUrl: '/prisoner/A1234BC/cell-move/search-for-cell?returnUrl=/',
+              cellSearchUrl: '/prisoner/A1234BC/cell-move/search-for-cell?returnToService=default',
               profileUrl: 'http://localhost:3000/prisoner/A1234BC',
             },
             {
@@ -209,7 +209,7 @@ describe('View Residential Location', () => {
               formattedName: 'Steve Smith',
               offenderNo: 'B4567CD',
               cellHistoryUrl: 'http://localhost:3000/prisoner/B4567CD/location-details',
-              cellSearchUrl: '/prisoner/B4567CD/cell-move/search-for-cell?returnUrl=/',
+              cellSearchUrl: '/prisoner/B4567CD/cell-move/search-for-cell?returnToService=default',
               profileUrl: 'http://localhost:3000/prisoner/B4567CD',
             },
           ],

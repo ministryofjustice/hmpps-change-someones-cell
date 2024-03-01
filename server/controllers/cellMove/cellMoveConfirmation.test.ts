@@ -49,6 +49,18 @@ describe('Cell move confirmation', () => {
     expect(locationService.getLocation).toHaveBeenCalledWith(systemClientToken, 1)
   })
 
+  it('should render the confirmation page', async () => {
+    await controller(req, res)
+
+    expect(res.render).toHaveBeenCalledWith(
+      'cellMove/confirmation.njk',
+      expect.objectContaining({
+        backToStartUrl: '/back-to-start?serviceUrlParams[offenderNo]=A12345',
+        confirmationMessage: 'Bob Doe has been moved to cell A-1-012',
+      }),
+    )
+  })
+
   it('should store correct redirect and home url then re-throw the error', async () => {
     const offenderNo = 'A12345'
     const error = new Error('network error')

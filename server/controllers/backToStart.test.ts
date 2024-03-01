@@ -1,3 +1,4 @@
+import config from '../config'
 import backToStart from './backToStart'
 
 describe('Back to start url', () => {
@@ -23,18 +24,26 @@ describe('Back to start url', () => {
     expect(res.redirect).toHaveBeenCalledWith('/')
   })
 
-  describe('when there is a returnUrl set in session', () => {
+  describe('when a returnToService of prisonerProfile is set in the session', () => {
     beforeEach(() => {
-      req.session.returnUrl = '/url-to-return-to'
+      req.session.returnToService = 'prisonerProfile'
     })
 
-    it('should redirect to the returnUrl specified', async () => {
+    it('should redirect to the prisoner profile', async () => {
       await controller(req, res)
 
-      expect(res.redirect).toHaveBeenCalledWith('/url-to-return-to')
+      expect(res.redirect).toHaveBeenCalledWith(config.prisonerProfileUrl)
     })
 
-    it('should remove the returnUrl from the session', async () => {
+    it('should redirect to a specific prisoner profile if specified', async () => {
+      const offenderNo = 'AB1234C'
+
+      await controller({ ...req, query: { serviceUrlParams: { offenderNo } } }, res)
+
+      expect(res.redirect).toHaveBeenCalledWith(`${config.prisonerProfileUrl}/prisoner/${offenderNo}`)
+    })
+
+    it('should remove the returnToService from the session', async () => {
       await controller(req, res)
 
       expect(req.session).toEqual({})
