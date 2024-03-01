@@ -48,7 +48,7 @@ export default ({ prisonerCellAllocationService }: Params) =>
           ),
         ),
         cellHistoryUrl: `${config.prisonerProfileUrl}/prisoner/${prisoner.offenderNo}/location-details`,
-        cellSearchUrl: `/prisoner/${prisoner.offenderNo}/cell-move/search-for-cell?returnUrl=/`,
+        cellSearchUrl: `/prisoner/${prisoner.offenderNo}/cell-move/search-for-cell?returnToService=default`,
       }))
 
     return res.render('cellMove/cellMovePrisonerSearch.njk', {

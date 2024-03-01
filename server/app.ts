@@ -22,7 +22,7 @@ import populateClientToken from './middleware/populateClientToken'
 import routes from './routes'
 import type { Services } from './services'
 import setupApiRoutes from './setupApiRoutes'
-import returnUrl from './middleware/returnUrl'
+import returnToService from './middleware/returnToService'
 import referrerUrl from './middleware/referrerUrl'
 
 export default function createApp(services: Services): express.Application {
@@ -46,7 +46,7 @@ export default function createApp(services: Services): express.Application {
   app.get('*', getFrontendComponents(services))
   app.use(setUpCurrentUser(services))
   app.use(populateClientToken())
-  app.use(returnUrl())
+  app.use(returnToService())
   app.use(referrerUrl())
   app.use(setupApiRoutes(services))
 
