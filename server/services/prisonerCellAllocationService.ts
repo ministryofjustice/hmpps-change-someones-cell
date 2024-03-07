@@ -1,5 +1,6 @@
 import { PrisonApiClient, WhereaboutsApiClient } from '../data'
 import { Alert, Offender, OffenderInReception } from '../data/prisonApiClient'
+import logger from '../../logger'
 
 export interface OffenderWithAlerts extends OffenderInReception {
   alerts?: string[]
@@ -71,7 +72,10 @@ export default class PrisonerCellAllocationService {
   async getOffendersInReception(token: string, agencyId: string): Promise<OffenderWithAlerts[]> {
     const offenders = await this.prisonApiClient.getOffendersInReception(token, agencyId)
 
-    if (!offenders) return []
+    if (!offenders || offenders.length === 0) {
+      logger.info(`Agency ${agencyId} has no prisoners in reception`)
+      return []
+    }
 
     const offenderNumbers = offenders.map(o => o.offenderNo)
     const alerts = await this.getActiveAlerts(token, offenderNumbers)

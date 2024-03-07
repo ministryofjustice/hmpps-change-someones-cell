@@ -415,5 +415,10 @@ describe('Prisoner cell allocation service', () => {
         new Error('some error'),
       )
     })
+    it('Does not call to get offender alerts if none in reception', async () => {
+      prisonApiClient.getOffendersInReception.mockResolvedValue([])
+      await prisonerCellAllocationService.getOffendersInReception(token, 'LEI')
+      expect(prisonApiClient.getAlertsGlobal).not.toHaveBeenCalled()
+    })
   })
 })
