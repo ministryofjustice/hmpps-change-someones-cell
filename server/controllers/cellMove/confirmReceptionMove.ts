@@ -111,6 +111,9 @@ export default ({ prisonerCellAllocationService, prisonerDetailsService }: Param
         comment,
       )
 
+      // flush formValues from flash otherwise they will be carried over when the next prisoner is moved to reception
+      req.flash('formValues')
+
       return res.redirect(`/prisoner/${offenderNo}/reception-move/confirmation`)
     } catch (error) {
       logger.error(`Error moving ${offenderNo} to reception`)
