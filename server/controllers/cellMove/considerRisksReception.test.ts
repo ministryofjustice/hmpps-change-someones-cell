@@ -267,6 +267,12 @@ describe('Consider risks reception', () => {
       )
     })
 
+    it('should get csra assessments only once if no other prisoners in reception', async () => {
+      prisonerCellAllocationService.getOffendersInReception.mockResolvedValue([])
+      await controller.view(req, res)
+      expect(prisonerDetailsService.getCsraAssessments).toHaveBeenCalledTimes(1)
+    })
+
     it('should not flash errors', async () => {
       req.body = { considerRisksReception: 'yes' }
       await controller.submit(req, res)

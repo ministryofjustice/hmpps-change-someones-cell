@@ -75,10 +75,15 @@ export default ({ nonAssociationsService, prisonerCellAllocationService, prisone
         activeCaseLoadId,
       )
       const offenderNumbersOfAllInReception = offendersInReception.map(offender => offender.offenderNo)
-      const offenderCsraStatus = await prisonerDetailsService.getCsraAssessments(
-        systemClientToken,
-        offenderNumbersOfAllInReception,
-      )
+
+      let offenderCsraStatus = []
+
+      if (offenderNumbersOfAllInReception.length > 0) {
+        offenderCsraStatus = await prisonerDetailsService.getCsraAssessments(
+          systemClientToken,
+          offenderNumbersOfAllInReception,
+        )
+      }
 
       const otherOffenders = offendersInReception
         .sort((left, right) => left.lastName.localeCompare(right.lastName, 'en', { ignorePunctuation: true }))
