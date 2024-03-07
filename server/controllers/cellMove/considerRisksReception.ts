@@ -134,6 +134,9 @@ export default ({ nonAssociationsService, prisonerCellAllocationService, prisone
         comment: nonAssociation.comments || 'Not entered',
       }))
 
+      const personOrPeople = otherOffenders.length === 1 ? 'person' : 'people'
+      const inReceptionCount = `${otherOffenders.length} ${personOrPeople} in reception`
+
       return res.render('receptionMove/considerRisksReception.njk', {
         reverseOrderPrisonerName: putLastNameFirst(prisonerDetails.firstName, prisonerDetails.lastName).trim(),
         prisonerName: formatName(prisonerDetails.firstName, prisonerDetails.lastName),
@@ -149,7 +152,7 @@ export default ({ nonAssociationsService, prisonerCellAllocationService, prisone
         hasNonAssociations: nonAssociationsInEstablishment?.length > 0,
         nonAssociationsRows,
         offendersInReception: otherOffenders,
-        inReceptionCount: `${otherOffenders.length} people in reception`,
+        inReceptionCount,
         errors: req.flash('errors'),
       })
     } catch (error) {
