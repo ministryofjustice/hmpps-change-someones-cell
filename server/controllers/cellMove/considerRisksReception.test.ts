@@ -171,6 +171,36 @@ describe('Consider risks reception', () => {
         }),
       )
     })
+    it('should use singular description when only one person in reception', async () => {
+      prisonerCellAllocationService.getOffendersInReception.mockResolvedValue([
+        {
+          offenderNo: 'B123',
+          firstName: 'Jack',
+          lastName: 'Simpson',
+          bookingId: 323,
+          dateOfBirth: '2002-01-02',
+          alerts: [],
+        },
+      ])
+      await controller.view(req, res)
+
+      expect(res.render).toHaveBeenCalledWith(
+        'receptionMove/considerRisksReception.njk',
+        expect.objectContaining({
+          inReceptionCount: '1 person in reception',
+          offendersInReception: [
+            {
+              alerts: [],
+              csraClassification: 'Not entered',
+              displayCsraLink: undefined,
+              name: 'Simpson, Jack',
+              nonAssociation: false,
+              offenderNo: 'B123',
+            },
+          ],
+        }),
+      )
+    })
     it('should populate view model with other prisoners in reception', async () => {
       prisonerCellAllocationService.getOffendersInReception.mockResolvedValue([
         {
@@ -235,6 +265,12 @@ describe('Consider risks reception', () => {
           searchForCellRootUrl: '/prisoner/A12345/cell-move/search-for-cell',
         }),
       )
+    })
+
+    it('should get csra assessments only once if no other prisoners in reception', async () => {
+      prisonerCellAllocationService.getOffendersInReception.mockResolvedValue([])
+      await controller.view(req, res)
+      expect(prisonerDetailsService.getCsraAssessments).toHaveBeenCalledTimes(1)
     })
 
     it('should not flash errors', async () => {

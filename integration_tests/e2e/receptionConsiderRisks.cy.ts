@@ -336,3 +336,34 @@ context('Reception full journey', () => {
     })
   })
 })
+
+context('Multiple moves to reception', () => {
+  it('should not persist previous selections', () => {
+    const page = considerRisksPage.goTo(offenderNo)
+
+    page.receptionMoveHeaders().should('exist')
+    page.nonAssociationsLink().should('exist')
+    page.form().confirmMoveYes().click()
+    page.form().submitButton().click()
+    cy.title().should('eq', `Change Someone's Cell - Confirm reception move`)
+    page.form().submitButton().click()
+    page
+      .errorSummary()
+      .should('contain', 'Select a reason for the move')
+      .and('contain', 'Explain why the person is being moved to reception')
+    page.form().selectReceptionReason().click()
+    page.form().moveReason().type('Risk')
+    page.form().submitButton().click()
+    page.errorSummary().should('contain', 'Provide more detail about why this person is being moved to reception')
+    page
+      .form()
+      .moveReason()
+      .type('{backspace}{backspace}{backspace}{backspace}Transfer due to staff conflict of interest')
+    page.form().submitButton().click()
+
+    considerRisksPage.goTo(offenderNo)
+    page.form().confirmMoveYes().click()
+    page.form().submitButton().click()
+    page.form().moveReason().should('have.value', '')
+  })
+})

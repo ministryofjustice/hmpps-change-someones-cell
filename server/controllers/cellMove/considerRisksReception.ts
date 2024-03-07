@@ -75,10 +75,15 @@ export default ({ nonAssociationsService, prisonerCellAllocationService, prisone
         activeCaseLoadId,
       )
       const offenderNumbersOfAllInReception = offendersInReception.map(offender => offender.offenderNo)
-      const offenderCsraStatus = await prisonerDetailsService.getCsraAssessments(
-        systemClientToken,
-        offenderNumbersOfAllInReception,
-      )
+
+      let offenderCsraStatus = []
+
+      if (offenderNumbersOfAllInReception.length > 0) {
+        offenderCsraStatus = await prisonerDetailsService.getCsraAssessments(
+          systemClientToken,
+          offenderNumbersOfAllInReception,
+        )
+      }
 
       const otherOffenders = offendersInReception
         .sort((left, right) => left.lastName.localeCompare(right.lastName, 'en', { ignorePunctuation: true }))
@@ -134,6 +139,9 @@ export default ({ nonAssociationsService, prisonerCellAllocationService, prisone
         comment: nonAssociation.comments || 'Not entered',
       }))
 
+      const personOrPeople = otherOffenders.length === 1 ? 'person' : 'people'
+      const inReceptionCount = `${otherOffenders.length} ${personOrPeople} in reception`
+
       return res.render('receptionMove/considerRisksReception.njk', {
         reverseOrderPrisonerName: putLastNameFirst(prisonerDetails.firstName, prisonerDetails.lastName).trim(),
         prisonerName: formatName(prisonerDetails.firstName, prisonerDetails.lastName),
@@ -149,7 +157,7 @@ export default ({ nonAssociationsService, prisonerCellAllocationService, prisone
         hasNonAssociations: nonAssociationsInEstablishment?.length > 0,
         nonAssociationsRows,
         offendersInReception: otherOffenders,
-        inReceptionCount: `${otherOffenders.length} people in reception`,
+        inReceptionCount,
         errors: req.flash('errors'),
       })
     } catch (error) {
