@@ -50,9 +50,12 @@ export default ({ userService }: Services) => {
   }
 
   return async (req, res, next) => {
-    if (!req.session.userDetails) {
-      const userDetails = await userService.getUser(res.locals.user.token)
+    try {
+      const userDetails = res.locals.user && (await userService.getUser(res.locals.user.token))
       req.session.userDetails = userDetails
+    } catch (error) {
+      logger.error(error, `Failed to retrieve user for: ${res.locals.user?.username}`)
+      next(error)
     }
 
     let activeCaseLoad
