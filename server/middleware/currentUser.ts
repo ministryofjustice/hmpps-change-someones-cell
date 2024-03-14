@@ -12,30 +12,6 @@ export type User = {
 }
 
 export default ({ userService }: Services) => {
-  const getActiveCaseload = async (req, res) => {
-    const { activeCaseLoadId, username } = req.session.userDetails
-    const { allCaseloads: caseloads } = req.session
-
-    const activeCaseLoad = caseloads.find(cl => cl.caseLoadId === activeCaseLoadId)
-    if (activeCaseLoad) {
-      return activeCaseLoad
-    }
-
-    const potentialCaseLoad = caseloads.find(cl => cl.caseLoadId !== '___')
-    if (potentialCaseLoad) {
-      const firstCaseLoadId = potentialCaseLoad.caseLoadId
-      logger.warn(`No active caseload set for user: ${username}: setting to ${firstCaseLoadId}`)
-      await userService.setActiveCaseload(res.locals.user.token, potentialCaseLoad)
-
-      req.session.userDetails.activeCaseLoadId = firstCaseLoadId
-
-      return potentialCaseLoad
-    }
-
-    logger.warn(`No available caseload to set for user: ${username}`)
-    return null
-  }
-
   const getUserRoles = async (req, res) => {
     try {
       const { authorities: roles = [] } = jwtDecode(res.locals.user.token) as { authorities?: string[] }
@@ -52,40 +28,33 @@ export default ({ userService }: Services) => {
   return async (req, res, next) => {
     try {
       const userDetails = res.locals.user && (await userService.getUser(res.locals.user.token))
-      req.session.userDetails = userDetails
+
+      const feMeta: FeComponentsMeta = res.locals.feComponents?.meta
+
+      const allCaseloads = feMeta ? feMeta.caseLoads : await userService.userCaseLoads(res.locals.user.token)
+      const activeCaseLoad = feMeta
+        ? feMeta.activeCaseLoad
+        : allCaseloads.find(cl => cl.caseLoadId === userDetails.activeCaseLoadId)
+
+      const userRoles = await getUserRoles(req, res)
+
+      const user: User = {
+        ...res.locals.user,
+        username: userDetails.username,
+        userRoles,
+        allCaseloads,
+        displayName: forenameToInitial(userDetails.name as any),
+        activeCaseLoad,
+        activeCaseLoadId: userDetails.activeCaseLoadId,
+        backLink: req.session.userBackLink,
+      }
+
+      res.locals.user = user
+
+      next()
     } catch (error) {
-      logger.error(error, `Failed to retrieve user for: ${res.locals.user?.username}`)
+      logger.error(error, `Failed to retrieve details user for: ${res.locals.user?.username}`)
       next(error)
     }
-
-    let activeCaseLoad
-    let allCaseloads
-    const feMeta: FeComponentsMeta = res.locals.feComponents?.meta
-
-    if (feMeta) {
-      allCaseloads = feMeta.caseLoads
-      activeCaseLoad = feMeta.activeCaseLoad
-      req.session.allCaseloads = allCaseloads
-    } else {
-      allCaseloads = await userService.userCaseLoads(res.locals.user.token)
-      req.session.allCaseloads = allCaseloads
-      activeCaseLoad = await getActiveCaseload(req, res)
-    }
-
-    const userRoles = await getUserRoles(req, res)
-
-    const user: User = {
-      ...res.locals.user,
-      username: req.session.userDetails.username,
-      userRoles,
-      allCaseloads: req.session.allCaseloads,
-      displayName: forenameToInitial(req.session.userDetails.name),
-      activeCaseLoad,
-      backLink: req.session.userBackLink,
-    }
-
-    res.locals.user = user
-
-    next()
   }
 }

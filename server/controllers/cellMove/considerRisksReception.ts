@@ -18,11 +18,9 @@ export default ({ nonAssociationsService, prisonerCellAllocationService, prisone
   const view = async (req, res) => {
     const { offenderNo } = req.params
     const { systemClientToken, user } = res.locals
-    const { allCaseloads: userCaseLoads, userRoles } = user
+    const { allCaseloads: userCaseLoads, userRoles, activeCaseLoadId } = user
 
     try {
-      const { activeCaseLoadId } = req.session.userDetails
-
       const [prisonerDetails, assessments] = await Promise.all([
         prisonerDetailsService.getDetails(systemClientToken, offenderNo, true),
         prisonerDetailsService.getCsraAssessments(systemClientToken, [offenderNo]),
