@@ -12,7 +12,7 @@ generic-service:
   ingress:
     enabled: true
     host: app-hostname.local # override per environment
-    tlsSecretName: hmpps-change-someones-cell-cert
+    tlsSecretName: hmpps-prisoner-cell-allocation-cert
 
   livenessProbe:
     httpGet:
