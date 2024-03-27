@@ -16,6 +16,12 @@ generic-service:
     PRISONER_PROFILE_URL: "https://prisoner.digital.prison.service.justice.gov.uk"
     NON_ASSOCIATIONS_API_URL: "https://non-associations-api.hmpps.service.justice.gov.uk"
     WHEREABOUTS_API_URL: "https://whereabouts-api.service.justice.gov.uk"
+  
+  allowlist:
+    groups:
+      - internal
+      - prisons
 
 generic-prometheus-alerts:
   alertSeverity: digital-prison-service
+
