@@ -121,7 +121,7 @@ describe('View Residential Location', () => {
           assignedLivingUnitDesc: 'UNIT-1',
           iepLevel: 'Standard',
           categoryCode: 'C',
-          alertsDetails: ['XA', 'XVL'],
+          alertsDetails: ['XA', 'XGANG'],
         },
         {
           bookingId: 2,
@@ -135,7 +135,7 @@ describe('View Residential Location', () => {
           assignedLivingUnitDesc: 'CSWAP',
           iepLevel: 'Standard',
           categoryCode: 'C',
-          alertsDetails: ['RSS', 'XC'],
+          alertsDetails: ['XCU'],
         },
       ]
       prisonerCellAllocationService.getInmates = jest.fn().mockReturnValue(inmates)
@@ -171,12 +171,16 @@ describe('View Residential Location', () => {
               alerts: [
                 {
                   alertCodes: ['XA'],
-                  classes: 'alert-status alert-status--arsonist',
-                  img: '/assets/images/Arsonist_icon.png',
+                  classes: 'alert-status alert-status--security',
                   label: 'Arsonist',
                 },
+                {
+                  alertCodes: ['XGANG'],
+                  classes: 'alert-status alert-status--security',
+                  label: 'Gang member',
+                },
               ],
-              alertsDetails: ['XA', 'XVL'],
+              alertsDetails: ['XA', 'XGANG'],
               assignedLivingUnitDesc: 'UNIT-1',
               assignedLivingUnitId: 1,
               bookingId: 1,
@@ -196,7 +200,7 @@ describe('View Residential Location', () => {
               age: 30,
               agencyId: 'MDI',
               alerts: [],
-              alertsDetails: ['RSS', 'XC'],
+              alertsDetails: ['XCU'],
               assignedLivingUnitDesc: 'No cell allocated',
               assignedLivingUnitId: 2,
               bookingId: 2,
