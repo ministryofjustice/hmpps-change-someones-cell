@@ -24,6 +24,7 @@ export function buildAppInsightsClient(
     defaultClient.context.tags['ai.cloud.role'] = overrideName || applicationName
     defaultClient.context.tags['ai.application.ver'] = buildNumber
     defaultClient.addTelemetryProcessor(addUserDataToRequests)
+    defaultClient.addTelemetryProcessor(ignorePathsProcessor)
     return defaultClient
   }
   return null
@@ -41,6 +42,20 @@ export function addUserDataToRequests(envelope: EnvelopeTelemetry, contextObject
         activeCaseLoadId,
         ...properties,
       }
+    }
+  }
+  return true
+}
+
+export const ignorePathsProcessor = (envelope: EnvelopeTelemetry) => {
+  const prefixesToIgnore = ['GET /ping', 'GET /metrics']
+
+  const isRequest = envelope.data.baseType === Contracts.TelemetryTypeString.Request
+  if (isRequest) {
+    const requestData = envelope.data.baseData
+    if (requestData instanceof Contracts.RequestData) {
+      const { name } = requestData
+      return prefixesToIgnore.every(prefix => !name.startsWith(prefix))
     }
   }
   return true
