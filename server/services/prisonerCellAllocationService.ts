@@ -16,6 +16,7 @@ export default class PrisonerCellAllocationService {
     return await this.prisonApiClient.getInmates(token, locationId, keywords, returnAlerts)
   }
 
+  // Deprecated TODO: Remove this code
   async getInmatesAtLocation(token: string, locationId: number) {
     return await this.prisonApiClient.getInmatesAtLocation(token, locationId)
   }
