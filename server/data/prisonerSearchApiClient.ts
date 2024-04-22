@@ -29,7 +29,7 @@ export default class PrisonerSearchApiClient {
     return new RestClient('Prisoner Search Api Client', { ...config.apis.prisonerSearchApi, ...extraConfig }, token)
   }
 
-  getPrisonerForLocation(token: string, prisonId: string, locationPath: string): Promise<Prisoner[]> {
+  getPrisonerForLocation(token: string, prisonId: string, locations: string[]): Promise<Prisoner[]> {
     return PrisonerSearchApiClient.restClient(token).post<Prisoner[]>({
       path: '/attribute-search',
       data: {
@@ -48,7 +48,7 @@ export default class PrisonerSearchApiClient {
                 type: 'String',
                 attribute: 'cellLocation',
                 condition: 'IN',
-                searchTerm: locationPath,
+                searchTerm: locations,
               },
             ],
           },
