@@ -1,6 +1,7 @@
 import { PrisonApiClient, WhereaboutsApiClient } from '../data'
 import { Alert, Offender, OffenderInReception } from '../data/prisonApiClient'
 import logger from '../../logger'
+import PrisonerSearchApiClient from '../data/prisonerSearchApiClient'
 
 export interface OffenderWithAlerts extends OffenderInReception {
   alerts?: string[]
@@ -10,6 +11,7 @@ export default class PrisonerCellAllocationService {
   constructor(
     private readonly prisonApiClient: PrisonApiClient,
     private readonly whereaboutsApiClient: WhereaboutsApiClient,
+    private readonly prisonerSearchApiClient: PrisonerSearchApiClient,
   ) {}
 
   async getInmates(token: string, locationId: string, keywords?: string, returnAlerts?: boolean): Promise<Offender[]> {
@@ -19,6 +21,11 @@ export default class PrisonerCellAllocationService {
   // Deprecated TODO: Remove this code
   async getInmatesAtLocation(token: string, locationId: number) {
     return await this.prisonApiClient.getInmatesAtLocation(token, locationId)
+  }
+
+  async getPrisonersAtLocations(token: string, agencyId, locationDescriptions: string[]) {
+    const result = await this.prisonerSearchApiClient.getPrisonersForLocation(token, agencyId, locationDescriptions)
+    return result.content
   }
 
   async getCellsWithCapacity(token: string, agencyId: string, location: string, subLocation?: string) {

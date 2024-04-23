@@ -1,4 +1,5 @@
 import config from '../config'
+import { Page } from './prisonApiClient'
 import RestClient from './restClient'
 
 export interface Prisoner {
@@ -29,9 +30,12 @@ export default class PrisonerSearchApiClient {
     return new RestClient('Prisoner Search Api Client', { ...config.apis.prisonerSearchApi, ...extraConfig }, token)
   }
 
-  getPrisonerForLocation(token: string, prisonId: string, locations: string[]): Promise<Prisoner[]> {
-    return PrisonerSearchApiClient.restClient(token).post<Prisoner[]>({
+  getPrisonersForLocation(token: string, prisonId: string, locations: string[]): Promise<Page<Prisoner>> {
+    return PrisonerSearchApiClient.restClient(token).post<Page<Prisoner>>({
       path: '/attribute-search',
+      query: {
+        size: 10000,
+      },
       data: {
         joinType: 'AND',
         queries: [
@@ -48,7 +52,7 @@ export default class PrisonerSearchApiClient {
                 type: 'String',
                 attribute: 'cellLocation',
                 condition: 'IN',
-                searchTerm: locations,
+                searchTerm: locations.join(','),
               },
             ],
           },

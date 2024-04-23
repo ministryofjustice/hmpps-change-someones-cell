@@ -16,11 +16,12 @@ export const services = () => {
     whereaboutsApiClient,
     nonAssociationsApiClient,
     googleAnalyticsClient,
+    prisonerSearchApiClient,
   } = dataAccess()
 
   const userService = new UserService(manageUsersApiClient, prisonApiClient)
   const feComponentsService = new FeComponentsService(feComponentsClient)
-  const prisonerCellAllocationService = new PrisonerCellAllocationService(prisonApiClient, whereaboutsApiClient)
+  const prisonerCellAllocationService = new PrisonerCellAllocationService(prisonApiClient, whereaboutsApiClient, prisonerSearchApiClient)
   const prisonerDetailsService = new PrisonerDetailsService(prisonApiClient)
   const locationService = new LocationService(prisonApiClient, whereaboutsApiClient)
   const nonAssociationsService = new NonAssociationsService(nonAssociationsApiClient)

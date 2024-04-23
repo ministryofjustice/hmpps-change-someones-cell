@@ -21,6 +21,5 @@ generic-service:
     WHEREABOUTS_API_URL: "https://whereabouts-api-preprod.service.justice.gov.uk"
     PRISONER_SEARCH_API_URL: "https://prisoner-search-preprod.prison.service.justice.gov.uk"
 
-
 generic-prometheus-alerts:
   alertSeverity: digital-prison-service-dev
