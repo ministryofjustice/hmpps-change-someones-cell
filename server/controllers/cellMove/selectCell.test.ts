@@ -90,25 +90,6 @@ describe('Select a cell', () => {
     offenderNo: 'G3878UK',
   }
 
-  const assessment = {
-    bookingId: 123456,
-    offenderNo: 'GV09876N',
-    classificationCode: 'C',
-    classification: 'Cat C',
-    assessmentCode: 'CATEGORY',
-    assessmentDescription: 'Categorisation',
-    cellSharingAlertFlag: true,
-    assessmentDate: '2018-02-11',
-    nextReviewDate: '2018-02-11',
-    approvalDate: '2018-02-11',
-    assessmentAgencyId: 'MDI',
-    assessmentStatus: 'A',
-    assessmentSeq: 1,
-    assessmentComment: 'Comment details',
-    assessorId: 130000,
-    assessorUser: 'NGK33Y',
-  }
-
   const systemClientToken = 'system_token'
 
   beforeAll(() => {
