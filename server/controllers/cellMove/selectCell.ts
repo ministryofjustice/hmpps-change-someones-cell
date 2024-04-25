@@ -1,7 +1,6 @@
-import moment from 'moment'
 import { alertFlagLabels, cellMoveAlertCodes } from '../../shared/alertFlagValues'
 
-import { putLastNameFirst, hasLength, groupBy, properCaseName, formatName, formatLocation, stripAgencyPrefix } from '../../utils'
+import { putLastNameFirst, hasLength, properCaseName, formatName, formatLocation, stripAgencyPrefix } from '../../utils'
 
 import {
   userHasAccess,
@@ -24,28 +23,16 @@ const toDropDownValue = entry => ({ text: entry.name, value: entry.key })
 
 const sortByDescription = (a, b) => a.description.localeCompare(b.description)
 
-const sortByLatestAssessmentDateDesc = (left, right) => {
-  const leftDate = moment(left.assessmentDate, 'DD/MM/YYYY')
-  const rightDate = moment(right.assessmentDate, 'DD/MM/YYYY')
-
-  if (leftDate.isBefore(rightDate)) return 1
-  if (leftDate.isAfter(rightDate)) return -1
-
-  return 0
-}
-
 const getCellOccupants = async (
   req,
   res,
   {
     prisonerCellAllocationService,
-    prisonerDetailsService,
     activeCaseLoadId,
     cells,
     nonAssociations,
   }: {
     prisonerCellAllocationService: PrisonerCellAllocationService
-    prisonerDetailsService: PrisonerDetailsService
     activeCaseLoadId: string
     cells: OffenderCell[]
     nonAssociations: OffenderNonAssociationLegacy
@@ -61,7 +48,9 @@ const getCellOccupants = async (
   if (!hasLength(currentCellOccupants)) return []
 
   return cells.flatMap(cell => {
-    const occupants = currentCellOccupants.filter(o => o.cellLocation === stripAgencyPrefix(cell.description, activeCaseLoadId))
+    const occupants = currentCellOccupants.filter(
+      o => o.cellLocation === stripAgencyPrefix(cell.description, activeCaseLoadId),
+    )
     return occupants.map(occupant => {
       const csraInfo = occupant.csra
 
@@ -77,7 +66,9 @@ const getCellOccupants = async (
         nonAssociation: Boolean(
           nonAssociations &&
             nonAssociations.nonAssociations &&
-            nonAssociations.nonAssociations.find(na => na.offenderNonAssociation.offenderNo === occupant.prisonerNumber),
+            nonAssociations.nonAssociations.find(
+              na => na.offenderNonAssociation.offenderNo === occupant.prisonerNumber,
+            ),
         ),
         csra: csraInfo || 'Not entered',
         csraDetailsUrl: `/prisoner/${occupant.prisonerNumber}/cell-move/cell-sharing-risk-assessment-details`,
@@ -220,7 +211,6 @@ export default ({
 
       const cellOccupants = await getCellOccupants(req, res, {
         prisonerCellAllocationService,
-        prisonerDetailsService,
         activeCaseLoadId,
         cells: selectedCells,
         nonAssociations,

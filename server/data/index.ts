@@ -45,4 +45,5 @@ export {
   WhereaboutsApiClient,
   NonAssociationsApiClient,
   GoogleAnalyticsClient,
+  PrisonerSearchApiClient,
 }

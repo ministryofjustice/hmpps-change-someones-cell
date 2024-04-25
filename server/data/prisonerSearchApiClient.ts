@@ -30,7 +30,7 @@ export default class PrisonerSearchApiClient {
     return new RestClient('Prisoner Search Api Client', { ...config.apis.prisonerSearchApi, ...extraConfig }, token)
   }
 
-  getPrisonersForLocation(token: string, prisonId: string, locations: string[]): Promise<Page<Prisoner>> {
+  getPrisonersAtLocations(token: string, prisonId: string, locations: string[]): Promise<Page<Prisoner>> {
     return PrisonerSearchApiClient.restClient(token).post<Page<Prisoner>>({
       path: '/attribute-search',
       query: {
