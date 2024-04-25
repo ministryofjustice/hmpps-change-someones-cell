@@ -286,6 +286,23 @@ context('A user can search for a cell', () => {
         cy.task('stubInmatesAtLocation', {
           inmates: [{ offenderNo: 'A12345', firstName: 'Bob', lastName: 'Doe', assignedLivingUnitId: 1 }],
         })
+        cy.task('stubPrisonersAtLocations', {
+          prisoners: [
+            {
+              prisonerNumber: 'G6123VU',
+              firstName: 'Bob',
+              lastName: 'Doe',
+              cellLocation: '1-2',
+              alerts: [
+                {
+                  alertCode: 'PEEP',
+                  alertCodeDescription: 'PEEP',
+                },
+              ],
+              csra: 'Standard',
+            },
+          ],
+        })
         cy.task('stubGetAlerts', { agencyId: 'MDI', alerts: [{ offenderNo: 'A12345', alertCode: 'PEEP' }] })
         cy.task('stubCsraAssessments', {
           offenderNumbers: ['A12345'],
