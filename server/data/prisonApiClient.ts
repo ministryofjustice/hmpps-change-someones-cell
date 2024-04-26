@@ -347,6 +347,7 @@ export default class PrisonApiClient {
     })
   }
 
+  // Deprecated TODO: Remove this code
   getInmatesAtLocation(token: string, locationId: number): Promise<Offender[]> {
     return PrisonApiClient.restClient(token).get<Offender[]>({
       path: `/api/locations/${locationId}/inmates`,
@@ -371,6 +372,7 @@ export default class PrisonApiClient {
     return PrisonApiClient.restClient(token).get<CaseLoad[]>({ path: '/api/users/me/caseLoads' })
   }
 
+  // TODO: remove this - use search
   getDetails(token: string, offenderNo: string, fullInfo = false) {
     const fullInfoString = fullInfo ? 'true' : 'false'
     return PrisonApiClient.restClient(token).get<OffenderDetails>({

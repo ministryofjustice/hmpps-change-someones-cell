@@ -18,7 +18,7 @@ const someAgency = 'LEI'
 describe('Select a cell', () => {
   const locationService = jest.mocked(new LocationService(undefined, undefined))
   const nonAssociationsService = jest.mocked(new NonAssociationsService(undefined))
-  const prisonerCellAllocationService = jest.mocked(new PrisonerCellAllocationService(undefined, undefined))
+  const prisonerCellAllocationService = jest.mocked(new PrisonerCellAllocationService(undefined, undefined, undefined))
   const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined))
 
   let controller
@@ -90,25 +90,6 @@ describe('Select a cell', () => {
     offenderNo: 'G3878UK',
   }
 
-  const assessment = {
-    bookingId: 123456,
-    offenderNo: 'GV09876N',
-    classificationCode: 'C',
-    classification: 'Cat C',
-    assessmentCode: 'CATEGORY',
-    assessmentDescription: 'Categorisation',
-    cellSharingAlertFlag: true,
-    assessmentDate: '2018-02-11',
-    nextReviewDate: '2018-02-11',
-    approvalDate: '2018-02-11',
-    assessmentAgencyId: 'MDI',
-    assessmentStatus: 'A',
-    assessmentSeq: 1,
-    assessmentComment: 'Comment details',
-    assessorId: 130000,
-    assessorUser: 'NGK33Y',
-  }
-
   const systemClientToken = 'system_token'
 
   beforeAll(() => {
@@ -161,7 +142,7 @@ describe('Select a cell', () => {
 
     locationService.getLocation = jest.fn().mockResolvedValue(Promise.resolve(location))
     prisonerCellAllocationService.getCellsWithCapacity = jest.fn().mockResolvedValue([])
-    prisonerCellAllocationService.getInmatesAtLocation = jest.fn().mockResolvedValue([])
+    prisonerCellAllocationService.getPrisonersAtLocations = jest.fn().mockResolvedValue([])
 
     locationService.searchGroups = jest.fn().mockResolvedValue(locationGroups)
 
@@ -497,7 +478,7 @@ describe('Select a cell', () => {
         .mockResolvedValueOnce(cellLocationData)
         .mockResolvedValueOnce(parentLocationData)
         .mockResolvedValueOnce(superParentLocationData)
-      prisonerCellAllocationService.getInmatesAtLocation = jest.fn().mockResolvedValue([
+      prisonerCellAllocationService.getPrisonersAtLocations = jest.fn().mockResolvedValue([
         { firstName: 'bob', lastName: 'doe', offenderNo: 'A11111' },
         { firstName: 'dave', lastName: 'doe1', offenderNo: 'A22222' },
       ])
@@ -505,7 +486,7 @@ describe('Select a cell', () => {
       prisonerCellAllocationService.getCellsWithCapacity = jest.fn().mockResolvedValue([
         {
           id: 1,
-          description: 'MDI-1-3',
+          description: 'LEI-1-1-3',
           capacity: 4,
           noOfOccupants: 1,
           attributes: [
@@ -515,7 +496,7 @@ describe('Select a cell', () => {
         },
         {
           id: 2,
-          description: 'MDI-1-2',
+          description: 'LEI-1-1-2',
           capacity: 5,
           noOfOccupants: 1,
           attributes: [
@@ -525,7 +506,7 @@ describe('Select a cell', () => {
         },
         {
           id: 3,
-          description: 'MDI-1-1',
+          description: 'LEI-1-1-1',
           capacity: 3,
           noOfOccupants: 1,
           attributes: [{ description: 'Wheelchair Access', code: 'WA' }],
@@ -536,79 +517,62 @@ describe('Select a cell', () => {
     it('should make the relevant calls to gather cell occupant data', async () => {
       await controller(req, res)
 
-      expect(prisonerCellAllocationService.getInmatesAtLocation).toHaveBeenCalledWith(systemClientToken, 1)
-      expect(prisonerCellAllocationService.getInmatesAtLocation).toHaveBeenCalledWith(systemClientToken, 2)
-      expect(prisonerCellAllocationService.getInmatesAtLocation).toHaveBeenCalledWith(systemClientToken, 3)
-      expect(prisonerDetailsService.getAlerts).toHaveBeenCalledWith(systemClientToken, 'LEI', ['A11111', 'A22222'])
+      expect(prisonerCellAllocationService.getPrisonersAtLocations).toHaveBeenCalledWith(systemClientToken, 'LEI', [
+        '1-1-3',
+        '1-1-2',
+        '1-1-1',
+      ])
     })
 
     it('should return the correctly formatted cell details', async () => {
-      prisonerCellAllocationService.getInmatesAtLocation = jest.fn().mockImplementation((token, cellId) => {
-        if (cellId === 1)
-          return Promise.resolve([
-            {
-              ...offender,
-              firstName: 'bob1',
-              lastName: 'doe1',
-              offenderNo: 'A111111',
-              assignedLivingUnitId: cellId,
-            },
-          ])
-        if (cellId === 2)
-          return Promise.resolve([
-            {
-              ...offender,
-              firstName: 'bob2',
-              lastName: 'doe2',
-              offenderNo: 'A222222',
-              assignedLivingUnitId: cellId,
-            },
-          ])
-
-        return Promise.resolve([
+      prisonerCellAllocationService.getPrisonersAtLocations = jest.fn().mockResolvedValue(
+        Promise.resolve([
+          {
+            ...offender,
+            firstName: 'bob1',
+            lastName: 'doe1',
+            prisonerNumber: 'A111111',
+            cellLocation: '1-1-3',
+            alerts: [
+              {
+                ...alert,
+                alertCode: 'URS',
+                alertCodeDescription: 'Refusing to shield',
+              },
+            ],
+            csra: 'Standard',
+          },
+          {
+            ...offender,
+            firstName: 'bob2',
+            lastName: 'doe2',
+            prisonerNumber: 'A222222',
+            cellLocation: '1-1-2',
+            alerts: [
+              {
+                ...alert,
+                alertCode: 'XEL',
+                alertCodeDescription: 'E-list',
+              },
+            ],
+            csra: 'High',
+          },
           {
             ...offender,
             firstName: 'bob3',
             lastName: 'doe3',
-            offenderNo: 'A333333',
-            assignedLivingUnitId: cellId,
+            prisonerNumber: 'A333333',
+            cellLocation: '1-1-1',
+            alerts: [
+              {
+                ...alert,
+                alertCode: 'PEEP',
+                alertCodeDescription: 'PEEP',
+              },
+            ],
           },
-        ])
-      })
-
-      prisonerDetailsService.getAlerts = jest.fn().mockResolvedValue([
-        { ...alert, offenderNo: 'A111111', alertCode: 'PEEP' },
-        { ...alert, offenderNo: 'A222222', alertCode: 'XEL' },
-        { ...alert, offenderNo: 'A333333', alertCode: 'URS' },
-      ])
-
-      prisonerDetailsService.getCsraAssessments = jest.fn().mockResolvedValue([
-        {
-          ...assessment,
-          offenderNo: 'A111111',
-          assessmentDescription: 'TEST',
-          assessmentCode: 'TEST',
-          assessmentComment: 'test',
-        },
-        {
-          ...assessment,
-          offenderNo: 'A222222',
-          assessmentDescription: 'CSR',
-          assessmentCode: 'CSR',
-          assessmentComment: 'test',
-          classification: 'High',
-          classificationCode: 'HI',
-        },
-        {
-          ...assessment,
-          offenderNo: 'A333333',
-          assessmentDescription: 'CSR',
-          assessmentCode: 'CSR',
-          assessmentComment: 'test',
-          classification: 'Standard',
-          classificationCode: 'STANDARD',
-        },
-      ])
+        ]),
+      )
 
       await controller(req, res)
 
@@ -619,21 +583,21 @@ describe('Select a cell', () => {
             {
               attributes: [{ code: 'WA', description: 'Wheelchair Access' }],
               capacity: 3,
-              description: 'MDI-1-1',
+              description: 'LEI-1-1-1',
               id: 3,
               noOfOccupants: 1,
               occupants: [
                 {
                   alerts: [
                     {
-                      alertCodes: ['URS'],
-                      classes: 'alert-status alert-status--refusing-to-shield',
-                      label: 'Refusing to shield',
+                      alertCodes: ['PEEP'],
+                      classes: 'alert-status alert-status--medical',
+                      label: 'PEEP',
                     },
                   ],
                   nonAssociation: false,
                   cellId: 3,
-                  csra: 'Standard',
+                  csra: 'Not entered',
                   csraDetailsUrl: '/prisoner/A333333/cell-move/cell-sharing-risk-assessment-details',
                   name: 'Doe3, Bob3',
                   viewOffenderDetails: '/prisoner/A333333/cell-move/prisoner-details',
@@ -651,7 +615,7 @@ describe('Select a cell', () => {
                 },
               ],
               capacity: 5,
-              description: 'MDI-1-2',
+              description: 'LEI-1-1-2',
               id: 2,
               noOfOccupants: 1,
               occupants: [
@@ -686,21 +650,21 @@ describe('Select a cell', () => {
                 },
               ],
               capacity: 4,
-              description: 'MDI-1-3',
+              description: 'LEI-1-1-3',
               id: 1,
               noOfOccupants: 1,
               occupants: [
                 {
                   alerts: [
                     {
-                      alertCodes: ['PEEP'],
-                      classes: 'alert-status alert-status--medical',
-                      label: 'PEEP',
+                      alertCodes: ['URS'],
+                      classes: 'alert-status alert-status--refusing-to-shield',
+                      label: 'Refusing to shield',
                     },
                   ],
                   nonAssociation: false,
                   cellId: 1,
-                  csra: 'Not entered',
+                  csra: 'Standard',
                   csraDetailsUrl: '/prisoner/A111111/cell-move/cell-sharing-risk-assessment-details',
                   name: 'Doe1, Bob1',
                   viewOffenderDetails: '/prisoner/A111111/cell-move/prisoner-details',
@@ -718,102 +682,6 @@ describe('Select a cell', () => {
           ],
         }),
       )
-    })
-
-    it('should select the latest csra rating for each occupant', async () => {
-      prisonerCellAllocationService.getCellsWithCapacity = jest.fn().mockResolvedValue([
-        {
-          id: 1,
-          description: 'MDI-1-3',
-          capacity: 4,
-          noOfOccupants: 1,
-          attributes: [],
-        },
-      ])
-      prisonerCellAllocationService.getInmatesAtLocation = jest.fn().mockResolvedValue([
-        {
-          ...offender,
-          firstName: 'bob1',
-          lastName: 'doe1',
-          offenderNo: 'A111111',
-          assignedLivingUnitId: 1,
-        },
-      ])
-
-      prisonerDetailsService.getAlerts = jest.fn().mockResolvedValue([])
-
-      prisonerDetailsService.getCsraAssessments = jest.fn().mockResolvedValue([
-        {
-          ...assessment,
-          offenderNo: 'A111111',
-          assessmentCode: 'CSR',
-          assessmentDescription: 'CSR',
-          assessmentComment: 'test',
-          classification: 'High',
-          classificationCode: 'HI',
-          assessmentDate: '1980-01-01',
-        },
-        {
-          ...assessment,
-          offenderNo: 'A111111',
-          assessmentCode: 'CSR',
-          assessmentDescription: 'CSR',
-          assessmentComment: 'test',
-          classification: 'Standard',
-          classificationCode: 'STANDARD',
-          assessmentDate: '2020-01-01',
-        },
-      ])
-
-      await controller(req, res)
-
-      expect(res.render).toHaveBeenCalledWith(
-        'cellMove/selectCell.njk',
-        expect.objectContaining({
-          cells: [
-            {
-              attributes: [],
-              capacity: 4,
-              description: 'MDI-1-3',
-              id: 1,
-              noOfOccupants: 1,
-              occupants: [
-                {
-                  alerts: [],
-                  nonAssociation: false,
-                  cellId: 1,
-                  csra: 'High',
-                  csraDetailsUrl: '/prisoner/A111111/cell-move/cell-sharing-risk-assessment-details',
-                  name: 'Doe1, Bob1',
-                  viewOffenderDetails: '/prisoner/A111111/cell-move/prisoner-details',
-                },
-              ],
-              spaces: 3,
-              type: false,
-            },
-          ],
-        }),
-      )
-    })
-
-    it('should not make a call for assessments or alerts when there are no cell occupants', async () => {
-      prisonerCellAllocationService.getCellsWithCapacity = jest.fn().mockResolvedValue([
-        {
-          id: 1,
-          description: 'MDI-1-3',
-          capacity: 4,
-          noOfOccupants: 1,
-          attributes: [],
-        },
-      ])
-      prisonerCellAllocationService.getInmatesAtLocation = jest.fn().mockResolvedValue([])
-      prisonerDetailsService.getCsraAssessments = jest.fn()
-      prisonerDetailsService.getAlerts = jest.fn()
-
-      await controller(req, res)
-
-      expect(prisonerDetailsService.getCsraAssessments.mock.calls.length).toBe(0)
-      expect(prisonerDetailsService.getAlerts.mock.calls.length).toBe(0)
     })
   })
 
@@ -853,23 +721,22 @@ describe('Select a cell', () => {
       prisonerCellAllocationService.getCellsWithCapacity = jest.fn().mockResolvedValue([
         {
           id: 1,
-          description: 'MDI-1-3',
+          description: 'LEI-1-1-1',
           capacity: 4,
           noOfOccupants: 1,
           attributes: [],
         },
       ])
-      prisonerCellAllocationService.getInmatesAtLocation = jest.fn().mockResolvedValue([
+      prisonerCellAllocationService.getPrisonersAtLocations = jest.fn().mockResolvedValue([
         {
           ...offender,
           firstName: 'bob1',
           lastName: 'doe1',
-          offenderNo: 'A111111',
-          assignedLivingUnitId: 1,
+          prisonerNumber: 'A111111',
+          cellLocation: '1-1-1',
+          alerts: [],
         },
       ])
-      prisonerDetailsService.getAlerts = jest.fn().mockResolvedValue([])
-      prisonerDetailsService.getCsraAssessments = jest.fn().mockResolvedValue([])
 
       req.query = {
         location: 'Houseblock 1',
@@ -902,7 +769,7 @@ describe('Select a cell', () => {
             {
               attributes: [],
               capacity: 4,
-              description: 'MDI-1-3',
+              description: 'LEI-1-1-1',
               id: 1,
               noOfOccupants: 1,
               occupants: [

@@ -7,6 +7,7 @@ import prisonApi from './integration_tests/mockApis/prisonApi'
 import users from './integration_tests/mockApis/users'
 import whereabouts from './integration_tests/mockApis/whereabouts'
 import nonAssociationsApi from './integration_tests/mockApis/nonAssociationsApi'
+import prisonerSearchApi from './integration_tests/mockApis/prisonerSearchApi'
 
 export default defineConfig({
   chromeWebSecurity: false,
@@ -83,6 +84,7 @@ export default defineConfig({
           prisonApi.stubReceptionWithCapacity(agencyId, reception),
         stubOffendersInReception: ({ agencyId, inReception }) =>
           prisonApi.stubOffendersInReception(agencyId, inReception),
+        stubPrisonersAtLocations: ({ prisoners }) => prisonerSearchApi.stubPrisonersAtLocations(prisoners),
       })
     },
     baseUrl: 'http://localhost:3007',

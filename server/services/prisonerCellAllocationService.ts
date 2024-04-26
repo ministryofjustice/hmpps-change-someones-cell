@@ -1,6 +1,7 @@
 import { PrisonApiClient, WhereaboutsApiClient } from '../data'
 import { Alert, Offender, OffenderInReception } from '../data/prisonApiClient'
 import logger from '../../logger'
+import PrisonerSearchApiClient from '../data/prisonerSearchApiClient'
 
 export interface OffenderWithAlerts extends OffenderInReception {
   alerts?: string[]
@@ -10,14 +11,21 @@ export default class PrisonerCellAllocationService {
   constructor(
     private readonly prisonApiClient: PrisonApiClient,
     private readonly whereaboutsApiClient: WhereaboutsApiClient,
+    private readonly prisonerSearchApiClient: PrisonerSearchApiClient,
   ) {}
 
   async getInmates(token: string, locationId: string, keywords?: string, returnAlerts?: boolean): Promise<Offender[]> {
     return await this.prisonApiClient.getInmates(token, locationId, keywords, returnAlerts)
   }
 
+  // Deprecated TODO: Remove this code and update all controllers to use getPrisonersAtLocations instead
   async getInmatesAtLocation(token: string, locationId: number) {
     return await this.prisonApiClient.getInmatesAtLocation(token, locationId)
+  }
+
+  async getPrisonersAtLocations(token: string, agencyId, locationDescriptions: string[]) {
+    const result = await this.prisonerSearchApiClient.getPrisonersAtLocations(token, agencyId, locationDescriptions)
+    return result.content
   }
 
   async getCellsWithCapacity(token: string, agencyId: string, location: string, subLocation?: string) {

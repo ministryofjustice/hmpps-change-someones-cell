@@ -1,7 +1,6 @@
-import moment from 'moment'
 import { alertFlagLabels, cellMoveAlertCodes } from '../../shared/alertFlagValues'
 
-import { putLastNameFirst, hasLength, groupBy, properCaseName, formatName, formatLocation } from '../../utils'
+import { putLastNameFirst, hasLength, properCaseName, formatName, formatLocation, stripAgencyPrefix } from '../../utils'
 
 import {
   userHasAccess,
@@ -16,6 +15,7 @@ import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import LocationService from '../../services/locationService'
 import { OffenderNonAssociationLegacy } from '../../data/nonAssociationsApiClient'
 import config from '../../config'
+import { OffenderCell } from '../../data/prisonApiClient'
 
 const defaultSubLocationsValue = { text: 'Select area in residential unit', value: '' }
 const noAreasSelectedDropDownValue = { text: 'No areas to select', value: '' }
@@ -23,92 +23,55 @@ const toDropDownValue = entry => ({ text: entry.name, value: entry.key })
 
 const sortByDescription = (a, b) => a.description.localeCompare(b.description)
 
-const sortByLatestAssessmentDateDesc = (left, right) => {
-  const leftDate = moment(left.assessmentDate, 'DD/MM/YYYY')
-  const rightDate = moment(right.assessmentDate, 'DD/MM/YYYY')
-
-  if (leftDate.isBefore(rightDate)) return 1
-  if (leftDate.isAfter(rightDate)) return -1
-
-  return 0
-}
-
 const getCellOccupants = async (
   req,
   res,
   {
     prisonerCellAllocationService,
-    prisonerDetailsService,
     activeCaseLoadId,
     cells,
     nonAssociations,
   }: {
     prisonerCellAllocationService: PrisonerCellAllocationService
-    prisonerDetailsService: PrisonerDetailsService
     activeCaseLoadId: string
-    cells: { id: number }[]
+    cells: OffenderCell[]
     nonAssociations: OffenderNonAssociationLegacy
   },
 ) => {
-  const currentCellOccupants = (
-    await Promise.all(
-      cells
-        .map(cell => cell.id)
-        .map(cellId => prisonerCellAllocationService.getInmatesAtLocation(res.locals.systemClientToken, cellId)),
-    )
-  ).flatMap(occupant => occupant)
+  const cellDescriptions = cells.map(cell => stripAgencyPrefix(cell.description, activeCaseLoadId))
+  const currentCellOccupants = await prisonerCellAllocationService.getPrisonersAtLocations(
+    res.locals.systemClientToken,
+    activeCaseLoadId,
+    cellDescriptions,
+  )
 
   if (!hasLength(currentCellOccupants)) return []
 
-  const occupantOffenderNos = Array.from(new Set(currentCellOccupants.map(occupant => occupant.offenderNo)))
-
-  const occupantAlerts = await prisonerDetailsService.getAlerts(
-    res.locals.systemClientToken,
-    activeCaseLoadId,
-    occupantOffenderNos,
-  )
-  const occupantAssessments = await prisonerDetailsService.getCsraAssessments(
-    res.locals.systemClientToken,
-    occupantOffenderNos,
-  )
-  const assessmentsGroupedByOffenderNo = occupantAssessments ? groupBy(occupantAssessments, 'offenderNo') : []
-
-  const cellSharingAssessments = Object.keys(assessmentsGroupedByOffenderNo)
-    .map(
-      offenderNumber =>
-        assessmentsGroupedByOffenderNo[offenderNumber]
-          .filter(
-            assessment =>
-              assessment && assessment.assessmentDescription && assessment.assessmentDescription.includes('CSR'),
-          )
-          .sort(sortByLatestAssessmentDateDesc)[0],
-    )
-    .filter(Boolean)
-
   return cells.flatMap(cell => {
-    const occupants = currentCellOccupants.filter(o => o.assignedLivingUnitId === cell.id)
+    const occupants = currentCellOccupants.filter(
+      o => o.cellLocation === stripAgencyPrefix(cell.description, activeCaseLoadId),
+    )
     return occupants.map(occupant => {
-      const csraInfo = cellSharingAssessments.find(rating => rating.offenderNo === occupant.offenderNo)
+      const csraInfo = occupant.csra
 
-      const alertCodes = occupantAlerts
-        .filter(
-          alert =>
-            alert.offenderNo === occupant.offenderNo && !alert.expired && cellMoveAlertCodes.includes(alert.alertCode),
-        )
+      const alertCodes = occupant.alerts
+        .filter(alert => !alert.expired && cellMoveAlertCodes.includes(alert.alertCode))
         .map(alert => alert.alertCode)
 
       return {
         cellId: cell.id,
         name: `${properCaseName(occupant.lastName)}, ${properCaseName(occupant.firstName)}`,
-        viewOffenderDetails: `/prisoner/${occupant.offenderNo}/cell-move/prisoner-details`,
+        viewOffenderDetails: `/prisoner/${occupant.prisonerNumber}/cell-move/prisoner-details`,
         alerts: alertFlagLabels.filter(label => label.alertCodes.some(code => alertCodes.includes(code))),
         nonAssociation: Boolean(
           nonAssociations &&
             nonAssociations.nonAssociations &&
-            nonAssociations.nonAssociations.find(na => na.offenderNonAssociation.offenderNo === occupant.offenderNo),
+            nonAssociations.nonAssociations.find(
+              na => na.offenderNonAssociation.offenderNo === occupant.prisonerNumber,
+            ),
         ),
-        csra: (csraInfo && translateCsra(csraInfo.classificationCode)) || 'Not entered',
-        csraDetailsUrl: `/prisoner/${occupant.offenderNo}/cell-move/cell-sharing-risk-assessment-details`,
+        csra: csraInfo || 'Not entered',
+        csraDetailsUrl: `/prisoner/${occupant.prisonerNumber}/cell-move/cell-sharing-risk-assessment-details`,
       }
     })
   })
@@ -248,7 +211,6 @@ export default ({
 
       const cellOccupants = await getCellOccupants(req, res, {
         prisonerCellAllocationService,
-        prisonerDetailsService,
         activeCaseLoadId,
         cells: selectedCells,
         nonAssociations,

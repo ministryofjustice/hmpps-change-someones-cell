@@ -43,18 +43,21 @@ context('A user can select a cell', () => {
     cy.task('stubInmatesAtLocation', {
       inmates: [{ offenderNo: 'A12345', firstName: 'Bob', lastName: 'Doe', assignedLivingUnitId: 1 }],
     })
-    cy.task('stubGetAlerts', { agencyId: 'MDI', alerts: [{ offenderNo: 'A12345', alertCode: 'PEEP' }] })
-    cy.task('stubCsraAssessments', {
-      offenderNumbers: ['A12345'],
-      assessments: [
+    cy.task('stubPrisonersAtLocations', {
+      prisoners: [
         {
-          offenderNo: 'A12345',
-          assessmentCode: 'CSRA',
-          assessmentDescription: 'CSRA',
-          assessmentComment: 'test',
-          assessmentDate: '2020-01-10',
-          classification: 'Standard',
-          classificationCode: 'STANDARD',
+          prisonerNumber: 'A12345',
+          firstName: 'Horatio',
+          lastName: 'McBubblesworth',
+          cellLocation: '1-1',
+          alerts: [],
+        },
+        {
+          prisonerNumber: 'G6123VU',
+          firstName: 'Bob',
+          lastName: 'Doe',
+          cellLocation: '1-2',
+          alerts: [],
         },
       ],
     })
@@ -100,10 +103,10 @@ context('A user can select a cell', () => {
           { description: 'Gated Cell', code: 'GC' },
         ],
         capacity: 2,
-        description: 'LEI-1-2',
+        description: 'MDI-1-2',
         id: 1,
         noOfOccupants: 2,
-        userDescription: 'LEI-1-1',
+        userDescription: 'MDI-1-1',
       },
       {
         attributes: [
@@ -111,16 +114,40 @@ context('A user can select a cell', () => {
           { description: 'Gated Cell', code: 'GC' },
         ],
         capacity: 3,
-        description: 'LEI-1-1',
+        description: 'MDI-1-1',
         id: 1,
         noOfOccupants: 2,
-        userDescription: 'LEI-1-1',
+        userDescription: 'MDI-1-1',
       },
     ]
 
     beforeEach(() => {
       cy.task('stubCellsWithCapacity', { cells: response })
       cy.task('stubCellsWithCapacityByGroupName', { agencyId: 'MDI', groupName: 1, response })
+      cy.task('stubPrisonersAtLocations', {
+        prisoners: [
+          {
+            prisonerNumber: 'A12345',
+            firstName: 'Horatio',
+            lastName: 'McBubblesworth',
+            cellLocation: '1-1',
+            alerts: [],
+          },
+          {
+            prisonerNumber: 'G6123VU',
+            firstName: 'Bob',
+            lastName: 'Doe',
+            cellLocation: '1-2',
+            alerts: [
+              {
+                alertCode: 'PEEP',
+                alertCodeDescription: 'PEEP',
+              },
+            ],
+            csra: 'Standard',
+          },
+        ],
+      })
     })
 
     it('should load without error', () => {
@@ -133,18 +160,18 @@ context('A user can select a cell', () => {
       const page = SelectCellPage.goTo(offenderNo)
 
       page.cellResults().then($table => {
-        cy.get($table).find('tr').its('length').should('eq', 9)
+        cy.get($table).find('tr').its('length').should('eq', 5)
         cy.get($table)
           .find('tr')
           .then($tableRows => {
             const columns = $tableRows.find('td')
 
             assertRow(0, columns, {
-              location: 'LEI-1-1',
+              location: 'MDI-1-1',
               cellType: 'Gated Cell,\nListener Cell',
               capacity: 3,
               spaces: 1,
-              occupier: 'Doe, Bob\nView details\nfor Doe, Bob\nNON-ASSOCIATION',
+              occupier: 'Doe, Bob\nView details\nfor Doe, Bob',
               csra: 'Standard\n\nView details\nfor Doe, Bob',
               relevantAlerts: 'PEEP',
               selectCell: 'Select cell',
@@ -155,75 +182,9 @@ context('A user can select a cell', () => {
               cellType: '',
               capacity: '',
               spaces: '',
-              occupier: 'Doe, Bob\nView details\nfor Doe, Bob\nNON-ASSOCIATION',
-              csra: 'Standard\n\nView details\nfor Doe, Bob',
-              relevantAlerts: 'PEEP',
-              selectCell: '',
-            })
-
-            assertRow(2, columns, {
-              location: '',
-              cellType: '',
-              capacity: '',
-              spaces: '',
-              occupier: 'Doe, Bob\nView details\nfor Doe, Bob\nNON-ASSOCIATION',
-              csra: 'Standard\n\nView details\nfor Doe, Bob',
-              relevantAlerts: 'PEEP',
-              selectCell: '',
-            })
-
-            assertRow(3, columns, {
-              location: '',
-              cellType: '',
-              capacity: '',
-              spaces: '',
-              occupier: 'Doe, Bob\nView details\nfor Doe, Bob\nNON-ASSOCIATION',
-              csra: 'Standard\n\nView details\nfor Doe, Bob',
-              relevantAlerts: 'PEEP',
-              selectCell: '',
-            })
-
-            assertRow(4, columns, {
-              location: 'LEI-1-2',
-              cellType: 'Gated Cell',
-              capacity: 2,
-              spaces: 0,
-              occupier: 'Doe, Bob\nView details\nfor Doe, Bob\nNON-ASSOCIATION',
-              csra: 'Standard\n\nView details\nfor Doe, Bob',
-              relevantAlerts: 'PEEP',
-              selectCell: 'Select cell',
-            })
-
-            assertRow(5, columns, {
-              location: '',
-              cellType: '',
-              capacity: '',
-              spaces: '',
-              occupier: 'Doe, Bob\nView details\nfor Doe, Bob\nNON-ASSOCIATION',
-              csra: 'Standard\n\nView details\nfor Doe, Bob',
-              relevantAlerts: 'PEEP',
-              selectCell: '',
-            })
-
-            assertRow(6, columns, {
-              location: '',
-              cellType: '',
-              capacity: '',
-              spaces: '',
-              occupier: 'Doe, Bob\nView details\nfor Doe, Bob\nNON-ASSOCIATION',
-              csra: 'Standard\n\nView details\nfor Doe, Bob',
-              relevantAlerts: 'PEEP',
-              selectCell: '',
-            })
-
-            assertRow(7, columns, {
-              location: '',
-              cellType: '',
-              capacity: '',
-              spaces: '',
-              occupier: 'Doe, Bob\nView details\nfor Doe, Bob\nNON-ASSOCIATION',
-              csra: 'Standard\n\nView details\nfor Doe, Bob',
-              relevantAlerts: 'PEEP',
+              occupier: 'Mcbubblesworth, Horatio\nView details\nfor Mcbubblesworth, Horatio\nNON-ASSOCIATION',
+              csra: 'Not entered\n\nView details\nfor Mcbubblesworth, Horatio',
+              relevantAlerts: '',
               selectCell: '',
             })
           })
@@ -304,6 +265,17 @@ context('A user can select a cell', () => {
           cy.task('stubLocation', { locationId: 3, locationData: { locationPrefix: 'MDI-1' } })
           cy.task('stubInmatesAtLocation', {
             inmates: [{ offenderNo: 'A12345', firstName: 'Bob', lastName: 'Doe', assignedLivingUnitId: 1 }],
+          })
+          cy.task('stubPrisonersAtLocations', {
+            prisoners: [
+              {
+                prisonerNumber: 'A12345',
+                firstName: 'Bob',
+                lastName: 'Doe',
+                cellLocation: '1-1',
+                alerts: [],
+              },
+            ],
           })
           cy.task('stubOffenderNonAssociationsLegacy', {
             offenderNo,

@@ -9,7 +9,7 @@ jest.mock('../../services/prisonerCellAllocationService')
 jest.mock('../../services/prisonerDetailsService')
 
 describe('Confirm reception move', () => {
-  const prisonerCellAllocationService = jest.mocked(new PrisonerCellAllocationService(undefined, undefined))
+  const prisonerCellAllocationService = jest.mocked(new PrisonerCellAllocationService(undefined, undefined, undefined))
   const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined))
 
   logger.info = jest.fn()

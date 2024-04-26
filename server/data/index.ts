@@ -19,6 +19,7 @@ import PrisonApiClient from './prisonApiClient'
 import WhereaboutsApiClient from './whereaboutsApiClient'
 import NonAssociationsApiClient from './nonAssociationsApiClient'
 import GoogleAnalyticsClient from './googleAnalyticsClient'
+import PrisonerSearchApiClient from './prisonerSearchApiClient'
 
 type RestClientBuilder<T> = (token: string) => T
 
@@ -31,6 +32,7 @@ export const dataAccess = () => ({
   whereaboutsApiClient: new WhereaboutsApiClient(),
   nonAssociationsApiClient: new NonAssociationsApiClient(),
   googleAnalyticsClient: new GoogleAnalyticsClient(),
+  prisonerSearchApiClient: new PrisonerSearchApiClient(),
 })
 
 export type DataAccess = ReturnType<typeof dataAccess>
@@ -43,4 +45,5 @@ export {
   WhereaboutsApiClient,
   NonAssociationsApiClient,
   GoogleAnalyticsClient,
+  PrisonerSearchApiClient,
 }
