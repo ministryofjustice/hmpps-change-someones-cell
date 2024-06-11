@@ -10,17 +10,6 @@ export interface LocationGroup {
   }[]
 }
 
-export interface CellMoveResponse {
-  cellMoveResult: {
-    bookingId: number
-    agencyId: string
-    assignedLivingUnitId: number
-    assignedLivingUnitDesc: string
-    bedAssignmentHistorySequence: number
-    caseNoteId: number
-  }
-}
-
 export interface LocationPrefix {
   locationPrefix: string
 }
