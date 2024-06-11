@@ -1,4 +1,4 @@
-import { PrisonApiClient, WhereaboutsApiClient } from '../data'
+import { PrisonApiClient, WhereaboutsApiClient, LocationsInsidePrisonApiClient } from '../data'
 import { Agency, Location, OffenderCell } from '../data/prisonApiClient'
 import { LocationGroup, LocationPrefix } from '../data/whereaboutsApiClient'
 import LocationService from './locationService'
@@ -6,18 +6,22 @@ import { SanitisedError } from '../sanitisedError'
 
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/whereaboutsApiClient')
+jest.mock('../data/locationsInsidePrisonApiClient')
+
+const prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
+const whereaboutsApiClient = new WhereaboutsApiClient() as jest.Mocked<WhereaboutsApiClient>
+const locationsInsidePrisonApiClient =
+  new LocationsInsidePrisonApiClient() as jest.Mocked<LocationsInsidePrisonApiClient>
 
 const token = 'some token'
 
 describe('Location service', () => {
-  let prisonApiClient: jest.Mocked<PrisonApiClient>
-  let whereaboutsApiClient: jest.Mocked<WhereaboutsApiClient>
   let locationService: LocationService
 
   beforeEach(() => {
-    prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
-    whereaboutsApiClient = new WhereaboutsApiClient() as jest.Mocked<WhereaboutsApiClient>
-    locationService = new LocationService(prisonApiClient, whereaboutsApiClient)
+    jest.resetAllMocks()
+
+    locationService = new LocationService(prisonApiClient, whereaboutsApiClient, locationsInsidePrisonApiClient)
   })
 
   describe('searchGroups', () => {
@@ -27,15 +31,16 @@ describe('Location service', () => {
     ]
 
     it('retrieves location groups', async () => {
-      whereaboutsApiClient.searchGroups.mockResolvedValue(locationGroups)
+      locationsInsidePrisonApiClient.searchGroups.mockResolvedValue(locationGroups)
 
       const results = await locationService.searchGroups(token, 'BXI')
 
+      expect(locationsInsidePrisonApiClient.searchGroups).toHaveBeenCalledTimes(1)
       expect(results).toEqual(locationGroups)
     })
 
     it('Propagates error', async () => {
-      whereaboutsApiClient.searchGroups.mockRejectedValue(new Error('some error'))
+      locationsInsidePrisonApiClient.searchGroups.mockRejectedValue(new Error('some error'))
 
       await expect(locationService.searchGroups(token, 'BXI')).rejects.toEqual(new Error('some error'))
     })

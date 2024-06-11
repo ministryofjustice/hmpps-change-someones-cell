@@ -11,7 +11,7 @@ jest.mock('../../services/prisonerCellAllocationService')
 jest.mock('../../services/prisonerDetailsService')
 
 describe('Cell move history', () => {
-  const locationService = jest.mocked(new LocationService(undefined, undefined))
+  const locationService = jest.mocked(new LocationService(undefined, undefined, undefined))
   const prisonerCellAllocationService = jest.mocked(new PrisonerCellAllocationService(undefined, undefined, undefined))
   const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined))
   const userService = jest.mocked(new UserService(undefined, undefined))

@@ -122,6 +122,14 @@ export default {
       },
       agent: new AgentConfig(Number(get('WHEREABOUTS_API_TIMEOUT_RESPONSE', 10000))),
     },
+    locationsInsidePrisonApi: {
+      url: get('LOCATIONS_INSIDE_PRISON_API_URL', 'http://localhost:8083', requiredInProduction),
+      timeout: {
+        response: Number(get('LOCATIONS_INSIDE_PRISON_API_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('LOCATIONS_INSIDE_PRISON_API_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('LOCATIONS_INSIDE_PRISON_API_TIMEOUT_RESPONSE', 10000))),
+    },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName: get('ENVIRONMENT_NAME', ''),
