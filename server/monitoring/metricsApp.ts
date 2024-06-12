@@ -8,6 +8,10 @@ const metricsMiddleware = promBundle({
   includeMethod: true,
   includePath: true,
   normalizePath: [['^/assets/.+$', '/assets/#assetPath']],
+  urlValueParser: {
+    minHexLength: 7,
+    extraMasks: ['[A-Z][0-9]{4}[A-Z]{2}'],
+  },
 })
 
 function metricsPort(): number {
