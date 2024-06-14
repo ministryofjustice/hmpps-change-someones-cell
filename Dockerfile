@@ -27,6 +27,7 @@ ENV GIT_BRANCH=${GIT_BRANCH}
 
 RUN apt-get update && \
         apt-get upgrade -y && \
+        apt-get install -y procps && \
         apt-get autoremove -y && \
         rm -rf /var/lib/apt/lists/*
 
