@@ -17,6 +17,7 @@ import TokenStore from './tokenStore'
 import FeComponentsClient from './feComponentsClient'
 import PrisonApiClient from './prisonApiClient'
 import WhereaboutsApiClient from './whereaboutsApiClient'
+import LocationsInsidePrisonApiClient from './locationsInsidePrisonApiClient'
 import NonAssociationsApiClient from './nonAssociationsApiClient'
 import GoogleAnalyticsClient from './googleAnalyticsClient'
 import PrisonerSearchApiClient from './prisonerSearchApiClient'
@@ -30,6 +31,7 @@ export const dataAccess = () => ({
   feComponentsClient: new FeComponentsClient(),
   prisonApiClient: new PrisonApiClient(),
   whereaboutsApiClient: new WhereaboutsApiClient(),
+  locationsInsidePrisonApiClient: new LocationsInsidePrisonApiClient(),
   nonAssociationsApiClient: new NonAssociationsApiClient(),
   googleAnalyticsClient: new GoogleAnalyticsClient(),
   prisonerSearchApiClient: new PrisonerSearchApiClient(),
@@ -43,6 +45,7 @@ export {
   ManageUsersApiClient,
   PrisonApiClient,
   WhereaboutsApiClient,
+  LocationsInsidePrisonApiClient,
   NonAssociationsApiClient,
   GoogleAnalyticsClient,
   PrisonerSearchApiClient,

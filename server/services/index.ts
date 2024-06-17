@@ -14,6 +14,7 @@ export const services = () => {
     feComponentsClient,
     prisonApiClient,
     whereaboutsApiClient,
+    locationsInsidePrisonApiClient,
     nonAssociationsApiClient,
     googleAnalyticsClient,
     prisonerSearchApiClient,
@@ -27,7 +28,7 @@ export const services = () => {
     prisonerSearchApiClient,
   )
   const prisonerDetailsService = new PrisonerDetailsService(prisonApiClient)
-  const locationService = new LocationService(prisonApiClient, whereaboutsApiClient)
+  const locationService = new LocationService(prisonApiClient, whereaboutsApiClient, locationsInsidePrisonApiClient)
   const nonAssociationsService = new NonAssociationsService(nonAssociationsApiClient)
   const analyticsService = new AnalyticsService(googleAnalyticsClient)
 

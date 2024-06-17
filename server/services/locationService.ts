@@ -1,15 +1,19 @@
-import { PrisonApiClient, WhereaboutsApiClient } from '../data'
+import { PrisonApiClient, WhereaboutsApiClient, LocationsInsidePrisonApiClient } from '../data'
 import { Agency, Location, OffenderCell } from '../data/prisonApiClient'
-import { LocationGroup, LocationPrefix } from '../data/whereaboutsApiClient'
+import { LocationGroup, LocationPrefix } from '../data/locationsInsidePrisonApiClient'
 
 export default class LocationService {
   constructor(
     private readonly prisonApiClient: PrisonApiClient,
     private readonly whereaboutsApiClient: WhereaboutsApiClient,
+    private readonly locationsInsidePrisonApiClient: LocationsInsidePrisonApiClient,
   ) {}
 
   async searchGroups(token: string, agencyId: string): Promise<LocationGroup[]> {
-    return await this.whereaboutsApiClient.searchGroups(token, agencyId)
+    const groups = await this.locationsInsidePrisonApiClient.searchGroups(token, agencyId)
+    return groups.map(group =>
+      group.children.length === 1 ? { name: group.name, key: group.key, children: [] } : group,
+    )
   }
 
   async getLocation(token: string, livingUnitId: number): Promise<Location> {

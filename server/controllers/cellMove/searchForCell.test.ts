@@ -7,7 +7,7 @@ import NonAssociationsService from '../../services/nonAssociationsService'
 Reflect.deleteProperty(process.env, 'APPINSIGHTS_INSTRUMENTATIONKEY')
 
 describe('select location', () => {
-  const locationService = jest.mocked(new LocationService(undefined, undefined))
+  const locationService = jest.mocked(new LocationService(undefined, undefined, undefined))
   const nonAssociationsService = jest.mocked(new NonAssociationsService(undefined))
   const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined))
 

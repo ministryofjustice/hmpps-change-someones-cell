@@ -16,7 +16,7 @@ const someBookingId = -10
 const someAgency = 'LEI'
 
 describe('Select a cell', () => {
-  const locationService = jest.mocked(new LocationService(undefined, undefined))
+  const locationService = jest.mocked(new LocationService(undefined, undefined, undefined))
   const nonAssociationsService = jest.mocked(new NonAssociationsService(undefined))
   const prisonerCellAllocationService = jest.mocked(new PrisonerCellAllocationService(undefined, undefined, undefined))
   const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined))
@@ -136,7 +136,7 @@ describe('Select a cell', () => {
       {
         name: 'Houseblock 1',
         key: 'hb1',
-        children: [{ name: 'Sub value', key: 'sl' }],
+        children: [{ name: 'Sub value', key: 'sl', children: [] }],
       },
     ]
 

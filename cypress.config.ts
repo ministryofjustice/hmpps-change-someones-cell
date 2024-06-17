@@ -6,6 +6,7 @@ import components from './integration_tests/mockApis/components'
 import prisonApi from './integration_tests/mockApis/prisonApi'
 import users from './integration_tests/mockApis/users'
 import whereabouts from './integration_tests/mockApis/whereabouts'
+import locationsInsidePrisonApi from './integration_tests/mockApis/locationsInsidePrisonApi'
 import nonAssociationsApi from './integration_tests/mockApis/nonAssociationsApi'
 import prisonerSearchApi from './integration_tests/mockApis/prisonerSearchApi'
 
@@ -42,6 +43,7 @@ export default defineConfig({
             users.stubHealth(),
             prisonApi.stubHealth(),
             whereabouts.stubHealth(),
+            locationsInsidePrisonApi.stubHealth(),
             tokenVerification.stubHealth(),
           ]),
         stubLocationConfig: ({ agencyId, response }) => whereabouts.stubLocationConfig({ agencyId, response }),
@@ -50,7 +52,7 @@ export default defineConfig({
         stubInmates: prisonApi.stubInmates,
         stubOffenderFullDetails: fullDetails => Promise.all([prisonApi.stubOffenderFullDetails(fullDetails)]),
         stubOffenderNonAssociationsLegacy: response => nonAssociationsApi.stubOffenderNonAssociationsLegacy(response),
-        stubGroups: caseload => whereabouts.stubGroups(caseload),
+        stubGroups: caseload => locationsInsidePrisonApi.stubGroups(caseload),
         stubUserCaseLoads: caseloads => prisonApi.stubUserCaseloads(caseloads),
         stubMainOffence: offence => prisonApi.stubMainOffence(offence),
         stubOffenderBasicDetails: basicDetails => Promise.all([prisonApi.stubOffenderBasicDetails(basicDetails)]),

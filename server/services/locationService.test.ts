@@ -1,4 +1,4 @@
-import { PrisonApiClient, WhereaboutsApiClient } from '../data'
+import { PrisonApiClient, WhereaboutsApiClient, LocationsInsidePrisonApiClient } from '../data'
 import { Agency, Location, OffenderCell } from '../data/prisonApiClient'
 import { LocationGroup, LocationPrefix } from '../data/whereaboutsApiClient'
 import LocationService from './locationService'
@@ -6,37 +6,59 @@ import { SanitisedError } from '../sanitisedError'
 
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/whereaboutsApiClient')
+jest.mock('../data/locationsInsidePrisonApiClient')
+
+const prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
+const whereaboutsApiClient = new WhereaboutsApiClient() as jest.Mocked<WhereaboutsApiClient>
+const locationsInsidePrisonApiClient =
+  new LocationsInsidePrisonApiClient() as jest.Mocked<LocationsInsidePrisonApiClient>
 
 const token = 'some token'
 
 describe('Location service', () => {
-  let prisonApiClient: jest.Mocked<PrisonApiClient>
-  let whereaboutsApiClient: jest.Mocked<WhereaboutsApiClient>
   let locationService: LocationService
 
   beforeEach(() => {
-    prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
-    whereaboutsApiClient = new WhereaboutsApiClient() as jest.Mocked<WhereaboutsApiClient>
-    locationService = new LocationService(prisonApiClient, whereaboutsApiClient)
+    jest.resetAllMocks()
+
+    locationService = new LocationService(prisonApiClient, whereaboutsApiClient, locationsInsidePrisonApiClient)
   })
 
   describe('searchGroups', () => {
     const locationGroups: LocationGroup[] = [
       { name: 'A Wing', key: 'A', children: [] },
-      { name: 'B Wing', key: 'B', children: [] },
+      { name: 'B Wing', key: 'B', children: [{ name: 'child-B', key: 'child-B', children: [] }] },
+      {
+        name: 'C Wing',
+        key: 'C',
+        children: [
+          { name: 'child-C1', key: 'child-C1', children: [] },
+          { name: 'child-C2', key: 'child-C2', children: [] },
+        ],
+      },
     ]
 
-    it('retrieves location groups', async () => {
-      whereaboutsApiClient.searchGroups.mockResolvedValue(locationGroups)
+    const locationGroupsWithSingleChildrenReduced: LocationGroup[] = [
+      { name: 'A Wing', key: 'A', children: [] },
+      { name: 'B Wing', key: 'B', children: [] },
+      {
+        name: 'C Wing',
+        key: 'C',
+        children: [
+          { name: 'child-C1', key: 'child-C1', children: [] },
+          { name: 'child-C2', key: 'child-C2', children: [] },
+        ],
+      },
+    ]
 
+    it('retrieves location groups and reduces single children to empty array', async () => {
+      locationsInsidePrisonApiClient.searchGroups.mockResolvedValue(locationGroups)
       const results = await locationService.searchGroups(token, 'BXI')
-
-      expect(results).toEqual(locationGroups)
+      expect(locationsInsidePrisonApiClient.searchGroups).toHaveBeenCalledTimes(1)
+      expect(results).toEqual(locationGroupsWithSingleChildrenReduced)
     })
-
     it('Propagates error', async () => {
-      whereaboutsApiClient.searchGroups.mockRejectedValue(new Error('some error'))
-
+      locationsInsidePrisonApiClient.searchGroups.mockRejectedValue(new Error('some error'))
       await expect(locationService.searchGroups(token, 'BXI')).rejects.toEqual(new Error('some error'))
     })
   })
