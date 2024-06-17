@@ -10,7 +10,10 @@ export default class LocationService {
   ) {}
 
   async searchGroups(token: string, agencyId: string): Promise<LocationGroup[]> {
-    return await this.locationsInsidePrisonApiClient.searchGroups(token, agencyId)
+    const groups = await this.locationsInsidePrisonApiClient.searchGroups(token, agencyId)
+    return groups.map(group =>
+      group.children.length === 1 ? { name: group.name, key: group.key, children: [] } : group,
+    )
   }
 
   async getLocation(token: string, livingUnitId: number): Promise<Location> {

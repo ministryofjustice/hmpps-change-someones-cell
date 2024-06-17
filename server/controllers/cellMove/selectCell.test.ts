@@ -136,7 +136,7 @@ describe('Select a cell', () => {
       {
         name: 'Houseblock 1',
         key: 'hb1',
-        children: [{ name: 'Sub value', key: 'sl' }],
+        children: [{ name: 'Sub value', key: 'sl', children: [] }],
       },
     ]
 

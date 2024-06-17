@@ -27,21 +27,38 @@ describe('Location service', () => {
   describe('searchGroups', () => {
     const locationGroups: LocationGroup[] = [
       { name: 'A Wing', key: 'A', children: [] },
-      { name: 'B Wing', key: 'B', children: [] },
+      { name: 'B Wing', key: 'B', children: [{ name: 'child-B', key: 'child-B', children: [] }] },
+      {
+        name: 'C Wing',
+        key: 'C',
+        children: [
+          { name: 'child-C1', key: 'child-C1', children: [] },
+          { name: 'child-C2', key: 'child-C2', children: [] },
+        ],
+      },
     ]
 
-    it('retrieves location groups', async () => {
+    const locationGroupsWithSingleChildrenReduced: LocationGroup[] = [
+      { name: 'A Wing', key: 'A', children: [] },
+      { name: 'B Wing', key: 'B', children: [] },
+      {
+        name: 'C Wing',
+        key: 'C',
+        children: [
+          { name: 'child-C1', key: 'child-C1', children: [] },
+          { name: 'child-C2', key: 'child-C2', children: [] },
+        ],
+      },
+    ]
+
+    it('retrieves location groups and reduces single children to empty array', async () => {
       locationsInsidePrisonApiClient.searchGroups.mockResolvedValue(locationGroups)
-
       const results = await locationService.searchGroups(token, 'BXI')
-
       expect(locationsInsidePrisonApiClient.searchGroups).toHaveBeenCalledTimes(1)
-      expect(results).toEqual(locationGroups)
+      expect(results).toEqual(locationGroupsWithSingleChildrenReduced)
     })
-
     it('Propagates error', async () => {
       locationsInsidePrisonApiClient.searchGroups.mockRejectedValue(new Error('some error'))
-
       await expect(locationService.searchGroups(token, 'BXI')).rejects.toEqual(new Error('some error'))
     })
   })

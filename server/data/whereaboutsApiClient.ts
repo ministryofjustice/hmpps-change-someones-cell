@@ -5,10 +5,7 @@ import RestClient from './restClient'
 export interface LocationGroup {
   name: string
   key: string
-  children: {
-    key: string
-    name: string
-  }[]
+  children: LocationGroup[]
 }
 
 export interface CellMoveResponse {
