@@ -39,11 +39,15 @@ const getCellOccupants = async (
   },
 ) => {
   const cellDescriptions = cells.map(cell => stripAgencyPrefix(cell.description, activeCaseLoadId))
-  const currentCellOccupants = await prisonerCellAllocationService.getPrisonersAtLocations(
-    res.locals.systemClientToken,
-    activeCaseLoadId,
-    cellDescriptions,
-  )
+
+  let currentCellOccupants = []
+
+  if (cellDescriptions.length)
+    currentCellOccupants = await prisonerCellAllocationService.getPrisonersAtLocations(
+      res.locals.systemClientToken,
+      activeCaseLoadId,
+      cellDescriptions,
+    )
 
   if (!hasLength(currentCellOccupants)) return []
 
