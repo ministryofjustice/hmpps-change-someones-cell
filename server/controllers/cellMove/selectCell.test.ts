@@ -379,6 +379,66 @@ describe('Select a cell', () => {
         'sub1',
       )
     })
+
+    it('should not make a call to retrieve prisoners to get single capacity cells if there are only multi capacity cells at that location', async () => {
+      req.query = {
+        location: 'hb1',
+        subLocation: 'sub1',
+        cellType: 'SO',
+      }
+      prisonerCellAllocationService.getCellsWithCapacity.mockResolvedValue([
+        {
+          id: 1,
+          description: 'MDI-1',
+          noOfOccupants: 0,
+          capacity: 2,
+          attributes: [],
+        },
+      ])
+      await controller(req, res)
+
+      expect(prisonerCellAllocationService.getPrisonersAtLocations).not.toHaveBeenCalled()
+    })
+
+    it('should not make a call to retrieve prisoners to get multi capacity cells if there are only single capacity cells at that location', async () => {
+      req.query = {
+        location: 'hb1',
+        subLocation: 'sub1',
+        cellType: 'MO',
+      }
+      prisonerCellAllocationService.getCellsWithCapacity.mockResolvedValue([
+        {
+          id: 1,
+          description: 'MDI-1',
+          noOfOccupants: 0,
+          capacity: 1,
+          attributes: [],
+        },
+      ])
+      await controller(req, res)
+
+      expect(prisonerCellAllocationService.getPrisonersAtLocations).not.toHaveBeenCalled()
+    })
+
+    it('should make a call to retrieve prisoners at location', async () => {
+      req.query = {
+        location: 'hb1',
+        subLocation: 'sub1',
+        cellType: 'MO',
+      }
+      prisonerCellAllocationService.getCellsWithCapacity.mockResolvedValue([
+        {
+          id: 1,
+          description: 'MDI-1',
+          noOfOccupants: 0,
+          capacity: 2,
+          attributes: [],
+        },
+      ])
+      await controller(req, res)
+
+      expect(prisonerCellAllocationService.getPrisonersAtLocations).toHaveBeenCalled()
+    })
   })
 
   describe('Cell types', () => {
