@@ -7,7 +7,10 @@ const metricsMiddleware = promBundle({
   httpDurationMetricName: 'http_server_requests_seconds',
   includeMethod: true,
   includePath: true,
-  normalizePath: [['^/assets/.+$', '/assets/#assetPath']],
+  normalizePath: [
+    ['^/assets/.+$', '/assets/#assetPath'],
+    ['^/app/images/.+$', '/app/images/#offenderNo/data'],
+  ],
   urlValueParser: {
     minHexLength: 7,
     extraMasks: ['[A-Z][0-9]{4}[A-Z]{2}'],
