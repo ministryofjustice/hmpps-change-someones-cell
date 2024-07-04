@@ -183,21 +183,6 @@ export const stubCellAttributes = cellAttributes =>
     },
   })
 
-export const stubInmatesAtLocation = inmates =>
-  stubFor({
-    request: {
-      method: 'GET',
-      urlPathPattern: '/api/locations/.+?/inmates',
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: inmates || [],
-    },
-  })
-
 export const stubOffenderCellHistory = history =>
   stubFor({
     request: {
@@ -470,7 +455,6 @@ export default {
   stubMainOffence,
   stubOffenderBasicDetails,
   stubCellAttributes,
-  stubInmatesAtLocation,
   stubOffenderCellHistory,
   stubGetAlerts,
   stubCsraAssessments,

@@ -419,6 +419,7 @@ context('A user can see conflicts in cell', () => {
   it('should redirect to confirm cell when there are no warnings', () => {
     cy.task('stubOffenderNonAssociationsLegacy', {})
 
+    cy.task('stubInmatesAtLocation', [])
     cy.task('stubBookingDetails', {
       firstName: 'Bob',
       lastName: 'Doe',
@@ -445,7 +446,9 @@ context('A user can see conflicts in cell', () => {
     ConfirmCellMovePage.verifyOnPage('Bob Doe', '1-1-1')
   })
 
-  xit('should not show CSRA messages and have the correct confirmation label', () => {
+  it('should not show CSRA messages and have the correct confirmation label', () => {
+    cy.task('stubInmatesAtLocation', [])
+
     cy.task('stubOffenderFullDetails', offenderFullDetails)
 
     const page = ConsiderRisksPage.goTo(offenderNo, 'MDI-1-1-1')
