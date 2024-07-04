@@ -55,20 +55,6 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('getInmatesAtLocation', () => {
-    it('should return data from api', async () => {
-      const response = { data: 'data' }
-
-      fakePrisonApiClient
-        .get('/api/locations/4231/inmates')
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .reply(200, response)
-
-      const output = await prisonApiClient.getInmatesAtLocation(accessToken, 4231)
-      expect(output).toEqual(response)
-    })
-  })
-
   describe('userCaseLoads', () => {
     it('should return data from api', async () => {
       const response = { data: 'data' }

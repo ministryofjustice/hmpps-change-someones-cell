@@ -18,11 +18,6 @@ export default class PrisonerCellAllocationService {
     return await this.prisonApiClient.getInmates(token, locationId, keywords, returnAlerts)
   }
 
-  // Deprecated TODO: Remove this code and update all controllers to use getPrisonersAtLocations instead
-  async getInmatesAtLocation(token: string, locationId: number) {
-    return await this.prisonApiClient.getInmatesAtLocation(token, locationId)
-  }
-
   async getPrisonersAtLocations(token: string, agencyId, locationDescriptions: string[]) {
     const result = await this.prisonerSearchApiClient.getPrisonersAtLocations(token, agencyId, locationDescriptions)
     return result.content

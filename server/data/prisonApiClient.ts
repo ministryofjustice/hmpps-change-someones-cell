@@ -347,13 +347,6 @@ export default class PrisonApiClient {
     })
   }
 
-  // Deprecated TODO: Remove this code
-  getInmatesAtLocation(token: string, locationId: number): Promise<Offender[]> {
-    return PrisonApiClient.restClient(token).get<Offender[]>({
-      path: `/api/locations/${locationId}/inmates`,
-    })
-  }
-
   getImage(token: string, imageId: string) {
     return PrisonApiClient.restClient(token).stream({ path: `/api/images/${imageId}/data` })
   }

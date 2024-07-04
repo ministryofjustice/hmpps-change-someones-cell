@@ -70,41 +70,6 @@ describe('Prisoner cell allocation service', () => {
     })
   })
 
-  describe('getInmatesAtLocation', () => {
-    const offenders: Offender[] = [
-      {
-        bookingId: 1,
-        offenderNo: 'A1234BC',
-        firstName: 'JOHN',
-        lastName: 'SMITH',
-        dateOfBirth: '1990-10-12',
-        age: 29,
-        agencyId: 'MDI',
-        assignedLivingUnitId: 1,
-        assignedLivingUnitDesc: 'UNIT-1',
-        categoryCode: 'C',
-        alertsDetails: ['XA', 'XVL'],
-        alertsCodes: ['XA', 'XVL'],
-      },
-    ]
-
-    it('Retrieves inmates at location', async () => {
-      prisonApiClient.getInmatesAtLocation.mockResolvedValue(offenders)
-
-      const result = await prisonerCellAllocationService.getInmatesAtLocation(token, 4231)
-
-      expect(result[0].offenderNo).toEqual('A1234BC')
-    })
-
-    it('Propagates error', async () => {
-      prisonApiClient.getInmatesAtLocation.mockRejectedValue(new Error('some error'))
-
-      await expect(prisonerCellAllocationService.getInmatesAtLocation(token, 4231)).rejects.toEqual(
-        new Error('some error'),
-      )
-    })
-  })
-
   describe('getPrisonersAtLocations', () => {
     const prisoners: Prisoner[] = [
       {
