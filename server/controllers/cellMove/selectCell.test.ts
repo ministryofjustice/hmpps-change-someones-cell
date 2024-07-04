@@ -3,7 +3,7 @@ import LocationService from '../../services/locationService'
 import NonAssociationsService from '../../services/nonAssociationsService'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
-import { Alert, Location, Offender } from '../../data/prisonApiClient'
+import { Alert, Offender } from '../../data/prisonApiClient'
 import { LocationGroup } from '../../data/whereaboutsApiClient'
 
 jest.mock('../../services/locationService')
@@ -24,36 +24,6 @@ describe('Select a cell', () => {
   let controller
   let req
   let res
-
-  const location: Location = {
-    locationId: 0,
-    locationType: 'string',
-    description: 'string',
-    locationUsage: 'string',
-    agencyId: 'string',
-    parentLocationId: 0,
-    currentOccupancy: 0,
-    locationPrefix: 'string',
-    operationalCapacity: 0,
-    userDescription: 'string',
-    internalLocationCode: 'string',
-    subLocations: true,
-  }
-
-  const cellLocationData = {
-    ...location,
-    parentLocationId: 2,
-  }
-
-  const parentLocationData = {
-    ...location,
-    parentLocationId: 3,
-  }
-
-  const superParentLocationData = {
-    ...location,
-    locationPrefix: 'MDI-1',
-  }
 
   const offender: Offender = {
     bookingId: 1,
@@ -140,7 +110,6 @@ describe('Select a cell', () => {
       },
     ]
 
-    locationService.getLocation = jest.fn().mockResolvedValue(Promise.resolve(location))
     prisonerCellAllocationService.getCellsWithCapacity = jest.fn().mockResolvedValue([])
     prisonerCellAllocationService.getPrisonersAtLocations = jest.fn().mockResolvedValue([])
 
@@ -534,10 +503,6 @@ describe('Select a cell', () => {
 
   describe('Cell view model data', () => {
     beforeEach(() => {
-      locationService.getLocation
-        .mockResolvedValueOnce(cellLocationData)
-        .mockResolvedValueOnce(parentLocationData)
-        .mockResolvedValueOnce(superParentLocationData)
       prisonerCellAllocationService.getPrisonersAtLocations = jest.fn().mockResolvedValue([
         { firstName: 'bob', lastName: 'doe', offenderNo: 'A11111' },
         { firstName: 'dave', lastName: 'doe1', offenderNo: 'A22222' },
@@ -851,18 +816,7 @@ describe('Select a cell', () => {
       )
     })
 
-    it('should not request the location prefix when there are no non-associations', async () => {
-      nonAssociationsService.getNonAssociations = jest.fn().mockResolvedValue(null)
-      await controller(req, res)
-
-      expect(locationService.getLocation.mock.calls.length).toBe(0)
-    })
-
     it('should set show non association value to true when there are res unit level non-associations', async () => {
-      locationService.getLocation
-        .mockResolvedValueOnce(cellLocationData)
-        .mockResolvedValueOnce(parentLocationData)
-        .mockResolvedValueOnce(superParentLocationData)
       prisonerCellAllocationService.getCellsWithCapacity = jest.fn().mockResolvedValue([
         {
           id: 1,

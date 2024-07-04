@@ -34,4 +34,32 @@ describe('LocationsInsidePrisonApiClient', () => {
       expect(output).toEqual(response)
     })
   })
+
+  describe('getLocation', () => {
+    it('should return a location from api', async () => {
+      const response = { data: 'data' }
+
+      fakeLocationsInsidePrisonApiClient
+        .get('/locations/key/MDI-1-2-003')
+        .matchHeader('authorization', `Bearer ${accessToken}`)
+        .reply(200, response)
+
+      const output = await locationsInsidePrisonApiClient.getLocation(accessToken, 'MDI-1-2-003')
+      expect(output).toEqual(response)
+    })
+  })
+
+  describe('getInmatesAtLocation', () => {
+    it('should return occupants from api', async () => {
+      const response = { data: 'data' }
+
+      fakeLocationsInsidePrisonApiClient
+        .get('/prisoner-locations/key/MDI-1-2-003')
+        .matchHeader('authorization', `Bearer ${accessToken}`)
+        .reply(200, response)
+
+      const output = await locationsInsidePrisonApiClient.getInmatesAtLocation(accessToken, 'MDI-1-2-003')
+      expect(output).toEqual(response)
+    })
+  })
 })

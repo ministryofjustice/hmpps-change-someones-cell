@@ -394,10 +394,6 @@ export default class PrisonApiClient {
     })
   }
 
-  getLocation(token: string, livingUnitId: number) {
-    return PrisonApiClient.restClient(token).get<Location>({ path: `/api/locations/${livingUnitId}` })
-  }
-
   getCellsWithCapacity(token: string, agencyId: string) {
     return PrisonApiClient.restClient(token, { timeout: { deadline: 30000 } }).get<OffenderCell[]>({
       path: `/api/agencies/${agencyId}/cellsWithCapacity`,

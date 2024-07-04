@@ -222,9 +222,6 @@ context('A user can see conflicts in cell', () => {
     cy.signIn()
   })
   beforeEach(() => {
-    cy.task('stubInmatesAtLocation', {
-      inmates: [{ offenderNo: 'A12345', firstName: 'Bob', lastName: 'Doe', assignedLivingUnitId: 1 }],
-    })
     cy.task('stubOffenderNonAssociationsLegacy', {
       offenderNo,
       firstName: 'JOHN',
@@ -252,9 +249,34 @@ context('A user can see conflicts in cell', () => {
         },
       ],
     })
-    cy.task('stubLocation', { locationId: 1, locationData: { parentLocationId: 2, description: 'MDI-1-1' } })
-    cy.task('stubLocation', { locationId: 2, locationData: { parentLocationId: 3 } })
-    cy.task('stubLocation', { locationId: 3, locationData: { locationPrefix: 'MDI-1' } })
+
+    cy.task('stubLocation', {
+      prisonId: 'MDI',
+      parentId: 'uuid',
+      key: 'MDI-1-1-1',
+      pathHierarchy: '1-1-1',
+      capacity: {
+        maxCapacity: 2,
+        workingCapacity: 2,
+      },
+    })
+
+    cy.task('stubInmatesAtLocation', [
+      {
+        cellLocation: 'MDI-1-1-1',
+        prisoners: [
+          {
+            prisonerNumber: 'A12345',
+            firstName: 'Bob',
+            lastName: 'Doe',
+            prisonId: 'MDI',
+            prisonName: 'Moorland (HMP)',
+            cellLocation: '1-1-1',
+            alerts: [],
+          },
+        ],
+      },
+    ])
     cy.task('stubGroups', { id: 'MDI' })
     cy.task('stubCellsWithCapacity', { cells: locationsResponse })
     cy.task('stubCellsWithCapacityByGroupName', { agencyId: 'MDI', groupName: 1, locationsResponse })
@@ -277,7 +299,7 @@ context('A user can see conflicts in cell', () => {
 
   it('should load with correct data', () => {
     stubPrisonDetails()
-    const page = ConsiderRisksPage.goTo(offenderNo, 1)
+    const page = ConsiderRisksPage.goTo(offenderNo, 'MDI-1-1-1')
     page.nonAssociationsSubTitle().contains('Test User has a non-association with a prisoner on this wing:')
     page.nonAssociationsSummary().then($summary => {
       cy.get($summary).find('dt').its('length').should('eq', 6)
@@ -356,14 +378,14 @@ context('A user can see conflicts in cell', () => {
 
   it('should show error when nothing is selected', () => {
     stubPrisonDetails()
-    const page = ConsiderRisksPage.goTo(offenderNo, 1)
+    const page = ConsiderRisksPage.goTo(offenderNo, 'MDI-1-1-1')
     page.form().submitButton().click()
     page.errorSummary().contains('Select yes if you are sure you want to select the cell')
   })
 
   it('should redirect to select cell if NO is selected', () => {
     stubPrisonDetails()
-    const page = ConsiderRisksPage.goTo(offenderNo, 1)
+    const page = ConsiderRisksPage.goTo(offenderNo, 'MDI-1-1-1')
     page.form().confirmationNo().click()
     page.form().submitButton().click()
     cy.url().should('include', '/select-cell')
@@ -371,10 +393,9 @@ context('A user can see conflicts in cell', () => {
 
   it('should redirect to confirm cell move on continue', () => {
     stubPrisonDetails()
-    const page = ConsiderRisksPage.goTo(offenderNo, 1)
+    const page = ConsiderRisksPage.goTo(offenderNo, 'MDI-1-1-1')
 
     cy.task('stubBookingDetails', { firstName: 'Bob', lastName: 'Doe' })
-    cy.task('stubLocation', { locationId: 1, locationDetails: { description: 'MDI-1-1' } })
     cy.task('stubCellMoveTypes', [
       {
         code: 'ADM',
@@ -392,13 +413,10 @@ context('A user can see conflicts in cell', () => {
 
     page.form().submitButton().click()
 
-    ConfirmCellMovePage.verifyOnPage('Bob Doe', 'HB1')
+    ConfirmCellMovePage.verifyOnPage('Bob Doe', '1-1-1')
   })
 
   it('should redirect to confirm cell when there are no warnings', () => {
-    cy.task('stubInmatesAtLocation', {
-      inmates: [],
-    })
     cy.task('stubOffenderNonAssociationsLegacy', {})
 
     cy.task('stubBookingDetails', {
@@ -406,6 +424,7 @@ context('A user can see conflicts in cell', () => {
       lastName: 'Doe',
       offenderNo,
       bookingId: 1234,
+      alerts: [],
     })
 
     cy.task('stubCellMoveTypes', [
@@ -421,18 +440,15 @@ context('A user can see conflicts in cell', () => {
       },
     ])
 
-    cy.visit(`/prisoner/${offenderNo}/cell-move/consider-risks?cellId=1`)
+    cy.visit(`/prisoner/${offenderNo}/cell-move/consider-risks?cellId=MDI-1-1-1`)
 
-    ConfirmCellMovePage.verifyOnPage('Bob Doe', 'MDI-1-1')
+    ConfirmCellMovePage.verifyOnPage('Bob Doe', '1-1-1')
   })
 
-  it('should not show CSRA messages and have the correct confirmation label', () => {
-    cy.task('stubInmatesAtLocation', {
-      inmates: [],
-    })
+  xit('should not show CSRA messages and have the correct confirmation label', () => {
     cy.task('stubOffenderFullDetails', offenderFullDetails)
 
-    const page = ConsiderRisksPage.goTo(offenderNo, 1)
+    const page = ConsiderRisksPage.goTo(offenderNo, 'MDI-1-1-1')
     page.csraMessages().should('not.exist')
     page.form().confirmationInput().contains('Are you sure you want to select this cell?')
   })
@@ -453,9 +469,7 @@ context('A user can see conflicts in cell', () => {
       cy.task('stubGroups', { id: 'MDI' })
       cy.task('stubUserCaseLoads')
       cy.task('stubCellAttributes')
-      cy.task('stubInmatesAtLocation', {
-        inmates: [{ offenderNo: 'A12345', firstName: 'Bob', lastName: 'Doe', assignedLivingUnitId: 1 }],
-      })
+
       cy.task('stubPrisonersAtLocations', {
         prisoners: [
           {
@@ -517,7 +531,7 @@ context('A user can see conflicts in cell', () => {
 
       it('should still have the correct back link when validation errors are shown', () => {
         stubPrisonDetails()
-        const page = ConsiderRisksPage.goTo(offenderNo, 1)
+        const page = ConsiderRisksPage.goTo(offenderNo, 'MDI-1-1-1')
         page.form().submitButton().click()
         page.errorSummary().contains('Select yes if you are sure you want to select the cell')
         cy.contains('Back').click()

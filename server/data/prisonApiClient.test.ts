@@ -173,20 +173,6 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('getLocation', () => {
-    it('should return a location from api', async () => {
-      const response = { data: 'data' }
-
-      fakePrisonApiClient
-        .get('/api/locations/123')
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .reply(200, response)
-
-      const output = await prisonApiClient.getLocation(accessToken, 123)
-      expect(output).toEqual(response)
-    })
-  })
-
   describe('getCellsWithCapacity', () => {
     it('should return available cells from api', async () => {
       const response = { data: 'data' }

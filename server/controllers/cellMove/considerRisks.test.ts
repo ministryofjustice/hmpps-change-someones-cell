@@ -3,7 +3,6 @@ import considerRisksController from './considerRisks'
 import LocationService from '../../services/locationService'
 import AnalyticsService from '../../services/analyticsService'
 import NonAssociationsService from '../../services/nonAssociationsService'
-import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import { OffenderDetails } from '../../data/prisonApiClient'
 import config from '../../config'
@@ -13,40 +12,63 @@ Reflect.deleteProperty(process.env, 'APPINSIGHTS_INSTRUMENTATIONKEY')
 jest.mock('../../services/analyticsService')
 jest.mock('../../services/locationService')
 jest.mock('../../services/nonAssociationsService')
-jest.mock('../../services/prisonerCellAllocationService')
 jest.mock('../../services/prisonerDetailsService')
 
 describe('move validation', () => {
   const analyticsService = jest.mocked(new AnalyticsService(undefined))
   const locationService = jest.mocked(new LocationService(undefined, undefined, undefined))
   const nonAssociationsService = jest.mocked(new NonAssociationsService(undefined))
-  const prisonerCellAllocationService = jest.mocked(new PrisonerCellAllocationService(undefined, undefined, undefined))
   const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined))
 
   let req
   let res
   let controller
 
+  const systemClientToken = 'system_token'
   const offenderNo = 'ABC123'
-  const cellId = 1
+  const cellId = 'MDI-1-1-001'
 
   const cellLocationData = {
-    parentLocationId: 2,
+    prisonId: 'MDI',
+    parentId: 'some-id',
+    key: 'MDI-1-1-001',
+    pathHierarchy: 'A-1-001',
+    capacity: { maxCapacity: 3, workingCapacity: 3 },
   }
 
-  const parentLocationData = {
-    parentLocationId: 3,
+  const createAlert = ({
+    alertId,
+    alertCode,
+    alertCodeDescription,
+    alertType,
+    alertTypeDescription,
+    comment,
+    dateCreated = '2019-08-20',
+  }) => {
+    return {
+      alertId,
+      alertCode,
+      alertCodeDescription,
+      alertType,
+      alertTypeDescription,
+      comment,
+      active: true,
+      addedByFirstName: 'Prison',
+      addedByLastName: 'Officer',
+      bookingId: 14,
+      dateCreated,
+      dateExpires: null,
+      expired: false,
+      expiredByFirstName: 'Prison',
+      expiredByLastName: 'Officer',
+      offenderNo,
+    }
   }
-
-  const superParentLocationData = {
-    locationPrefix: 'MDI-1',
-  }
-
-  const getCurrentOffenderDetailsResponse: OffenderDetails = {
-    bookingId: 1234,
-    offenderNo: 'A12345',
-    firstName: 'Test',
-    lastName: 'User',
+  const offenderDetails: OffenderDetails = {
+    bookingId: 1,
+    offenderNo: 'ABC123',
+    firstName: 'John',
+    lastName: 'Smith',
     csra: 'High',
     csraClassificationCode: 'HI',
     agencyId: 'MDI',
@@ -62,333 +84,155 @@ describe('move validation', () => {
     age: 29,
     assignedLivingUnitId: 5432,
     assignedLivingUnitDesc: '1-1-001',
+    profileInformation: [{ type: 'SEXO', resultValue: 'Homosexual' }],
     alertsDetails: ['X', 'XEL', 'XGANG', 'PEEP', 'XTACT', 'V', 'H', 'R'],
     alertsCodes: ['X', 'XEL', 'XGANG', 'PEEP', 'XTACT', 'V', 'H', 'R'],
     alerts: [
-      {
-        active: true,
-        addedByFirstName: 'John',
-        addedByLastName: 'Smith',
-        alertCode: 'RLG',
-        alertCodeDescription: 'Risk to LGB',
+      createAlert({
         alertId: 1,
-        alertType: 'X',
-        alertTypeDescription: 'Risk to LGB',
-        bookingId: 14,
-        comment: 'has a large poster on cell wall',
-        dateCreated: '2019-08-20',
-        dateExpires: null,
-        expired: false,
-        expiredByFirstName: 'John',
-        expiredByLastName: 'Smith',
-        offenderNo,
-      },
-      {
-        active: true,
-        addedByFirstName: 'John',
-        addedByLastName: 'Smith',
         alertCode: 'XEL',
         alertCodeDescription: 'E-List',
-        alertId: 1,
         alertType: 'X',
         alertTypeDescription: 'Security',
-        bookingId: 14,
         comment: 'has a large poster on cell wall',
-        dateCreated: '2019-08-20',
-        dateExpires: null,
-        expired: false,
-        expiredByFirstName: 'John',
-        expiredByLastName: 'Smith',
-        offenderNo,
-      },
-      {
-        active: true,
-        addedByFirstName: 'John',
-        addedByLastName: 'Smith',
+      }),
+      createAlert({
+        alertId: 1,
         alertCode: 'XGANG',
         alertCodeDescription: 'Gang member',
-        alertId: 1,
         alertType: 'X',
         alertTypeDescription: 'Security',
-        bookingId: 14,
         comment: 'has a large poster on cell wall',
-        dateCreated: '2019-08-20',
-        dateExpires: null,
-        expired: false,
-        expiredByFirstName: 'John',
-        expiredByLastName: 'Smith',
-        offenderNo,
-      },
-      {
-        active: true,
-        addedByFirstName: 'John',
-        addedByLastName: 'Smith',
+      }),
+      createAlert({
+        alertId: 2,
         alertCode: 'PEEP',
         alertCodeDescription: 'Peep',
-        alertId: 1,
         alertType: 'P',
         alertTypeDescription: 'Peep',
-        bookingId: 14,
         comment: 'has a large poster on cell wall',
-        dateCreated: '2019-08-20',
-        dateExpires: null,
-        expired: false,
-        expiredByFirstName: 'John',
-        expiredByLastName: 'Smith',
-        offenderNo,
-      },
-      {
-        active: true,
-        addedByFirstName: 'John',
-        addedByLastName: 'Smith',
+      }),
+      createAlert({
+        alertId: 3,
         alertCode: 'XTACT',
         alertCodeDescription: 'Gang member',
-        alertId: 1,
         alertType: 'X',
         alertTypeDescription: 'Security',
-        bookingId: 14,
-        comment: 'has a large poster on cell wall',
-        dateCreated: '2019-08-20',
-        dateExpires: null,
-        expired: false,
-        expiredByFirstName: 'John',
-        expiredByLastName: 'Smith',
-        offenderNo,
-      },
-      {
-        alertId: 3,
-        alertType: 'V',
-        alertTypeDescription: 'Vulnerability',
+        comment: 'test',
+      }),
+      createAlert({
+        alertId: 4,
         alertCode: 'VIP',
         alertCodeDescription: 'Isolated Prisoner',
+        alertType: 'V',
+        alertTypeDescription: 'Vulnerability',
         comment: 'test',
-        dateCreated: '2020-08-20',
-        expired: false,
-        active: true,
-        addedByFirstName: 'John',
-        addedByLastName: 'Smith',
-        bookingId: 14,
-        offenderNo,
-        dateExpires: null,
-        expiredByFirstName: 'John',
-        expiredByLastName: 'Smith',
-      },
-      {
-        alertId: 4,
-        alertType: 'H',
-        alertTypeDescription: 'Self Harm',
+      }),
+      createAlert({
+        alertId: 5,
         alertCode: 'HA',
         alertCodeDescription: 'ACCT open',
-        comment: 'Test comment',
-        dateCreated: '2021-02-18',
-        expired: false,
-        active: true,
-        addedByFirstName: 'John',
-        addedByLastName: 'Smith',
-        bookingId: 14,
-        offenderNo,
-        dateExpires: null,
-        expiredByFirstName: 'John',
-        expiredByLastName: 'Smith',
-      },
-      {
-        alertId: 5,
         alertType: 'H',
         alertTypeDescription: 'Self Harm',
+        comment: 'test',
+      }),
+      createAlert({
+        alertId: 6,
         alertCode: 'HA1',
         alertCodeDescription: 'ACCT post closure',
-        comment: '',
-        dateCreated: '2021-02-19',
-        expired: false,
-        active: true,
-        addedByFirstName: 'John',
-        addedByLastName: 'Smith',
-        bookingId: 14,
-        offenderNo,
-        dateExpires: null,
-        expiredByFirstName: 'John',
-        expiredByLastName: 'Smith',
-      },
-      {
-        alertId: 6,
-        alertType: 'R',
-        alertTypeDescription: 'Risk',
+        alertType: 'H',
+        alertTypeDescription: 'Self Harm',
+        comment: 'test',
+      }),
+      createAlert({
+        alertId: 7,
         alertCode: 'RTP',
         alertCodeDescription: 'Risk to transgender people',
+        alertType: 'R',
+        alertTypeDescription: 'Risk',
         comment: 'test',
-        dateCreated: '2020-09-21',
-        expired: false,
-        active: true,
-        addedByFirstName: 'John',
-        addedByLastName: 'Smith',
-        bookingId: 14,
-        offenderNo,
-        dateExpires: null,
-        expiredByFirstName: 'John',
-        expiredByLastName: 'Smith',
-      },
+      }),
+      createAlert({
+        alertId: 8,
+        alertCode: 'RLG',
+        alertCodeDescription: 'Risk to LGB',
+        alertType: 'X',
+        alertTypeDescription: 'Risk to LGB',
+        comment: 'has a large poster on cell wall',
+      }),
+      createAlert({
+        alertId: 9,
+        alertCode: 'RLG',
+        alertCodeDescription: 'Risk to LGB',
+        alertType: 'X',
+        alertTypeDescription: 'Risk to LGB',
+        comment: 'has a large poster on cell wall',
+      }),
     ],
-    profileInformation: [],
   }
 
-  const getCurrentOccupierDetailsResponse: OffenderDetails = {
-    bookingId: 1235,
+  const occupants = [
+    {
+      cellLocation: '1-1-001',
+      prisoners: [
+        {
+          prisonerNumber: 'A1111',
+          firstName: 'Occupant',
+          lastName: 'One',
+          prisonId: 'MDI',
+          prisonName: 'Moorlands',
+          cellLocation: '1-1-001',
+        },
+      ],
+    },
+    {
+      cellLocation: '1-1-001',
+      prisoners: [
+        {
+          prisonerNumber: 'A2222',
+          firstName: 'Occupant',
+          lastName: 'Two',
+          prisonId: 'MDI',
+          prisonName: 'Moorlands',
+          cellLocation: '1-1-001',
+        },
+      ],
+    },
+  ]
+
+  const occupantOneDetails = {
     firstName: 'Occupant',
     lastName: 'One',
-    csra: 'High',
     csraClassificationCode: 'HI',
-    agencyId: 'MDI',
-    offenderNo: 'A12346',
-    assessments: [],
-    assignedLivingUnit: {
-      agencyId: 'BXI',
-      locationId: 5432,
-      description: '1-1-001',
-      agencyName: 'Brixton (HMP)',
-    },
-    dateOfBirth: '1990-10-12',
-    age: 29,
-    assignedLivingUnitId: 5432,
-    assignedLivingUnitDesc: '1-1-001',
-    alertsDetails: ['X', 'XEL', 'XGANG', 'PEEP', 'XTACT', 'V', 'H', 'R'],
-    alertsCodes: ['X', 'XEL', 'XGANG', 'PEEP', 'XTACT', 'V', 'H', 'R'],
     alerts: [
-      {
-        active: true,
-        addedByFirstName: 'John',
-        addedByLastName: 'Smith',
-        alertCode: 'XC',
-        alertCodeDescription: 'Risk to females',
+      createAlert({
         alertId: 1,
-        alertType: 'X',
-        alertTypeDescription: 'Security',
-        bookingId: 14,
-        comment: 'has a large poster on cell wall',
-        dateCreated: '2019-08-20',
-        dateExpires: null,
-        expired: false,
-        expiredByFirstName: 'John',
-        expiredByLastName: 'Smith',
-        offenderNo,
-      },
-      {
-        active: true,
-        addedByFirstName: 'John',
-        addedByLastName: 'Smith',
-        alertCode: 'XGANG',
-        alertCodeDescription: 'Gang member',
-        alertId: 1,
-        alertType: 'X',
-        alertTypeDescription: 'Security',
-        bookingId: 14,
-        comment: 'has a large poster on cell wall',
-        dateCreated: '2019-08-20',
-        dateExpires: null,
-        expired: false,
-        expiredByFirstName: 'John',
-        expiredByLastName: 'Smith',
-        offenderNo,
-      },
-      {
-        active: true,
-        addedByFirstName: 'John',
-        addedByLastName: 'Smith',
-        alertCode: 'PEEP',
-        alertCodeDescription: 'Peep',
-        alertId: 1,
-        alertType: 'P',
-        alertTypeDescription: 'Peep',
-        bookingId: 14,
-        comment: 'has a large poster on cell wall',
-        dateCreated: '2019-08-20',
-        dateExpires: null,
-        expired: false,
-        expiredByFirstName: 'John',
-        expiredByLastName: 'Smith',
-        offenderNo,
-      },
-      {
-        active: true,
-        addedByFirstName: 'John',
-        addedByLastName: 'Smith',
-        alertCode: 'XTACT',
-        alertCodeDescription: 'Gang member',
-        alertId: 1,
-        alertType: 'X',
-        alertTypeDescription: 'Security',
-        bookingId: 14,
-        comment: 'has a large poster on cell wall',
-        dateCreated: '2019-08-20',
-        dateExpires: null,
-        expired: false,
-        expiredByFirstName: 'John',
-        expiredByLastName: 'Smith',
-        offenderNo,
-      },
-      {
-        alertId: 3,
-        alertType: 'V',
-        alertTypeDescription: 'Vulnerability',
         alertCode: 'VIP',
         alertCodeDescription: 'Isolated Prisoner',
+        alertType: 'V',
+        alertTypeDescription: 'Vulnerability',
         comment: 'test',
         dateCreated: '2020-08-20',
-        expired: false,
-        active: true,
-        addedByFirstName: 'John',
-        addedByLastName: 'Smith',
-        bookingId: 14,
-        offenderNo,
-        dateExpires: null,
-        expiredByFirstName: 'John',
-        expiredByLastName: 'Smith',
-      },
+      }),
     ],
-    profileInformation: [{ type: 'SEXO', resultValue: 'Homosexual' }],
-  }
+  } as unknown as OffenderDetails
 
-  const getAnotherCurrentOccupierDetailsResponse: OffenderDetails = {
-    bookingId: 1235,
+  const occupantTwoDetails = {
     firstName: 'Occupant',
-    categoryCode: 'B',
     lastName: 'Two',
-    csra: 'Standard',
     csraClassificationCode: 'STANDARD',
-    agencyId: 'MDI',
-    offenderNo: 'A12347',
-    assessments: [],
-    assignedLivingUnit: {
-      agencyId: 'BXI',
-      locationId: 5432,
-      description: '1-1-001',
-      agencyName: 'Brixton (HMP)',
-    },
-    dateOfBirth: '1990-10-12',
-    age: 29,
-    assignedLivingUnitId: 5432,
-    assignedLivingUnitDesc: '1-1-001',
-    alertsDetails: ['X', 'XEL', 'XGANG', 'PEEP', 'XTACT', 'V', 'H', 'R'],
-    alertsCodes: ['X', 'XEL', 'XGANG', 'PEEP', 'XTACT', 'V', 'H', 'R'],
-    alerts: [],
-    profileInformation: [{ type: 'SEXO' }],
-  }
-
-  const offender = {
-    bookingId: 1,
-    offenderNo: 'A1234BC',
-    firstName: 'JOHN',
-    lastName: 'SMITH',
-    dateOfBirth: '1990-10-12',
-    age: 29,
-    agencyId: 'MDI',
-    assignedLivingUnitId: 1,
-    assignedLivingUnitDesc: 'UNIT-1',
-    categoryCode: 'C',
-    alertsDetails: ['XA', 'XVL'],
-    alertsCodes: ['XA', 'XVL'],
-  }
-
-  const systemClientToken = 'system_token'
+    categoryCode: 'B',
+    alerts: [
+      createAlert({
+        alertId: 1,
+        alertCode: 'XGANG',
+        alertCodeDescription: 'Gang member',
+        alertType: 'X',
+        alertTypeDescription: 'Security',
+        comment: 'has a large poster on cell wall',
+      }),
+    ],
+  } as unknown as OffenderDetails
 
   beforeEach(() => {
     req = {
@@ -405,8 +249,8 @@ describe('move validation', () => {
     res = {
       locals: {
         user: {
-          activeCaseLoad: { caseLoadId: 'LEI' },
-          allCaseloads: [{ caseLoadId: 'LEI' }],
+          activeCaseLoad: { caseLoadId: 'MDI' },
+          allCaseloads: [{ caseLoadId: 'MDI' }],
           userRoles: ['ROLE_CELL_MOVE'],
         },
         systemClientToken,
@@ -416,12 +260,7 @@ describe('move validation', () => {
     }
 
     prisonerDetailsService.getDetails = jest.fn()
-    prisonerCellAllocationService.getInmatesAtLocation = jest.fn()
-    locationService.getLocation = jest
-      .fn()
-      .mockResolvedValueOnce(cellLocationData)
-      .mockResolvedValueOnce(parentLocationData)
-      .mockResolvedValueOnce(superParentLocationData)
+    locationService.getLocation = jest.fn().mockResolvedValueOnce(cellLocationData)
     analyticsService.sendEvents = jest.fn().mockResolvedValue(Promise.resolve({}))
     nonAssociationsService.getNonAssociations = jest.fn().mockResolvedValue({
       offenderNo: 'ABC123',
@@ -510,68 +349,64 @@ describe('move validation', () => {
       analyticsService,
       locationService,
       nonAssociationsService,
-      prisonerCellAllocationService,
       prisonerDetailsService,
     })
   })
 
   it('Makes the expected API calls on get', async () => {
+    locationService.getInmatesAtLocation.mockResolvedValue(occupants)
     prisonerDetailsService.getDetails
-      .mockResolvedValueOnce(getCurrentOffenderDetailsResponse)
-      .mockResolvedValueOnce(getCurrentOccupierDetailsResponse)
+      .mockResolvedValueOnce(offenderDetails)
+      .mockResolvedValueOnce(occupantOneDetails)
+      .mockResolvedValueOnce(occupantTwoDetails)
 
-    prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue([{ ...offender, offenderNo: 'A12346' }])
     await controller.index(req, res)
 
     expect(prisonerDetailsService.getDetails).toHaveBeenCalledWith(systemClientToken, offenderNo, true)
-    expect(prisonerDetailsService.getDetails).toHaveBeenCalledWith(systemClientToken, 'A12346', true)
+    expect(prisonerDetailsService.getDetails).toHaveBeenCalledWith(systemClientToken, 'ABC123', true)
+    expect(prisonerDetailsService.getDetails).toHaveBeenCalledWith(systemClientToken, 'A1111', true)
+    expect(prisonerDetailsService.getDetails).toHaveBeenCalledWith(systemClientToken, 'A2222', true)
     expect(nonAssociationsService.getNonAssociations).toHaveBeenCalledWith(systemClientToken, offenderNo)
-    expect(locationService.getLocation).toHaveBeenCalledWith(systemClientToken, 1)
-    expect(locationService.getLocation).toHaveBeenCalledWith(systemClientToken, 2)
-    expect(locationService.getLocation).toHaveBeenCalledWith(systemClientToken, 3)
-    expect(prisonerCellAllocationService.getInmatesAtLocation).toHaveBeenCalledWith(systemClientToken, 1)
+    expect(locationService.getLocation).toHaveBeenCalledWith(systemClientToken, 'MDI-1-1-001')
+    expect(locationService.getInmatesAtLocation).toHaveBeenCalledWith(systemClientToken, 'MDI-1-1-001')
   })
 
   it('Passes the expected data to the template on get', async () => {
+    locationService.getInmatesAtLocation.mockResolvedValue(occupants)
     prisonerDetailsService.getDetails
-      .mockResolvedValueOnce(getCurrentOffenderDetailsResponse)
-      .mockResolvedValueOnce(getCurrentOccupierDetailsResponse)
-      .mockResolvedValueOnce(getAnotherCurrentOccupierDetailsResponse)
+      .mockResolvedValueOnce(offenderDetails)
+      .mockResolvedValueOnce(occupantOneDetails)
+      .mockResolvedValueOnce(occupantTwoDetails)
 
-    prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue([
-      { ...offender, offenderNo: 'A12346' },
-      { ...offender, offenderNo: 'A12347' },
-    ])
     await controller.index(req, res)
 
     expect(res.render).toHaveBeenCalledWith('cellMove/considerRisks.njk', {
       categoryWarning: 'a Cat A rating and Occupant One is a Cat not entered and Occupant Two is a Cat B',
       confirmationQuestionLabel:
-        'Are you sure you want to move Test User into a cell with Occupant One and Occupant Two?',
+        'Are you sure you want to move John Smith into a cell with Occupant One and Occupant Two?',
       currentOccupantsWithFormattedActiveAlerts: [
         {
+          name: 'Occupant One',
           alerts: [
             {
-              comment: 'has a large poster on cell wall',
-              date: 'Date added: 20 August 2019',
-              title: 'a Gang member alert',
-            },
-            {
+              title: 'an Isolated Prisoner alert',
               comment: 'test',
               date: 'Date added: 20 August 2020',
-              title: 'an Isolated Prisoner alert',
             },
           ],
-          name: 'Occupant One',
+        },
+        {
+          name: 'Occupant Two',
+          alerts: [
+            {
+              title: 'a Gang member alert',
+              comment: 'has a large poster on cell wall',
+              date: 'Date added: 20 August 2019',
+            },
+          ],
         },
       ],
       currentOffenderActiveAlerts: [
-        {
-          comment: 'has a large poster on cell wall',
-          date: 'Date added: 20 August 2019',
-          title:
-            'a Risk to LGB alert and Occupant One has a sexual orientation of Homosexual and Occupant Two has a sexual orientation of not entered',
-        },
         {
           comment: 'has a large poster on cell wall',
           date: 'Date added: 20 August 2019',
@@ -584,23 +419,35 @@ describe('move validation', () => {
         },
         {
           comment: 'test',
-          date: 'Date added: 20 August 2020',
+          date: 'Date added: 20 August 2019',
           title: 'an Isolated Prisoner alert',
         },
         {
-          comment: 'Test comment',
-          date: 'Date added: 18 February 2021',
+          comment: 'test',
+          date: 'Date added: 20 August 2019',
           title: 'an ACCT open alert',
         },
+
         {
-          comment: '',
-          date: 'Date added: 19 February 2021',
+          comment: 'test',
+          date: 'Date added: 20 August 2019',
           title: 'an ACCT post closure alert',
         },
         {
           comment: 'test',
-          date: 'Date added: 21 September 2020',
+          date: 'Date added: 20 August 2019',
           title: 'a Risk to transgender people alert',
+        },
+        {
+          comment: 'has a large poster on cell wall',
+          date: 'Date added: 20 August 2019',
+          title:
+            'a Risk to LGB alert and Occupant One has a sexual orientation of not entered and Occupant Two has a sexual orientation of not entered',
+        },
+        {
+          comment: 'has a large poster on cell wall',
+          date: 'Date added: 20 August 2019',
+          title: 'a Risk to LGB alert and Occupant One has a sexual orientation of not entered',
         },
       ],
       errors: undefined,
@@ -615,13 +462,13 @@ describe('move validation', () => {
         },
       ],
       offenderNo: 'ABC123',
-      currentOffenderName: 'Test User',
+      currentOffenderName: 'John Smith',
       offendersFormattedNamesWithCsra: [
-        'Test User is CSRA High.',
+        'John Smith is CSRA High.',
         'Occupant One is CSRA High.',
         'Occupant Two is CSRA Standard.',
       ],
-      prisonerNameForBreadcrumb: 'User, Test',
+      prisonerNameForBreadcrumb: 'Smith, John',
       profileUrl: `${config.prisonerProfileUrl}/prisoner/ABC123`,
       selectCellUrl: '/prisoner/ABC123/cell-move/select-cell',
       showOffendersNamesWithCsra: true,
@@ -632,14 +479,15 @@ describe('move validation', () => {
 
   describe('Index', () => {
     it('Should warn that the prisoner is non hetro when occupants have risk to LGBT alert', async () => {
+      locationService.getInmatesAtLocation.mockResolvedValue(occupants)
+
       prisonerDetailsService.getDetails
         .mockResolvedValueOnce({
-          ...getCurrentOffenderDetailsResponse,
-          profileInformation: [{ type: 'SEXO', resultValue: 'Homosexual' }],
+          ...offenderDetails,
           alerts: [],
         })
         .mockResolvedValueOnce({
-          ...getCurrentOccupierDetailsResponse,
+          ...occupantOneDetails,
           alerts: [
             {
               active: true,
@@ -661,8 +509,11 @@ describe('move validation', () => {
             },
           ],
         })
+        .mockResolvedValueOnce({
+          ...occupantTwoDetails,
+          alerts: [],
+        })
 
-      prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue([{ ...offender, offenderNo: 'A12346' }])
       await controller.index(req, res)
 
       expect(res.render).toHaveBeenCalledWith(
@@ -675,7 +526,7 @@ describe('move validation', () => {
                 {
                   comment: 'alert comment',
                   date: 'Date added: 20 August 2019',
-                  title: 'a Risk to LGB alert and Test User has a sexual orientation of Homosexual',
+                  title: 'a Risk to LGB alert and John Smith has a sexual orientation of Homosexual',
                 },
               ],
               name: 'Occupant One',
@@ -686,18 +537,25 @@ describe('move validation', () => {
     })
 
     it('Should not show CSRA messages when both prisoner and occupants are standard', async () => {
+      locationService.getInmatesAtLocation.mockResolvedValue(occupants)
+
       prisonerDetailsService.getDetails
         .mockResolvedValueOnce({
-          ...getCurrentOffenderDetailsResponse,
+          ...offenderDetails,
           csra: 'Standard',
           csraClassificationCode: 'STANDARD',
         })
         .mockResolvedValueOnce({
-          ...getCurrentOccupierDetailsResponse,
+          ...occupantOneDetails,
           csra: 'Standard',
           csraClassificationCode: 'STANDARD',
         })
-      prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue([{ ...offender, offenderNo: 'A12346' }])
+        .mockResolvedValueOnce({
+          ...occupantTwoDetails,
+          csra: 'Standard',
+          csraClassificationCode: 'STANDARD',
+        })
+
       await controller.index(req, res)
 
       expect(res.render).toHaveBeenCalledWith(
@@ -712,16 +570,23 @@ describe('move validation', () => {
     it('Should not show CSRA message when a pisoner or occupant has no csra rating', async () => {
       prisonerDetailsService.getDetails
         .mockResolvedValueOnce({
-          ...getCurrentOffenderDetailsResponse,
+          ...offenderDetails,
+          csra: 'Standard',
+          csraClassificationCode: 'STANDARD',
+        })
+        .mockResolvedValueOnce({
+          ...occupantOneDetails,
           csra: undefined,
           csraClassificationCode: undefined,
         })
         .mockResolvedValueOnce({
-          ...getCurrentOccupierDetailsResponse,
+          ...occupantTwoDetails,
           csra: 'Standard',
           csraClassificationCode: 'STANDARD',
         })
-      prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue([{ ...offender, offenderNo: 'A12346' }])
+
+      locationService.getInmatesAtLocation.mockResolvedValue(occupants)
+
       await controller.index(req, res)
 
       expect(res.render).toHaveBeenCalledWith(
@@ -729,18 +594,22 @@ describe('move validation', () => {
         expect.objectContaining({
           showOffendersNamesWithCsra: false,
           showRisks: true,
-          offendersFormattedNamesWithCsra: ['Test User is CSRA not entered.', 'Occupant One is CSRA Standard.'],
+          offendersFormattedNamesWithCsra: [
+            'John Smith is CSRA Standard.',
+            'Occupant One is CSRA not entered.',
+            'Occupant Two is CSRA Standard.',
+          ],
         }),
       )
     })
 
     it('Does not pass alerts and CSRA when there are no occupants', async () => {
       prisonerDetailsService.getDetails.mockResolvedValueOnce({
-        ...getCurrentOffenderDetailsResponse,
+        ...offenderDetails,
         csra: 'Standard',
         categoryCode: 'C',
       })
-      prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue([])
+      locationService.getInmatesAtLocation.mockResolvedValue([])
       await controller.index(req, res)
 
       expect(res.render).toHaveBeenCalledWith(
@@ -757,10 +626,10 @@ describe('move validation', () => {
 
     it('Passes the correct conditional data to the template when there are no inmates at the location', async () => {
       prisonerDetailsService.getDetails.mockResolvedValueOnce({
-        ...getCurrentOffenderDetailsResponse,
+        ...offenderDetails,
         csra: 'Standard',
       })
-      prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue([])
+      locationService.getInmatesAtLocation.mockResolvedValue([])
 
       await controller.index(req, res)
 
@@ -778,28 +647,26 @@ describe('move validation', () => {
     it('Redirects to confirm cell move when there are no warnings', async () => {
       nonAssociationsService.getNonAssociations = jest.fn().mockResolvedValue({})
       prisonerDetailsService.getDetails = jest.fn().mockResolvedValue({ firstName: 'Bob', lastName: 'Doe', alerts: [] })
-      prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue([])
+      locationService.getInmatesAtLocation.mockResolvedValue([])
 
       await controller.index(req, res)
 
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/cell-move/confirm-cell-move?cellId=1')
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/ABC123/cell-move/confirm-cell-move?cellId=MDI-1-1-001')
     })
 
     it('reception as a location has zero non-associations', async () => {
       locationService.getLocation = jest.fn().mockResolvedValue({})
-      prisonerCellAllocationService.getInmatesAtLocation = jest.fn().mockResolvedValue([])
+      locationService.getInmatesAtLocation = jest.fn().mockResolvedValue([])
       prisonerDetailsService.getDetails
         .mockResolvedValueOnce({
-          ...getCurrentOffenderDetailsResponse,
+          ...offenderDetails,
           csra: 'Standard',
           csraClassificationCode: 'STANDARD',
         })
-        .mockResolvedValueOnce({
-          ...getCurrentOccupierDetailsResponse,
-          csra: 'Standard',
-          csraClassificationCode: 'STANDARD',
-        })
-      prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue([{ ...offender, offenderNo: 'A12346' }])
+        .mockResolvedValueOnce(occupantOneDetails)
+        .mockResolvedValueOnce(occupantTwoDetails)
+
+      locationService.getInmatesAtLocation.mockResolvedValue(occupants)
       await controller.index(req, res)
 
       expect(res.render).toHaveBeenCalledWith(
@@ -814,9 +681,11 @@ describe('move validation', () => {
   describe('Post', () => {})
   it('Redirects when form has been triggered with no data', async () => {
     prisonerDetailsService.getDetails
-      .mockResolvedValueOnce(getCurrentOffenderDetailsResponse)
-      .mockResolvedValueOnce(getCurrentOccupierDetailsResponse)
-    prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue([{ ...offender, offenderNo: 'A12346' }])
+      .mockResolvedValueOnce(offenderDetails)
+      .mockResolvedValueOnce(occupantOneDetails)
+      .mockResolvedValueOnce(occupantTwoDetails)
+
+    locationService.getInmatesAtLocation.mockResolvedValue(occupants)
     req.body = {}
     await controller.post(req, res)
 
@@ -830,20 +699,21 @@ describe('move validation', () => {
 
   it('Redirects when the user has confirmed they are happy', async () => {
     prisonerDetailsService.getDetails
-      .mockResolvedValueOnce(getCurrentOffenderDetailsResponse)
-      .mockResolvedValueOnce(getCurrentOccupierDetailsResponse)
-    prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue([{ ...offender, offenderNo: 'A12346' }])
+      .mockResolvedValueOnce(occupantOneDetails)
+      .mockResolvedValueOnce(occupantTwoDetails)
+    locationService.getInmatesAtLocation.mockResolvedValue(occupants)
     req.body = { confirmation: 'yes' }
     await controller.post(req, res)
 
-    expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${offenderNo}/cell-move/confirm-cell-move?cellId=1`)
+    expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${offenderNo}/cell-move/confirm-cell-move?cellId=MDI-1-1-001`)
   })
 
   it('Redirects when the user has changed their mind', async () => {
     prisonerDetailsService.getDetails
-      .mockResolvedValueOnce(getCurrentOffenderDetailsResponse)
-      .mockResolvedValueOnce(getCurrentOccupierDetailsResponse)
-    prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue([{ ...offender, offenderNo: 'A12346' }])
+      .mockResolvedValueOnce(offenderDetails)
+      .mockResolvedValueOnce(occupantOneDetails)
+      .mockResolvedValueOnce(occupantTwoDetails)
+    locationService.getInmatesAtLocation.mockResolvedValue(occupants)
     req.body = { confirmation: 'no' }
     await controller.post(req, res)
 
@@ -851,14 +721,12 @@ describe('move validation', () => {
   })
 
   it('Raise ga event on cancel, containing the alert codes for all involed offenders', async () => {
-    prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue([
-      { ...offender, offenderNo: 'A12346' },
-      { ...offender, offenderNo: 'A12421' },
-    ])
+    locationService.getInmatesAtLocation.mockResolvedValue(occupants)
     prisonerDetailsService.getDetails
-      .mockResolvedValueOnce(getCurrentOffenderDetailsResponse)
-      .mockResolvedValueOnce(getCurrentOccupierDetailsResponse)
-      .mockResolvedValueOnce(getCurrentOccupierDetailsResponse)
+      .mockResolvedValueOnce(offenderDetails)
+      .mockResolvedValueOnce(occupantOneDetails)
+      .mockResolvedValueOnce(occupantTwoDetails)
+    locationService.getInmatesAtLocation.mockResolvedValue(occupants)
 
     req.query = { offenderNo }
     req.body = { confirmation: 'no' }
@@ -869,8 +737,8 @@ describe('move validation', () => {
       {
         name: 'cancelled_on_consider_risks_page',
         params: {
-          cell_occupants_alert_codes: 'XGANG,VIP',
-          offender_alert_codes: 'RLG,XEL,XGANG,VIP,HA,HA1,RTP',
+          cell_occupants_alert_codes: 'VIP,XGANG',
+          offender_alert_codes: 'XEL,XGANG,VIP,HA,HA1,RTP,RLG,RLG',
         },
       },
     ])

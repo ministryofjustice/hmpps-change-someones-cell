@@ -1,6 +1,7 @@
 import { PrisonApiClient, WhereaboutsApiClient, LocationsInsidePrisonApiClient } from '../data'
-import { Agency, Location, OffenderCell } from '../data/prisonApiClient'
+import { Agency, OffenderCell } from '../data/prisonApiClient'
 import { LocationGroup, LocationPrefix } from '../data/whereaboutsApiClient'
+import { Location, Occupant } from '../data/locationsInsidePrisonApiClient'
 import LocationService from './locationService'
 import { SanitisedError } from '../sanitisedError'
 
@@ -65,32 +66,57 @@ describe('Location service', () => {
 
   describe('getLocation', () => {
     const location: Location = {
-      locationId: 0,
-      locationType: 'string',
-      description: 'string',
-      locationUsage: 'string',
-      agencyId: 'string',
-      parentLocationId: 0,
-      currentOccupancy: 0,
-      locationPrefix: 'string',
-      operationalCapacity: 0,
-      userDescription: 'string',
-      internalLocationCode: 'string',
-      subLocations: true,
+      prisonId: 'ABC',
+      parentId: 'ABC-1',
+      key: 'ABC-1-1-5',
+      pathHierarchy: '1-1-5',
+      capacity: { workingCapacity: 2, maxCapacity: 2 },
     }
 
     it('retrieves location', async () => {
-      prisonApiClient.getLocation.mockResolvedValue(location)
+      locationsInsidePrisonApiClient.getLocation.mockResolvedValue(location)
 
-      const results = await locationService.getLocation(token, 321)
+      const results = await locationService.getLocation(token, 'ABC-1-1-5')
 
       expect(results).toEqual(location)
     })
 
     it('Propagates error', async () => {
-      prisonApiClient.getLocation.mockRejectedValue(new Error('some error'))
+      locationsInsidePrisonApiClient.getLocation.mockRejectedValue(new Error('some error'))
 
-      await expect(locationService.getLocation(token, 321)).rejects.toEqual(new Error('some error'))
+      await expect(locationService.getLocation(token, 'ABC-1-1-5')).rejects.toEqual(new Error('some error'))
+    })
+  })
+
+  describe('getInmatesAtLocation', () => {
+    const occupants: Occupant[] = [
+      {
+        cellLocation: 'ABC-1-1-5',
+        prisoners: [
+          {
+            prisonerNumber: 'A1234AA',
+            firstName: 'Dave',
+            lastName: 'Jones',
+            prisonId: 'LEI',
+            prisonName: 'HMP Leeds',
+            cellLocation: '1-1-5',
+          },
+        ],
+      },
+    ]
+
+    it('retrieves inmates at location', async () => {
+      locationsInsidePrisonApiClient.getInmatesAtLocation.mockResolvedValue(occupants)
+
+      const results = await locationService.getInmatesAtLocation(token, 'ABC-1-1-5')
+
+      expect(results).toEqual(occupants)
+    })
+
+    it('Propagates error', async () => {
+      locationsInsidePrisonApiClient.getInmatesAtLocation.mockRejectedValue(new Error('some error'))
+
+      await expect(locationService.getInmatesAtLocation(token, 'ABC-1-1-5')).rejects.toEqual(new Error('some error'))
     })
   })
 

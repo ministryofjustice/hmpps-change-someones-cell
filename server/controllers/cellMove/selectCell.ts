@@ -84,15 +84,13 @@ const getCellOccupants = async (
 const getResidentialLevelNonAssociations = async (
   res,
   {
-    locationService,
     nonAssociations,
     cellId,
     agencyId,
     location,
   }: {
-    locationService: LocationService
     nonAssociations: OffenderNonAssociationLegacy
-    cellId: number
+    cellId: string
     agencyId: string
     location: string
   },
@@ -106,17 +104,9 @@ const getResidentialLevelNonAssociations = async (
         nonAssociation.offenderNonAssociation.assignedLivingUnitDescription.includes(agencyId),
     )
   }
-  // Get the residential unit level prefix for the selected cell by traversing up the
-  // parent location tree
-  const locationDetail = await locationService.getLocation(res.locals.systemClientToken, cellId)
-  const parentLocationDetail = await locationService.getLocation(
-    res.locals.systemClientToken,
-    locationDetail.parentLocationId,
-  )
-  const { locationPrefix } = await locationService.getLocation(
-    res.locals.systemClientToken,
-    parentLocationDetail.parentLocationId,
-  )
+
+  const [topLevel, firstChild] = cellId.split('-')
+  const locationPrefix = `${topLevel}-${firstChild}`
 
   return nonAssociations.nonAssociations.filter(
     nonAssociation =>
@@ -200,9 +190,8 @@ export default ({
       )
 
       const residentialLevelNonAssociations = await getResidentialLevelNonAssociations(res, {
-        locationService,
         nonAssociations,
-        cellId: hasLength(cells) && cells[0].id,
+        cellId: hasLength(cells) && cells[0].description,
         agencyId: prisonerDetails.agencyId,
         location,
       })

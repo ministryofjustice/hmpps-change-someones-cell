@@ -7,7 +7,6 @@ import getValueByType from '../../shared/getValueByType'
 import { translateCsra } from './cellMoveUtils'
 import AnalyticsService from '../../services/analyticsService'
 import LocationService from '../../services/locationService'
-import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import NonAssociationsService from '../../services/nonAssociationsService'
 import logger from '../../../logger'
@@ -21,18 +20,11 @@ const missingDataString = 'not entered'
 type Params = {
   analyticsService: AnalyticsService
   locationService: LocationService
-  prisonerCellAllocationService: PrisonerCellAllocationService
   prisonerDetailsService: PrisonerDetailsService
   nonAssociationsService: NonAssociationsService
 }
 
-export default ({
-  analyticsService,
-  locationService,
-  nonAssociationsService,
-  prisonerCellAllocationService,
-  prisonerDetailsService,
-}: Params) => {
+export default ({ analyticsService, locationService, nonAssociationsService, prisonerDetailsService }: Params) => {
   const getOccupantsDetails = async (context, offenders) =>
     Promise.all(offenders.map(offender => prisonerDetailsService.getDetails(context, offender, true)))
 
@@ -53,38 +45,30 @@ export default ({
     try {
       const [currentOffenderDetails, occupants] = await Promise.all([
         prisonerDetailsService.getDetails(systemClientToken, offenderNo, true),
-        prisonerCellAllocationService.getInmatesAtLocation(systemClientToken, cellId),
+        locationService.getInmatesAtLocation(systemClientToken, cellId),
       ])
-
       const hasOccupants = occupants.length > 0
-      const currentOccupantsOffenderNos = occupants.map(occupant => occupant.offenderNo)
+      const currentOccupants = occupants.flatMap(occupant => occupant.prisoners)
+      const currentOccupantsOffenderNos = currentOccupants.map(occupant => occupant.prisonerNumber)
       const currentOccupantsDetails =
         occupants && (await getOccupantsDetails(systemClientToken, currentOccupantsOffenderNos))
-
-      // Get the residential unit level prefix for the selected cell by traversing up the
-      // parent location tree
       const locationDetail = await locationService.getLocation(systemClientToken, cellId)
       let nonAssociationsWithinLocation = []
-      // reception does not have a parentLocationId
-      if (locationDetail.parentLocationId) {
-        const parentLocationDetail = await locationService.getLocation(
-          systemClientToken,
-          locationDetail.parentLocationId,
-        )
-        const { locationPrefix } = await locationService.getLocation(
-          systemClientToken,
-          parentLocationDetail.parentLocationId,
-        )
+
+      if (locationDetail.parentId) {
+        const [topLevel, firstChild] = cellId.split('-')
+        const locationPrefix = `${topLevel}-${firstChild}`
         // Get non-associations for the offender and filter them down to ones
         // that are currently in the same residential unit as the selected cell
         const currentOffenderNonAssociations = await nonAssociationsService.getNonAssociations(
           systemClientToken,
           offenderNo,
         )
-        nonAssociationsWithinLocation = currentOffenderNonAssociations?.nonAssociations?.filter(
-          nonAssociation =>
-            nonAssociation.offenderNonAssociation.assignedLivingUnitDescription?.includes(locationPrefix),
-        )
+        nonAssociationsWithinLocation =
+          currentOffenderNonAssociations?.nonAssociations?.filter(
+            nonAssociation =>
+              nonAssociation.offenderNonAssociation.assignedLivingUnitDescription?.includes(locationPrefix),
+          ) || []
       }
       const currentOffenderWithOccupants = [currentOffenderDetails, ...currentOccupantsDetails]
 
@@ -243,10 +227,11 @@ export default ({
 
       const [currentOffenderDetails, occupants] = await Promise.all([
         prisonerDetailsService.getDetails(systemClientToken, offenderNo, true),
-        prisonerCellAllocationService.getInmatesAtLocation(systemClientToken, cellId),
+        locationService.getInmatesAtLocation(systemClientToken, cellId),
       ])
 
-      const currentOccupantsOffenderNos = occupants.map(occupant => occupant.offenderNo)
+      const currentOccupants = occupants.flatMap(occupant => occupant.prisoners)
+      const currentOccupantsOffenderNos = currentOccupants.map(occupant => occupant.prisonerNumber)
       const currentOccupantsDetails =
         occupants && (await getOccupantsDetails(systemClientToken, currentOccupantsOffenderNos))
 

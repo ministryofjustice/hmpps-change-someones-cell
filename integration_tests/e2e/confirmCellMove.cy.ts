@@ -21,8 +21,14 @@ context('A user can confirm the cell move', () => {
       bookingId,
     })
     cy.task('stubLocation', {
-      locationId: 1,
-      locationData: { parentLocationId: 2, description: 'MDI-1-1', locationPrefix: 'MDI-1' },
+      prisonId: 'MDI',
+      parentId: 'uuid',
+      key: 'MDI-1-1-1',
+      pathHierarchy: '1-1-1',
+      capacity: {
+        maxCapacity: 2,
+        workingCapacity: 2,
+      },
     })
     cy.task('stubMoveToCell')
     cy.task('stubMoveToCellSwap')
@@ -44,13 +50,13 @@ context('A user can confirm the cell move', () => {
   })
 
   it('should display correct location and warning text', () => {
-    const page = ConfirmCellMovePage.goTo('A12345', 1, 'Bob Doe', 'MDI-1-1')
+    const page = ConfirmCellMovePage.goTo('A12345', 'MDI-1-1-1', 'Bob Doe', '1-1-1')
 
     page.warning().contains('You must have checked any local processes for non-associations.')
   })
 
   it('should make a call to update an offenders cell', () => {
-    const page = ConfirmCellMovePage.goTo(offenderNo, 1, 'Bob Doe', 'MDI-1-1')
+    const page = ConfirmCellMovePage.goTo(offenderNo, 'MDI-1-1-1', 'Bob Doe', '1-1-1')
     const comment = 'Hello world'
     page.form().reason().click()
     page.form().comment().type(comment)
@@ -60,7 +66,7 @@ context('A user can confirm the cell move', () => {
       bookingId,
       offenderNo,
       cellMoveReasonCode: 'ADM',
-      internalLocationDescriptionDestination: 'MDI-1',
+      internalLocationDescriptionDestination: 'MDI-1-1-1',
       commentText: comment,
     }).then(assertHasRequestCount(1))
 
@@ -68,7 +74,7 @@ context('A user can confirm the cell move', () => {
   })
 
   it('should navigate back to search for cell', () => {
-    const page = ConfirmCellMovePage.goTo('A12345', 1, 'Bob Doe', 'MDI-1-1')
+    const page = ConfirmCellMovePage.goTo('A12345', 'MDI-1-1-1', 'Bob Doe', '1-1-1')
 
     page.backLink().contains('Cancel')
     page.backLink().click()
@@ -77,7 +83,7 @@ context('A user can confirm the cell move', () => {
   })
 
   it('should have a back button leading to search for cell', () => {
-    ConfirmCellMovePage.goTo('A12345', 1, 'Bob Doe', 'MDI-1-1')
+    ConfirmCellMovePage.goTo('A12345', 'MDI-1-1-1', 'Bob Doe', '1-1-1')
 
     cy.contains('Back').click()
 

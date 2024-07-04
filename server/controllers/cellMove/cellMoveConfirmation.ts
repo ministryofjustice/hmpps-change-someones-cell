@@ -16,11 +16,11 @@ export default ({ locationService, prisonerDetailsService }: Params) =>
     try {
       const { cellId } = req.query
       const { firstName, lastName } = await prisonerDetailsService.getDetails(systemClientToken, offenderNo)
-      const { description } = await locationService.getLocation(systemClientToken, cellId)
+      const { pathHierarchy } = await locationService.getLocation(systemClientToken, cellId)
 
       return res.render('cellMove/confirmation.njk', {
         backToStartUrl: `/back-to-start?serviceUrlParams[offenderNo]=${offenderNo}`,
-        confirmationMessage: `${formatName(firstName, lastName)} has been moved to cell ${description}`,
+        confirmationMessage: `${formatName(firstName, lastName)} has been moved to cell ${pathHierarchy}`,
       })
     } catch (error) {
       res.locals.redirectUrl = `/prisoner/${offenderNo}/cell-move/search-for-cell`

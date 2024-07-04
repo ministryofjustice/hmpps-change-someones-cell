@@ -45,8 +45,8 @@ export default ({
 
     if (!cellId) return res.redirect(`/prisoner/${offenderNo}/cell-move/select-cell`)
 
-    const { locationPrefix, description } = isCellSwap
-      ? { description: 'swap', locationPrefix: undefined }
+    const { pathHierarchy } = isCellSwap
+      ? { pathHierarchy: 'swap' }
       : await locationService.getLocation(systemClientToken, cellId)
 
     const { firstName, lastName } = await prisonerDetailsService.getDetails(systemClientToken, offenderNo)
@@ -65,8 +65,7 @@ export default ({
       breadcrumbPrisonerName: putLastNameFirst(firstName, lastName),
       name: `${properCaseName(firstName)} ${properCaseName(lastName)}`,
       cellId,
-      movingToHeading: isCellSwap ? 'out of their current location' : `to cell ${description}`,
-      locationPrefix,
+      movingToHeading: isCellSwap ? 'out of their current location' : `to cell ${pathHierarchy}`,
       cellMoveReasonRadioValues,
       errors: req.flash('errors'),
       formValues: {
@@ -99,25 +98,24 @@ export default ({
 
   const makeCellMove = async (req, res, { cellId, bookingId, agencyId, offenderNo, reasonCode, commentText }) => {
     const { systemClientToken } = res.locals
-    const { capacity } = await locationService.getAttributesForLocation(systemClientToken, cellId)
-    const { locationPrefix, description } = await locationService.getLocation(systemClientToken, cellId)
-
+    const { capacity, key, pathHierarchy } = await locationService.getLocation(systemClientToken, cellId)
+    const actualCapacity = capacity.workingCapacity || capacity.maxCapacity
     try {
       await prisonerCellAllocationService.moveToCell(
         systemClientToken,
         bookingId,
         offenderNo,
-        locationPrefix,
+        key,
         reasonCode,
         commentText,
       )
     } catch (error) {
       if (error.status === 400)
-        return res.redirect(`/prisoner/${offenderNo}/cell-move/cell-not-available?cellDescription=${description}`)
+        return res.redirect(`/prisoner/${offenderNo}/cell-move/cell-not-available?cellDescription=${pathHierarchy}`)
       throw error
     }
 
-    const cellType = capacity === 1 ? 'Single occupancy' : 'Multi occupancy'
+    const cellType = actualCapacity === 1 ? 'Single occupancy' : 'Multi occupancy'
     sendCellMoveAnalyticsEvent(req, agencyId, cellType)
 
     return res.redirect(`/prisoner/${offenderNo}/cell-move/confirmation?cellId=${cellId}`)
