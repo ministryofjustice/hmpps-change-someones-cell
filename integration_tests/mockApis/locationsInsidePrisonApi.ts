@@ -122,7 +122,41 @@ export const stubGroups = (caseload, status = 200) => {
   })
 }
 
+export const stubLocation = location => {
+  return stubFor({
+    request: {
+      method: 'GET',
+      urlPathPattern: '/locations-inside-prison-api/locations/key/.+',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: location || {},
+    },
+  })
+}
+
+export const stubInmatesAtLocation = inmates => {
+  return stubFor({
+    request: {
+      method: 'GET',
+      urlPathPattern: '/locations-inside-prison-api/prisoner-locations/key/.+',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: inmates || [],
+    },
+  })
+}
+
 export default {
   stubHealth,
   stubGroups,
+  stubLocation,
+  stubInmatesAtLocation,
 }

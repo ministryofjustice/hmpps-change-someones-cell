@@ -20,7 +20,7 @@ describe('Change cell play back details', () => {
   let controller
 
   const systemClientToken = 'system_token'
-
+  const cellId = 'MDI-A-1-1'
   const req: any = {
     originalUrl: 'http://localhost',
     params: { offenderNo: 'A12345' },
@@ -51,6 +51,7 @@ describe('Change cell play back details', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    req.query = { cellId }
 
     prisonerDetailsService.getDetails = jest.fn().mockResolvedValue({
       bookingId: 1,
@@ -61,8 +62,14 @@ describe('Change cell play back details', () => {
     prisonerCellAllocationService.moveToCell = jest.fn()
     prisonerCellAllocationService.moveToCellSwap = jest.fn()
     locationService.getLocation = jest.fn().mockResolvedValue({
-      locationPrefix: 'MDI-10-19',
-      description: 'MDI-10',
+      prisonId: 'MDI',
+      parentId: 'uuid',
+      key: cellId,
+      pathHierarchy: 'A-1-1',
+      capacity: {
+        maxCapacity: 2,
+        workingCapacity: 1,
+      },
     })
 
     locationService.getAttributesForLocation = jest.fn().mockResolvedValue({ capacity: 1 })
@@ -88,25 +95,20 @@ describe('Change cell play back details', () => {
 
   describe('Index', () => {
     it('should redirect back to select cell page when location description is missing', async () => {
+      req.query = {}
       await controller.index(req, res)
 
       expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/cell-move/select-cell')
     })
 
     it('should make a request for the location and booking details', async () => {
-      req.query = {
-        cellId: 233,
-      }
-
       await controller.index(req, res)
 
-      expect(locationService.getLocation).toHaveBeenCalledWith(systemClientToken, 233)
+      expect(locationService.getLocation).toHaveBeenCalledWith(systemClientToken, cellId)
       expect(prisonerDetailsService.getDetails).toHaveBeenCalledWith(systemClientToken, 'A12345')
     })
 
     it('should render play back details page', async () => {
-      req.query = { cellId: 223 }
-
       await controller.index(req, res)
 
       expect(res.render).toHaveBeenCalledWith('cellMove/confirmCellMove.njk', {
@@ -118,10 +120,9 @@ describe('Change cell play back details', () => {
           reason: undefined,
         },
         breadcrumbPrisonerName: 'Doe, Bob',
-        cellId: 223,
+        cellId,
         cellMoveReasonRadioValues: [],
-        movingToHeading: 'to cell MDI-10',
-        locationPrefix: 'MDI-10-19',
+        movingToHeading: 'to cell A-1-1',
         name: 'Bob Doe',
         offenderNo: 'A12345',
         showCommentInput: true,
@@ -153,7 +154,6 @@ describe('Change cell play back details', () => {
         formValues: {
           comment: undefined,
         },
-        locationPrefix: undefined,
         name: 'Bob Doe',
         offenderNo: 'A12345',
         showCommentInput: false,
@@ -170,8 +170,6 @@ describe('Change cell play back details', () => {
     })
 
     it('should make a request to retrieve all cell move case note types for none c-swap moves', async () => {
-      req.query = { cellId: 'A-1-3' }
-
       prisonerCellAllocationService.getCellMoveReasonTypes.mockResolvedValue([
         {
           domain: 'CHG_HOUS_RSN',
@@ -214,7 +212,6 @@ describe('Change cell play back details', () => {
           text: 'Select the reason for the cell move',
         },
       ])
-      req.query = { cellId: 'A-1-3' }
 
       await controller.index(req, res)
       expect(res.render).toHaveBeenCalledWith(
@@ -246,7 +243,6 @@ describe('Change cell play back details', () => {
           comment: 'Hello',
         },
       ])
-      req.query = { cellId: 'A-1-3' }
 
       await controller.index(req, res)
 
@@ -287,7 +283,6 @@ describe('Change cell play back details', () => {
           comment: 'Hello',
         },
       ])
-      req.query = { cellId: 'A-1-3' }
 
       await controller.index(req, res)
 
@@ -338,7 +333,7 @@ describe('Change cell play back details', () => {
     })
 
     it('should trigger missing reason validation', async () => {
-      req.body = { cellId: 233, comment: 'hello world' }
+      req.body = { cellId, comment: 'hello world' }
 
       await controller.post(req, res)
 
@@ -352,11 +347,11 @@ describe('Change cell play back details', () => {
       expect(req.flash).toHaveBeenCalledWith('formValues', {
         comment: 'hello world',
       })
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/cell-move/confirm-cell-move?cellId=233')
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/cell-move/confirm-cell-move?cellId=MDI-A-1-1')
     })
 
     it('should trigger missing comment validation', async () => {
-      req.body = { cellId: 233, reason: 'ADM' }
+      req.body = { cellId, reason: 'ADM' }
 
       await controller.post(req, res)
 
@@ -368,11 +363,11 @@ describe('Change cell play back details', () => {
         },
       ])
 
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/cell-move/confirm-cell-move?cellId=233')
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/cell-move/confirm-cell-move?cellId=MDI-A-1-1')
     })
 
     it('should trigger minimum comment length validation', async () => {
-      req.body = { cellId: 233, comment: 'hello', reason: 'ADM' }
+      req.body = { cellId, comment: 'hello', reason: 'ADM' }
 
       await controller.post(req, res)
 
@@ -387,13 +382,13 @@ describe('Change cell play back details', () => {
         reason: 'ADM',
         comment: 'hello',
       })
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/cell-move/confirm-cell-move?cellId=233')
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/cell-move/confirm-cell-move?cellId=MDI-A-1-1')
     })
 
     it('should trigger the maximum comment length validation', async () => {
       const bigComment = [...Array(40001).keys()].map(() => 'A').join('')
 
-      req.body = { cellId: 233, comment: bigComment, reason: 'ADM' }
+      req.body = { cellId, comment: bigComment, reason: 'ADM' }
 
       await controller.post(req, res)
 
@@ -404,7 +399,7 @@ describe('Change cell play back details', () => {
         },
       ])
 
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/cell-move/confirm-cell-move?cellId=233')
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/cell-move/confirm-cell-move?cellId=MDI-A-1-1')
     })
 
     it('should redirect back to select cell page when location description is missing', async () => {
@@ -415,7 +410,7 @@ describe('Change cell play back details', () => {
 
     it('should call whereabouts api to make the cell move', async () => {
       prisonerDetailsService.getDetails = jest.fn().mockResolvedValue({ bookingId: 1 })
-      req.body = { reason: 'BEH', cellId: 223, comment: 'Hello world' }
+      req.body = { reason: 'BEH', cellId, comment: 'Hello world' }
 
       await controller.post(req, res)
 
@@ -424,15 +419,15 @@ describe('Change cell play back details', () => {
         systemClientToken,
         1,
         'A12345',
-        'MDI-10-19',
+        'MDI-A-1-1',
         'BEH',
         'Hello world',
       )
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/cell-move/confirmation?cellId=223')
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/cell-move/confirmation?cellId=MDI-A-1-1')
     })
 
     it('should store correct redirect and home url then re-throw the error', async () => {
-      req.body = { ...req.body, cellId: 223 }
+      req.body = { ...req.body, cellId }
       const offenderNo = 'A12345'
       const error = new Error('network error')
 
@@ -463,7 +458,7 @@ describe('Change cell play back details', () => {
       const error = new Error('Internal server error')
       prisonerCellAllocationService.moveToCell.mockRejectedValue(error)
 
-      req.body = { ...req.body, cellId: 123 }
+      req.body = { ...req.body, cellId }
 
       await expect(controller.post(req, res)).rejects.toThrowError(error)
 
@@ -471,13 +466,13 @@ describe('Change cell play back details', () => {
     })
 
     it('should redirect to cell not available on a http 400 bad request when attempting a cell move', async () => {
-      req.body = { ...req.body, cellId: 223 }
+      req.body = { ...req.body, cellId }
 
       prisonerCellAllocationService.moveToCell.mockRejectedValue(makeError('status', 400))
 
       await controller.post(req, res)
 
-      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/cell-move/cell-not-available?cellDescription=MDI-10')
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/cell-move/cell-not-available?cellDescription=A-1-1')
       expect(analyticsService.sendEvents.mock.calls.length).toBe(0)
     })
   })

@@ -183,21 +183,6 @@ export const stubCellAttributes = cellAttributes =>
     },
   })
 
-export const stubInmatesAtLocation = inmates =>
-  stubFor({
-    request: {
-      method: 'GET',
-      urlPathPattern: '/api/locations/.+?/inmates',
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: inmates || [],
-    },
-  })
-
 export const stubOffenderCellHistory = history =>
   stubFor({
     request: {
@@ -240,29 +225,6 @@ export const stubCsraAssessments = (offenderNumbers, assessments = []) =>
         'Content-Type': 'application/json;charset=UTF-8',
       },
       jsonBody: assessments,
-    },
-  })
-
-export const stubLocation = (locationId, locationData, status = 200) =>
-  stubFor({
-    request: {
-      method: 'GET',
-      url: `/api/locations/${locationId}`,
-    },
-    response: {
-      status,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: locationData || {
-        locationId,
-        locationType: 'WING',
-        description: 'HB1',
-        agencyId: 'RNI',
-        currentOccupancy: 243,
-        locationPrefix: 'RNI-HB1',
-        internalLocationCode: 'HB1',
-      },
     },
   })
 
@@ -493,11 +455,9 @@ export default {
   stubMainOffence,
   stubOffenderBasicDetails,
   stubCellAttributes,
-  stubInmatesAtLocation,
   stubOffenderCellHistory,
   stubGetAlerts,
   stubCsraAssessments,
-  stubLocation,
   stubCellsWithCapacity,
   stubSpecificOffenderFullDetails,
   stubPrisonerFullDetail,

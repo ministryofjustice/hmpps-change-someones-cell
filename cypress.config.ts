@@ -57,12 +57,12 @@ export default defineConfig({
         stubMainOffence: offence => prisonApi.stubMainOffence(offence),
         stubOffenderBasicDetails: basicDetails => Promise.all([prisonApi.stubOffenderBasicDetails(basicDetails)]),
         stubCellAttributes: prisonApi.stubCellAttributes,
-        stubInmatesAtLocation: ({ inmates }) => prisonApi.stubInmatesAtLocation(inmates),
+        stubInmatesAtLocation: inmates => locationsInsidePrisonApi.stubInmatesAtLocation(inmates),
         stubOffenderCellHistory: ({ history }) => prisonApi.stubOffenderCellHistory(history),
         stubGetAlerts: ({ agencyId, alerts }) => prisonApi.stubGetAlerts({ agencyId, alerts }),
         stubCsraAssessments: ({ offenderNumbers, assessments }) =>
           prisonApi.stubCsraAssessments(offenderNumbers, assessments),
-        stubLocation: ({ locationId, locationData }) => Promise.all([prisonApi.stubLocation(locationId, locationData)]),
+        stubLocation: location => locationsInsidePrisonApi.stubLocation(location),
         stubCellsWithCapacity: ({ cells }) => prisonApi.stubCellsWithCapacity(cells),
         stubCellsWithCapacityByGroupName: ({ agencyId, groupName, response }) =>
           whereabouts.stubCellsWithCapacityByGroupName({ agencyId, groupName, response }),

@@ -55,20 +55,6 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('getInmatesAtLocation', () => {
-    it('should return data from api', async () => {
-      const response = { data: 'data' }
-
-      fakePrisonApiClient
-        .get('/api/locations/4231/inmates')
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .reply(200, response)
-
-      const output = await prisonApiClient.getInmatesAtLocation(accessToken, 4231)
-      expect(output).toEqual(response)
-    })
-  })
-
   describe('userCaseLoads', () => {
     it('should return data from api', async () => {
       const response = { data: 'data' }
@@ -169,20 +155,6 @@ describe('prisonApiClient', () => {
         .reply(200, response)
 
       const output = await prisonApiClient.getCsraAssessments(accessToken, offenderNumbers)
-      expect(output).toEqual(response)
-    })
-  })
-
-  describe('getLocation', () => {
-    it('should return a location from api', async () => {
-      const response = { data: 'data' }
-
-      fakePrisonApiClient
-        .get('/api/locations/123')
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .reply(200, response)
-
-      const output = await prisonApiClient.getLocation(accessToken, 123)
       expect(output).toEqual(response)
     })
   })

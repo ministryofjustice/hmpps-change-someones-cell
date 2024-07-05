@@ -2,7 +2,7 @@ import cellConfirmationPage from '../pages/cellMoveConfirmationPage'
 import homePage from '../pages/homePage'
 
 const offenderNo = 'A1234A'
-const cellId = 1
+const cellId = 'MDI-1-1-1'
 
 context('A user get confirmation of a cell move', () => {
   before(() => {
@@ -20,14 +20,20 @@ context('A user get confirmation of a cell move', () => {
       bookingId: 1234,
     })
     cy.task('stubLocation', {
-      locationId: 1,
-      locationData: { parentLocationId: 2, description: 'MDI-1-1', locationPrefix: 'MDI-1' },
+      prisonId: 'MDI',
+      parentId: 'uuid',
+      key: 'MDI-1-1-1',
+      pathHierarchy: '1-1-1',
+      capacity: {
+        maxCapacity: 2,
+        workingCapacity: 2,
+      },
     })
     cy.task('stubMoveToCell')
   })
 
   it('should page with the correct offender name and cell description', () => {
-    const page = cellConfirmationPage.goTo({ offenderNo, cellId, cellDescription: 'MDI-1-1', name: 'Bob Doe' })
+    const page = cellConfirmationPage.goTo({ offenderNo, cellId, cellDescription: '1-1-1', name: 'Bob Doe' })
 
     cy.title().should('eq', `Change Someone's Cell - The prisoner’s cell has been changed`)
 

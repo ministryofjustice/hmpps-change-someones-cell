@@ -68,7 +68,7 @@
   {% endif %}
 
   {% if index === 1 %}
-     <td class="{{ cellClass }}"><a href="{{ '/prisoner/' + offenderNo + '/cell-move/consider-risks?cellId=' + cell.id }}" class="govuk-link">Select cell</a></td>
+     <td class="{{ cellClass }}"><a href="{{ '/prisoner/' + offenderNo + '/cell-move/consider-risks?cellId=' + cell.description }}" class="govuk-link">Select cell</a></td>
   {% else %}
       <td class="{{ cellClass }}">
       </td>

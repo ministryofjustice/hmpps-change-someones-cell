@@ -40,9 +40,6 @@ context('A user can select a cell', () => {
     })
     cy.task('stubGroups', { id: 'MDI' })
     cy.task('stubCellAttributes')
-    cy.task('stubInmatesAtLocation', {
-      inmates: [{ offenderNo: 'A12345', firstName: 'Bob', lastName: 'Doe', assignedLivingUnitId: 1 }],
-    })
     cy.task('stubPrisonersAtLocations', {
       prisoners: [
         {
@@ -89,9 +86,6 @@ context('A user can select a cell', () => {
       ],
     })
 
-    cy.task('stubLocation', { locationId: 1, locationData: { parentLocationId: 2, description: 'MDI-1-1' } })
-    cy.task('stubLocation', { locationId: 2, locationData: { parentLocationId: 3 } })
-    cy.task('stubLocation', { locationId: 3, locationData: { locationPrefix: 'MDI-1' } })
     cy.task('stubUserCaseLoads')
   })
 
@@ -260,12 +254,23 @@ context('A user can select a cell', () => {
           cy.task('stubOffenderNonAssociationsLegacy', {})
           cy.task('stubGroups', { id: 'MDI' })
           cy.task('stubUserCaseLoads')
-          cy.task('stubLocation', { locationId: 1, locationData: { parentLocationId: 2, description: 'MDI-1-1' } })
-          cy.task('stubLocation', { locationId: 2, locationData: { parentLocationId: 3 } })
-          cy.task('stubLocation', { locationId: 3, locationData: { locationPrefix: 'MDI-1' } })
-          cy.task('stubInmatesAtLocation', {
-            inmates: [{ offenderNo: 'A12345', firstName: 'Bob', lastName: 'Doe', assignedLivingUnitId: 1 }],
-          })
+          cy.task('stubLocation', {})
+          cy.task('stubInmatesAtLocation', [
+            {
+              cellLocation: 'MDI-1-1-1',
+              prisoners: [
+                {
+                  prisonerNumber: 'A12345',
+                  firstName: 'BOB',
+                  lastName: 'DOE',
+                  prisonId: 'MDI',
+                  prisonName: 'Moorland (HMP)',
+                  cellLocation: '1-1-1',
+                },
+              ],
+            },
+          ])
+
           cy.task('stubPrisonersAtLocations', {
             prisoners: [
               {
@@ -286,7 +291,7 @@ context('A user can select a cell', () => {
             nonAssociations: [],
           })
 
-          ConsiderRisksPage.goTo(offenderNo, 1)
+          ConsiderRisksPage.goTo(offenderNo, 'MDI-1-1-1')
           cy.contains('Back').click()
           cy.contains('Select an available cell')
         })

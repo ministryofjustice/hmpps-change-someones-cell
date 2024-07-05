@@ -11,23 +11,31 @@ describe('Cell move confirmation', () => {
   const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined))
 
   let controller
-  const req = { params: { offenderNo: 'A12345' }, query: { cellId: 1 }, originalUrl: 'http://localhost' }
+  const req = { params: { offenderNo: 'A12345' }, query: { cellId: 'MDI-A-1-1' }, originalUrl: 'http://localhost' }
   let res
 
   const systemClientToken = 'system_token'
+
+  const location = {
+    prisonId: 'MDI',
+    parentId: 'some-uuid',
+    key: 'MDI-A-1-1',
+    pathHierarchy: 'A-1-1',
+    capacity: { maxCapacity: 2, workingCapacity: 2 },
+  }
 
   beforeEach(() => {
     prisonerDetailsService.getDetails = jest
       .fn()
       .mockResolvedValue({ firstName: 'Bob', lastName: 'Doe', agencyId: 'MDI' })
-    locationService.getLocation = jest.fn().mockResolvedValue({ description: 'A-1-012' })
+    locationService.getLocation = jest.fn().mockResolvedValue(location)
     controller = cellMoveConfirmation({ locationService, prisonerDetailsService })
 
     res = {
       locals: {
         user: {
-          activeCaseLoad: { caseLoadId: 'LEI' },
-          allCaseloads: [{ caseLoadId: 'LEI' }],
+          activeCaseLoad: { caseLoadId: 'MDI' },
+          allCaseloads: [{ caseLoadId: 'MDI' }],
           userRoles: ['ROLE_CELL_MOVE'],
         },
         systemClientToken,
@@ -46,7 +54,7 @@ describe('Cell move confirmation', () => {
   it('should make call to retrieve location details', async () => {
     await controller(req, res)
 
-    expect(locationService.getLocation).toHaveBeenCalledWith(systemClientToken, 1)
+    expect(locationService.getLocation).toHaveBeenCalledWith(systemClientToken, 'MDI-A-1-1')
   })
 
   it('should render the confirmation page', async () => {
@@ -56,7 +64,7 @@ describe('Cell move confirmation', () => {
       'cellMove/confirmation.njk',
       expect.objectContaining({
         backToStartUrl: '/back-to-start?serviceUrlParams[offenderNo]=A12345',
-        confirmationMessage: 'Bob Doe has been moved to cell A-1-012',
+        confirmationMessage: 'Bob Doe has been moved to cell A-1-1',
       }),
     )
   })
