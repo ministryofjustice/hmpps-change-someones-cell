@@ -11,6 +11,7 @@ import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import NonAssociationsService from '../../services/nonAssociationsService'
 import logger from '../../../logger'
 import config from '../../config'
+import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
 
 const activeCellMoveAlertsExcludingDisabled = alert =>
   !alert.expired && cellMoveAlertCodes.includes(alert.alertCode) && alert.alertCode !== 'PEEP'
@@ -22,9 +23,16 @@ type Params = {
   locationService: LocationService
   prisonerDetailsService: PrisonerDetailsService
   nonAssociationsService: NonAssociationsService
+  prisonerCellAllocationService: PrisonerCellAllocationService
 }
 
-export default ({ analyticsService, locationService, nonAssociationsService, prisonerDetailsService }: Params) => {
+export default ({
+  analyticsService,
+  locationService,
+  nonAssociationsService,
+  prisonerDetailsService,
+  prisonerCellAllocationService,
+}: Params) => {
   const getOccupantsDetails = async (context, offenders) =>
     Promise.all(offenders.map(offender => prisonerDetailsService.getDetails(context, offender, true)))
 
@@ -45,7 +53,7 @@ export default ({ analyticsService, locationService, nonAssociationsService, pri
     try {
       const [currentOffenderDetails, occupants] = await Promise.all([
         prisonerDetailsService.getDetails(systemClientToken, offenderNo, true),
-        locationService.getInmatesAtLocation(systemClientToken, cellId),
+        prisonerCellAllocationService.getInmatesAtLocation(systemClientToken, cellId),
       ])
       const hasOccupants = occupants.length > 0
       const currentOccupants = occupants.flatMap(occupant => occupant.prisoners)
@@ -227,7 +235,7 @@ export default ({ analyticsService, locationService, nonAssociationsService, pri
 
       const [currentOffenderDetails, occupants] = await Promise.all([
         prisonerDetailsService.getDetails(systemClientToken, offenderNo, true),
-        locationService.getInmatesAtLocation(systemClientToken, cellId),
+        prisonerCellAllocationService.getInmatesAtLocation(systemClientToken, cellId),
       ])
 
       const currentOccupants = occupants.flatMap(occupant => occupant.prisoners)

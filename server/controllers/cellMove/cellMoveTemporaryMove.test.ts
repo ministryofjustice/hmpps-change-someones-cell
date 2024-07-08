@@ -4,7 +4,9 @@ import PrisonerCellAllocationService from '../../services/prisonerCellAllocation
 jest.mock('../../services/prisonerCellAllocationService')
 
 describe('Move someone temporarily out of a cell', () => {
-  const prisonerCellAllocationService = jest.mocked(new PrisonerCellAllocationService(undefined, undefined, undefined))
+  const prisonerCellAllocationService = jest.mocked(
+    new PrisonerCellAllocationService(undefined, undefined, undefined, undefined),
+  )
 
   let req
   let res

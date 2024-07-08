@@ -5,7 +5,9 @@ import prisonerSearchController from './cellMovePrisonerSearch'
 jest.mock('../../services/prisonerCellAllocationService')
 
 describe('Prisoner search', () => {
-  const prisonerCellAllocationService = jest.mocked(new PrisonerCellAllocationService(undefined, undefined, undefined))
+  const prisonerCellAllocationService = jest.mocked(
+    new PrisonerCellAllocationService(undefined, undefined, undefined, undefined),
+  )
 
   let req
   let res

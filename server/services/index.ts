@@ -26,6 +26,7 @@ export const services = () => {
     prisonApiClient,
     whereaboutsApiClient,
     prisonerSearchApiClient,
+    locationsInsidePrisonApiClient,
   )
   const prisonerDetailsService = new PrisonerDetailsService(prisonApiClient)
   const locationService = new LocationService(prisonApiClient, whereaboutsApiClient, locationsInsidePrisonApiClient)
