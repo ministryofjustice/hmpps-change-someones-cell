@@ -5,6 +5,8 @@ import AnalyticsService from '../../services/analyticsService'
 import NonAssociationsService from '../../services/nonAssociationsService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import { OffenderDetails } from '../../data/prisonApiClient'
+import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
+
 import config from '../../config'
 
 Reflect.deleteProperty(process.env, 'APPINSIGHTS_INSTRUMENTATIONKEY')
@@ -13,12 +15,16 @@ jest.mock('../../services/analyticsService')
 jest.mock('../../services/locationService')
 jest.mock('../../services/nonAssociationsService')
 jest.mock('../../services/prisonerDetailsService')
+jest.mock('../../services/prisonerCellAllocationService')
 
 describe('move validation', () => {
   const analyticsService = jest.mocked(new AnalyticsService(undefined))
   const locationService = jest.mocked(new LocationService(undefined, undefined, undefined))
   const nonAssociationsService = jest.mocked(new NonAssociationsService(undefined))
   const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined))
+  const prisonerCellAllocationService = jest.mocked(
+    new PrisonerCellAllocationService(undefined, undefined, undefined, undefined),
+  )
 
   let req
   let res
@@ -350,11 +356,12 @@ describe('move validation', () => {
       locationService,
       nonAssociationsService,
       prisonerDetailsService,
+      prisonerCellAllocationService,
     })
   })
 
   it('Makes the expected API calls on get', async () => {
-    locationService.getInmatesAtLocation.mockResolvedValue(occupants)
+    prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue(occupants)
     prisonerDetailsService.getDetails
       .mockResolvedValueOnce(offenderDetails)
       .mockResolvedValueOnce(occupantOneDetails)
@@ -368,11 +375,11 @@ describe('move validation', () => {
     expect(prisonerDetailsService.getDetails).toHaveBeenCalledWith(systemClientToken, 'A2222', true)
     expect(nonAssociationsService.getNonAssociations).toHaveBeenCalledWith(systemClientToken, offenderNo)
     expect(locationService.getLocation).toHaveBeenCalledWith(systemClientToken, 'MDI-1-1-001')
-    expect(locationService.getInmatesAtLocation).toHaveBeenCalledWith(systemClientToken, 'MDI-1-1-001')
+    expect(prisonerCellAllocationService.getInmatesAtLocation).toHaveBeenCalledWith(systemClientToken, 'MDI-1-1-001')
   })
 
   it('Passes the expected data to the template on get', async () => {
-    locationService.getInmatesAtLocation.mockResolvedValue(occupants)
+    prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue(occupants)
     prisonerDetailsService.getDetails
       .mockResolvedValueOnce(offenderDetails)
       .mockResolvedValueOnce(occupantOneDetails)
@@ -479,7 +486,7 @@ describe('move validation', () => {
 
   describe('Index', () => {
     it('Should warn that the prisoner is non hetro when occupants have risk to LGBT alert', async () => {
-      locationService.getInmatesAtLocation.mockResolvedValue(occupants)
+      prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue(occupants)
 
       prisonerDetailsService.getDetails
         .mockResolvedValueOnce({
@@ -537,7 +544,7 @@ describe('move validation', () => {
     })
 
     it('Should not show CSRA messages when both prisoner and occupants are standard', async () => {
-      locationService.getInmatesAtLocation.mockResolvedValue(occupants)
+      prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue(occupants)
 
       prisonerDetailsService.getDetails
         .mockResolvedValueOnce({
@@ -585,7 +592,7 @@ describe('move validation', () => {
           csraClassificationCode: 'STANDARD',
         })
 
-      locationService.getInmatesAtLocation.mockResolvedValue(occupants)
+      prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue(occupants)
 
       await controller.index(req, res)
 
@@ -609,7 +616,7 @@ describe('move validation', () => {
         csra: 'Standard',
         categoryCode: 'C',
       })
-      locationService.getInmatesAtLocation.mockResolvedValue([])
+      prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue([])
       await controller.index(req, res)
 
       expect(res.render).toHaveBeenCalledWith(
@@ -629,7 +636,7 @@ describe('move validation', () => {
         ...offenderDetails,
         csra: 'Standard',
       })
-      locationService.getInmatesAtLocation.mockResolvedValue([])
+      prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue([])
 
       await controller.index(req, res)
 
@@ -647,7 +654,7 @@ describe('move validation', () => {
     it('Redirects to confirm cell move when there are no warnings', async () => {
       nonAssociationsService.getNonAssociations = jest.fn().mockResolvedValue({})
       prisonerDetailsService.getDetails = jest.fn().mockResolvedValue({ firstName: 'Bob', lastName: 'Doe', alerts: [] })
-      locationService.getInmatesAtLocation.mockResolvedValue([])
+      prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue([])
 
       await controller.index(req, res)
 
@@ -656,7 +663,7 @@ describe('move validation', () => {
 
     it('reception as a location has zero non-associations', async () => {
       locationService.getLocation = jest.fn().mockResolvedValue({})
-      locationService.getInmatesAtLocation = jest.fn().mockResolvedValue([])
+      prisonerCellAllocationService.getInmatesAtLocation = jest.fn().mockResolvedValue([])
       prisonerDetailsService.getDetails
         .mockResolvedValueOnce({
           ...offenderDetails,
@@ -666,7 +673,7 @@ describe('move validation', () => {
         .mockResolvedValueOnce(occupantOneDetails)
         .mockResolvedValueOnce(occupantTwoDetails)
 
-      locationService.getInmatesAtLocation.mockResolvedValue(occupants)
+      prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue(occupants)
       await controller.index(req, res)
 
       expect(res.render).toHaveBeenCalledWith(
@@ -685,7 +692,7 @@ describe('move validation', () => {
       .mockResolvedValueOnce(occupantOneDetails)
       .mockResolvedValueOnce(occupantTwoDetails)
 
-    locationService.getInmatesAtLocation.mockResolvedValue(occupants)
+    prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue(occupants)
     req.body = {}
     await controller.post(req, res)
 
@@ -701,7 +708,7 @@ describe('move validation', () => {
     prisonerDetailsService.getDetails
       .mockResolvedValueOnce(occupantOneDetails)
       .mockResolvedValueOnce(occupantTwoDetails)
-    locationService.getInmatesAtLocation.mockResolvedValue(occupants)
+    prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue(occupants)
     req.body = { confirmation: 'yes' }
     await controller.post(req, res)
 
@@ -713,7 +720,7 @@ describe('move validation', () => {
       .mockResolvedValueOnce(offenderDetails)
       .mockResolvedValueOnce(occupantOneDetails)
       .mockResolvedValueOnce(occupantTwoDetails)
-    locationService.getInmatesAtLocation.mockResolvedValue(occupants)
+    prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue(occupants)
     req.body = { confirmation: 'no' }
     await controller.post(req, res)
 
@@ -721,12 +728,12 @@ describe('move validation', () => {
   })
 
   it('Raise ga event on cancel, containing the alert codes for all involed offenders', async () => {
-    locationService.getInmatesAtLocation.mockResolvedValue(occupants)
+    prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue(occupants)
     prisonerDetailsService.getDetails
       .mockResolvedValueOnce(offenderDetails)
       .mockResolvedValueOnce(occupantOneDetails)
       .mockResolvedValueOnce(occupantTwoDetails)
-    locationService.getInmatesAtLocation.mockResolvedValue(occupants)
+    prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue(occupants)
 
     req.query = { offenderNo }
     req.body = { confirmation: 'no' }
