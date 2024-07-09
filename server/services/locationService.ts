@@ -1,5 +1,5 @@
 import { PrisonApiClient, WhereaboutsApiClient, LocationsInsidePrisonApiClient } from '../data'
-import { Agency, OffenderCell } from '../data/prisonApiClient'
+import { Agency } from '../data/prisonApiClient'
 import { Location, LocationGroup, LocationPrefix } from '../data/locationsInsidePrisonApiClient'
 
 export default class LocationService {
@@ -18,10 +18,6 @@ export default class LocationService {
 
   async getLocation(token: string, key: string): Promise<Location> {
     return await this.locationsInsidePrisonApiClient.getLocation(token, key)
-  }
-
-  async getAttributesForLocation(token: string, locationId: number): Promise<OffenderCell> {
-    return await this.prisonApiClient.getAttributesForLocation(token, locationId)
   }
 
   async getAgencyGroupLocationPrefix(token: string, agencyId: string, groupName: string): Promise<LocationPrefix> {

@@ -74,7 +74,6 @@ describe('Change cell play back details', () => {
       },
     })
 
-    locationService.getAttributesForLocation = jest.fn().mockResolvedValue({ capacity: 1 })
     prisonerCellAllocationService.getCellMoveReasonTypes = jest.fn().mockResolvedValue([])
 
     analyticsService.sendEvents = jest.fn().mockResolvedValue(Promise.resolve({}))
