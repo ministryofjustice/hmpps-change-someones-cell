@@ -32,9 +32,6 @@ context('A user can confirm the cell move', () => {
     })
     cy.task('stubMoveToCell')
     cy.task('stubMoveToCellSwap')
-    cy.task('stubAttributesForLocation', {
-      capacity: 2,
-    })
     cy.task('stubCellMoveTypes', [
       {
         code: 'ADM',

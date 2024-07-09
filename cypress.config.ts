@@ -73,7 +73,6 @@ export default defineConfig({
         stubCellMoveTypes: type => prisonApi.stubCellMoveTypes(type),
         stubMoveToCell: () => whereabouts.stubMoveToCell(),
         stubMoveToCellSwap: () => prisonApi.stubMoveToCellSwap(),
-        stubAttributesForLocation: locationAttributes => prisonApi.stubAttributesForLocation(locationAttributes),
         verifyMoveToCell: body => whereabouts.verifyMoveToCell(body),
         verifyMoveToCellSwap: ({ bookingId }) => prisonApi.verifyMoveToCellSwap({ bookingId }),
         stubAgencyDetails: ({ agencyId, details }) => Promise.all([prisonApi.stubAgencyDetails(agencyId, details)]),

@@ -188,20 +188,6 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('getAttributesForLocation', () => {
-    it('should return data from api', async () => {
-      const response = { data: 'data' }
-
-      fakePrisonApiClient
-        .get('/api/cell/123/attributes')
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .reply(200, response)
-
-      const output = await prisonApiClient.getAttributesForLocation(accessToken, 123)
-      expect(output).toEqual(response)
-    })
-  })
-
   describe('moveToCellSwap', () => {
     it('should request the move to cell swap', async () => {
       const response = { data: 'data' }

@@ -20,10 +20,6 @@ export default class LocationService {
     return await this.locationsInsidePrisonApiClient.getLocation(token, key)
   }
 
-  async getAttributesForLocation(token: string, locationId: number): Promise<OffenderCell> {
-    return await this.prisonApiClient.getAttributesForLocation(token, locationId)
-  }
-
   async getAgencyGroupLocationPrefix(token: string, agencyId: string, groupName: string): Promise<LocationPrefix> {
     try {
       return await this.whereaboutsApiClient.getAgencyGroupLocationPrefix(token, agencyId, groupName)

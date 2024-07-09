@@ -1,5 +1,5 @@
 import { PrisonApiClient, WhereaboutsApiClient, LocationsInsidePrisonApiClient } from '../data'
-import { Agency, OffenderCell } from '../data/prisonApiClient'
+import { Agency } from '../data/prisonApiClient'
 import { LocationGroup, LocationPrefix } from '../data/whereaboutsApiClient'
 import { Location } from '../data/locationsInsidePrisonApiClient'
 import LocationService from './locationService'
@@ -85,36 +85,6 @@ describe('Location service', () => {
       locationsInsidePrisonApiClient.getLocation.mockRejectedValue(new Error('some error'))
 
       await expect(locationService.getLocation(token, 'ABC-1-1-5')).rejects.toEqual(new Error('some error'))
-    })
-  })
-
-  describe('getAttributesForLocation', () => {
-    const cell: OffenderCell = {
-      id: 6352,
-      description: 'LEI-1-1',
-      userDescription: 'LEI-1-1',
-      capacity: 2,
-      noOfOccupants: 2,
-      attributes: [
-        {
-          code: 'LC',
-          description: 'Listener Cell',
-        },
-      ],
-    }
-
-    it('retrieves location', async () => {
-      prisonApiClient.getAttributesForLocation.mockResolvedValue(cell)
-
-      const results = await locationService.getAttributesForLocation(token, 6352)
-
-      expect(results).toEqual(cell)
-    })
-
-    it('Propagates error', async () => {
-      prisonApiClient.getAttributesForLocation.mockRejectedValue(new Error('some error'))
-
-      await expect(locationService.getAttributesForLocation(token, 6352)).rejects.toEqual(new Error('some error'))
     })
   })
 

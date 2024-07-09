@@ -402,12 +402,6 @@ export default class PrisonApiClient {
     })
   }
 
-  getAttributesForLocation(token: string, locationId: number) {
-    return PrisonApiClient.restClient(token).get<OffenderCell>({
-      path: `/api/cell/${locationId}/attributes`,
-    })
-  }
-
   moveToCellSwap(token: string, bookingId: number) {
     return PrisonApiClient.restClient(token).put<OffenderDetails>({
       path: `/api/bookings/${bookingId}/move-to-cell-swap`,
