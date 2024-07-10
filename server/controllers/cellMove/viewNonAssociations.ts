@@ -4,7 +4,6 @@ import { getBackLinkData, getNonAssociationsInEstablishment } from './cellMoveUt
 import NonAssociationsService from '../../services/nonAssociationsService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import config from '../../config'
-import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
 
 type Params = {
   nonAssociationsService: NonAssociationsService

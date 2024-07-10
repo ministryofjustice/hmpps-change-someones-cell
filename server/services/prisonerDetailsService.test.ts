@@ -1,7 +1,7 @@
 import { Readable } from 'stream'
 import { PrisonApiClient } from '../data'
 import PrisonerDetailsService from './prisonerDetailsService'
-import { Alert, Assessment, OffenceDetail, OffenderDetails, PrisonerDetail } from '../data/prisonApiClient'
+import { Alert, Assessment, OffenceDetail, OffenderDetails } from '../data/prisonApiClient'
 import PrisonerSearchApiClient, { Prisoner } from '../data/prisonerSearchApiClient'
 
 jest.mock('../data/prisonApiClient')

@@ -1,5 +1,5 @@
 import config from '../config'
-import { OffenderDetails, Page } from './prisonApiClient'
+import { Page } from './prisonApiClient'
 import RestClient from './restClient'
 
 export interface Prisoner {

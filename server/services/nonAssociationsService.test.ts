@@ -39,9 +39,7 @@ describe('Non-associations service', () => {
     it('Propagates error', async () => {
       nonAssociationsApiClient.getNonAssociations.mockRejectedValue(new Error('some error'))
 
-      await expect(nonAssociationsService.getNonAssociations(token, 'BXI')).rejects.toEqual(
-        new Error('some error'),
-      )
+      await expect(nonAssociationsService.getNonAssociations(token, 'BXI')).rejects.toEqual(new Error('some error'))
     })
   })
 })

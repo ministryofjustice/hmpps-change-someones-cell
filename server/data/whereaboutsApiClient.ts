@@ -1,5 +1,4 @@
 import config from '../config'
-import { OffenderCell } from './prisonApiClient'
 import RestClient from './restClient'
 
 export interface LocationGroup {
