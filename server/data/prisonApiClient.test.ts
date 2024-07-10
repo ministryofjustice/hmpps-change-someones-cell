@@ -245,24 +245,6 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('getPrisoners', () => {
-    it('should search for prisoners', async () => {
-      const response = { data: 'data' }
-      const offenderNos = ['A1234BC', 'B4321CD']
-      const searchCriteria = { offenderNos }
-
-      fakePrisonApiClient
-        .post('/api/prisoners', searchCriteria)
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .matchHeader('Page-Offset', '0')
-        .matchHeader('Page-Limit', '2')
-        .reply(200, response)
-
-      const output = await prisonApiClient.getPrisoners(accessToken, offenderNos)
-      expect(output).toEqual(response)
-    })
-  })
-
   describe('getOffenderCellHistory', () => {
     it('should return data from api', async () => {
       const response = { data: 'data' }

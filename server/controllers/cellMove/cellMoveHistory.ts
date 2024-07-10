@@ -8,7 +8,7 @@ import { UserService } from '../../services'
 const latestBedAssignment = (left, right) => right.bedAssignmentHistorySequence - left.bedAssignmentHistorySequence
 const formatLocationDescription = (description, agencyId) => formatLocation(stripAgencyPrefix(description, agencyId))
 
-const matchesLocationPrefix = (description, locationPrefix) => {
+const matchesLocationPrefix = (description: string, locationPrefix: string) => {
   if (locationPrefix.length > description.length) return false
 
   const data = description.substr(0, locationPrefix.length)
@@ -86,7 +86,7 @@ export default ({ locationService, prisonerCellAllocationService, prisonerDetail
 
     const offenders = await prisonerDetailsService.getPrisoners(systemClientToken, offenderNos)
 
-    const bookingIds = (offenders && [...new Set(offenders.map(o => o.latestBookingId))]) || []
+    const bookingIds = (offenders && [...new Set(offenders.map(o => o.bookingId))]) || []
 
     const cellHistoryByOffenderNo = await Promise.all(
       bookingIds.map(bookingId =>
@@ -102,7 +102,7 @@ export default ({ locationService, prisonerCellAllocationService, prisonerDetail
     )
 
     const historyByDate = cellMoveHistory.sort(sortByMostEarliestFirst).map(history => {
-      const offender = offenders.find(o => o.offenderNo === history.offenderNo)
+      const offender = offenders.find(o => o.prisonerNumber === history.offenderNo)
       const staff = staffMembers.find(s => s.username === history.movementMadeBy)
       const movementReason = cellMoveTypes.find(type => type.code === history.assignmentReason)
       const assignmentTime = moment(history.assignmentDateTime, dateTimeFormat).format('HH:mm')

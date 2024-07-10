@@ -218,53 +218,32 @@ describe('Prisoner details service', () => {
   describe('getPrisoners', () => {
     const offenderNos = ['A1234BC', 'B1234CD']
 
-    const prisoners: PrisonerDetail[] = [
+    const prisoners: Prisoner[] = [
       {
-        offenderNo: 'A0000AA',
-        title: 'Earl',
-        suffix: 'Mac',
+        prisonerNumber: 'A0000AA',
         firstName: 'Thorfinn',
-        middleNames: 'Skull-splitter',
+        middleName: 'Skull-splitter',
         lastName: 'Torf-Einarsson',
-        dateOfBirth: '1960-02-29',
         gender: 'Female',
-        sexCode: 'F',
-        nationalities: 'Scottish',
-        currentlyInPrison: 'N',
-        latestBookingId: 1,
-        latestLocationId: 'WRI',
-        latestLocation: 'Whitemoor (HMP)',
-        internalLocation: 'WRI-B-3-018',
-        pncNumber: '01/000000A',
-        croNumber: '01/0001/01A',
-        ethnicity: 'White: British',
-        ethnicityCode: 'W1',
-        birthCountry: 'Norway',
-        religion: 'Pagan',
-        religionCode: 'PAG',
-        convictedStatus: 'Convicted',
-        legalStatus: 'REMAND',
-        imprisonmentStatus: 'LIFE',
-        imprisonmentStatusDesc: 'Service Life Imprisonment',
-        receptionDate: '1980-01-01',
-        maritalStatus: 'Single',
-        currentWorkingFirstName: 'Thorfinn',
-        currentWorkingLastName: 'Torf-Einarsson',
-        currentWorkingBirthDate: '1960-02-29',
+        bookingId: 1,
+        prisonId: 'WRI',
+        prisonName: 'Whitemoor (HMP)',
+        cellLocation: 'B-3-018',
+        alerts: [],
       },
     ]
 
     it('retrieves prisoners', async () => {
-      prisonApiClient.getPrisoners.mockResolvedValue(prisoners)
+      prisonerSearchApiClient.getPrisoners.mockResolvedValue(prisoners)
 
       const results = await prisonerDetailsService.getPrisoners(token, offenderNos)
 
-      expect(prisonApiClient.getPrisoners).toHaveBeenCalledWith(token, offenderNos)
+      expect(prisonerSearchApiClient.getPrisoners).toHaveBeenCalledWith(token, offenderNos)
       expect(results).toEqual(prisoners)
     })
 
     it('propagates error', async () => {
-      prisonApiClient.getPrisoners.mockRejectedValue(new Error('some error'))
+      prisonerSearchApiClient.getPrisoners.mockRejectedValue(new Error('some error'))
 
       await expect(prisonerDetailsService.getPrisoners(token, offenderNos)).rejects.toEqual(new Error('some error'))
     })

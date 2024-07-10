@@ -14,7 +14,7 @@ export interface Prisoner {
   cellLocation?: string
   csra?: string
   category?: string
-  mostSeriousOffence: string
+  mostSeriousOffence?: string
   alerts: Alert[]
 }
 
@@ -35,6 +35,13 @@ export default class PrisonerSearchApiClient {
   getPrisoner(token: string, prisonerNumber: string): Promise<Prisoner> {
     return PrisonerSearchApiClient.restClient(token).get<Prisoner>({
       path: `/prisoner/${prisonerNumber}`,
+    })
+  }
+
+  getPrisoners(token: string, prisonerNumbers: string[]): Promise<Prisoner[]> {
+    return PrisonerSearchApiClient.restClient(token).post<Prisoner[]>({
+      path: `/prisoner-search/prisoner-numbers`,
+      data: prisonerNumbers,
     })
   }
 

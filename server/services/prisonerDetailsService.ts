@@ -19,6 +19,10 @@ export default class PrisonerDetailsService {
     return await this.prisonerSearchApiClient.getPrisoner(token, prisonerNumber)
   }
 
+  async getPrisoners(token: string, prisonerNumbers: string[]): Promise<Prisoner[]> {
+    return await this.prisonerSearchApiClient.getPrisoners(token, prisonerNumbers)
+  }
+
   /**
    * @deprecated Use prisoner search to get prisoners
    */
@@ -39,12 +43,5 @@ export default class PrisonerDetailsService {
    */
   async getMainOffence(token: string, bookingId: number) {
     return this.prisonApiClient.getMainOffence(token, bookingId)
-  }
-
-  /**
-   * @deprecated Prisoner search should be used
-   */
-  async getPrisoners(token: string, offenderNos: string[]) {
-    return this.prisonApiClient.getPrisoners(token, offenderNos)
   }
 }

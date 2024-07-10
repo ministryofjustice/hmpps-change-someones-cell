@@ -434,22 +434,6 @@ export default class PrisonApiClient {
     })
   }
 
-  /**
-   * @deprecated Use prisoner search to find prisoners
-   */
-  getPrisoners(token: string, offenderNos: string[]) {
-    const searchCriteria: PrisonerDetailSearchCriteria = { offenderNos }
-    const headers = {
-      'Page-Offset': '0',
-      'Page-Limit': String(offenderNos.length),
-    }
-    return PrisonApiClient.restClient(token).post<PrisonerDetail[]>({
-      path: '/api/prisoners',
-      data: searchCriteria,
-      headers,
-    })
-  }
-
   getOffenderCellHistory(token: string, bookingId: number) {
     return PrisonApiClient.restClient(token).get<Page<BedAssignment>>({
       path: `/api/bookings/${bookingId}/cell-history`,

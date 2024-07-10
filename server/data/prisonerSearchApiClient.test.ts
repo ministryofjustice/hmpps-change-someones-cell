@@ -7,7 +7,7 @@ jest.mock('./tokenStore')
 
 const accessToken = 'token-1'
 
-describe('prisonApiClient', () => {
+describe('prisonerSearchApiClient', () => {
   let fakePrisonerSearchApiClient: nock.Scope
   let prisonerSearchApiClient: PrisonerSearchApiClient
 
@@ -19,6 +19,21 @@ describe('prisonApiClient', () => {
   afterEach(() => {
     jest.resetAllMocks()
     nock.cleanAll()
+  })
+
+  describe('getPrisoners', () => {
+    it('should search for prisoners', async () => {
+      const response = { data: 'data' }
+      const offenderNos = ['A1234BC', 'B4321CD']
+
+      fakePrisonerSearchApiClient
+        .post('/prisoner-search/prisoner-numbers', offenderNos)
+        .matchHeader('authorization', `Bearer ${accessToken}`)
+        .reply(200, response)
+
+      const output = await prisonerSearchApiClient.getPrisoners(accessToken, offenderNos)
+      expect(output).toEqual(response)
+    })
   })
 
   describe('getPrisonersAtLocations', () => {
