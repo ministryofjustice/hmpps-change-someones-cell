@@ -29,7 +29,8 @@ export default ({ prisonerDetailsService, nonAssociationsService }: Params) =>
         ),
         prisonNumber: nonAssociation.otherPrisonerDetails.prisonerNumber,
         location: nonAssociation.otherPrisonerDetails.cellLocation,
-        type: nonAssociation.reasonDescription,
+        reason: nonAssociation.reasonDescription,
+        type: nonAssociation.restrictionTypeDescription,
         selectedOffenderKey: `${formatName(firstName, lastName)} is`,
         selectedOffenderRole: nonAssociation.roleDescription,
         otherOffenderKey: `${formatName(

@@ -115,7 +115,8 @@ export default ({ nonAssociationsService, prisonerCellAllocationService, prisone
           nonAssociation.otherPrisonerDetails.lastName,
         ),
         prisonNumber: nonAssociation.otherPrisonerDetails.prisonerNumber,
-        type: nonAssociation.reasonDescription,
+        reason: nonAssociation.reasonDescription,
+        type: nonAssociation.restrictionTypeDescription,
         selectedOffenderKey: `${formatName(firstName, lastName)} is`,
         selectedOffenderRole: nonAssociation.roleDescription,
         otherOffenderKey: `${formatName(
