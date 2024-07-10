@@ -56,4 +56,10 @@ export default class LocationsInsidePrisonApiClient {
       path: `/prisoner-locations/key/${key}`,
     })
   }
+
+  getAgencyGroupLocationPrefix(token: string, agencyId: string, groupName: string): Promise<LocationPrefix> {
+    return this.restClient(token).get<LocationPrefix>({
+      path: `/locations/prison/${agencyId}/group/${groupName}/location-prefix`,
+    })
+  }
 }

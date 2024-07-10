@@ -62,4 +62,22 @@ describe('LocationsInsidePrisonApiClient', () => {
       expect(output).toEqual(response)
     })
   })
+
+  describe('getAgencyGroupLocationPrefix', () => {
+    it('should return data from api', async () => {
+      const response = { data: 'data' }
+
+      fakeLocationsInsidePrisonApiClient
+        .get('/locations/prison/MDI/group/Houseblock%201/location-prefix')
+        .matchHeader('authorization', `Bearer ${accessToken}`)
+        .reply(200, response)
+
+      const output = await locationsInsidePrisonApiClient.getAgencyGroupLocationPrefix(
+        accessToken,
+        'MDI',
+        'Houseblock 1',
+      )
+      expect(output).toEqual(response)
+    })
+  })
 })
