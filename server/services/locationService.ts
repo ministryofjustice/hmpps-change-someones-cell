@@ -22,7 +22,7 @@ export default class LocationService {
 
   async getAgencyGroupLocationPrefix(token: string, agencyId: string, groupName: string): Promise<LocationPrefix> {
     try {
-      return await this.whereaboutsApiClient.getAgencyGroupLocationPrefix(token, agencyId, groupName)
+      return await this.locationsInsidePrisonApiClient.getAgencyGroupLocationPrefix(token, agencyId, groupName)
     } catch (error) {
       if (error.status === 404) {
         return null
