@@ -41,7 +41,7 @@ export default class PrisonerSearchApiClient {
   getPrisoners(token: string, prisonerNumbers: string[]): Promise<Prisoner[]> {
     return PrisonerSearchApiClient.restClient(token).post<Prisoner[]>({
       path: `/prisoner-search/prisoner-numbers`,
-      data: prisonerNumbers,
+      data: { prisonerNumbers },
     })
   }
 

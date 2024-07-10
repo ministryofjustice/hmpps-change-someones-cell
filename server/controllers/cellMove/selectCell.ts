@@ -195,7 +195,7 @@ export default ({
           ...cell,
           occupants: cellOccupants.filter(occupant => occupant.cellId === cell.pathHierarchy).filter(Boolean),
           spaces: cell.maxCapacity - cell.noOfOccupants,
-          type: hasLength(cell.specialistCellTypes) && cell.specialistCellTypes.sort(),
+          type: hasLength(cell.legacyAttributes) && cell.legacyAttributes.sort(),
         })),
         locations: renderLocationOptions(locationsData),
         subLocations,
