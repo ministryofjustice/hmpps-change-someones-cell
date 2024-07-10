@@ -78,6 +78,12 @@ export default class LocationsInsidePrisonApiClient {
     })
   }
 
+  getAgencyGroupLocationPrefix(token: string, agencyId: string, groupName: string): Promise<LocationPrefix> {
+    return this.restClient(token).get<LocationPrefix>({
+      path: `/locations/prison/${agencyId}/group/${groupName}/location-prefix`,
+    })
+  }
+
   getCellsWithCapacity(token: string, agencyId: string, groupName: string = null): Promise<CellLocation[]> {
     return this.restClient(token).get<CellLocation[]>({
       path: `/location-occupancy/cells-with-capacity/${agencyId}?includePrisonerInformation=true${

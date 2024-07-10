@@ -49,13 +49,4 @@ export default class WhereaboutsApiClient {
       },
     })
   }
-
-  /**
-   * @deprecated locations can be obtained from location API
-   */
-  async getAgencyGroupLocationPrefix(token: string, agencyId: string, groupName: string): Promise<LocationPrefix> {
-    return WhereaboutsApiClient.restClient(token).get<LocationPrefix>({
-      path: `/locations/${agencyId}/${groupName}/location-prefix`,
-    })
-  }
 }
