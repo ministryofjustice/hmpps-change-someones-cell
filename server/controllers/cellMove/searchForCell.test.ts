@@ -9,7 +9,7 @@ Reflect.deleteProperty(process.env, 'APPINSIGHTS_INSTRUMENTATIONKEY')
 describe('select location', () => {
   const locationService = jest.mocked(new LocationService(undefined, undefined, undefined))
   const nonAssociationsService = jest.mocked(new NonAssociationsService(undefined))
-  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined))
+  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
 
   let req
   let res

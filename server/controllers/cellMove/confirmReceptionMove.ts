@@ -4,8 +4,9 @@ import logger from '../../../logger'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
 import config from '../../config'
+import { ReferenceCode } from '../../data/prisonApiClient'
 
-const sortOnListSeq = (a, b) => a.listSeq - b.listSeq
+const sortOnListSeq = (a: ReferenceCode, b: ReferenceCode) => a.listSeq - b.listSeq
 
 const validate = ({ reason, comment }) => {
   const errors = []
@@ -50,7 +51,7 @@ export default ({ prisonerCellAllocationService, prisonerDetailsService }: Param
     const { offenderNo } = req.params
     const { systemClientToken } = res.locals
 
-    const { firstName, lastName } = await prisonerDetailsService.getDetails(systemClientToken, offenderNo, false)
+    const { firstName, lastName } = await prisonerDetailsService.getPrisoner(systemClientToken, offenderNo)
 
     let backUrl = `/prisoner/${offenderNo}/reception-move/consider-risks-reception`
 
@@ -90,10 +91,10 @@ export default ({ prisonerCellAllocationService, prisonerDetailsService }: Param
       return res.redirect(`/prisoner/${offenderNo}/reception-move/confirm-reception-move`)
     }
 
-    const { bookingId, agencyId } = await prisonerDetailsService.getDetails(systemClientToken, offenderNo, true)
+    const { bookingId, prisonId } = await prisonerDetailsService.getPrisoner(systemClientToken, offenderNo)
     const receptionOccupancy = await prisonerCellAllocationService.getReceptionsWithCapacity(
       systemClientToken,
-      agencyId,
+      prisonId,
     )
 
     if (!receptionOccupancy.length) {

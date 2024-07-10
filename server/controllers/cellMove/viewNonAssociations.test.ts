@@ -11,7 +11,7 @@ jest.mock('../../services/prisonerDetailsService')
 
 describe('view non associations', () => {
   const nonAssociationsService = jest.mocked(new NonAssociationsService(undefined))
-  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined))
+  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
 
   let req
   let res
@@ -147,7 +147,7 @@ describe('view non associations', () => {
       ],
     })
 
-    controller = viewNonAssociations({ nonAssociationsService, prisonerDetailsService })
+    controller = viewNonAssociations({ prisonerDetailsService, nonAssociationsService })
   })
 
   it('Makes the expected API calls', async () => {

@@ -21,20 +21,6 @@ describe('whereaboutsApiClient', () => {
     nock.cleanAll()
   })
 
-  describe('getCellsWithCapacity', () => {
-    it('should return data from api', async () => {
-      const response = { data: 'data' }
-
-      fakeWhereaboutsApiClient
-        .get('/locations/cellsWithCapacity/BXI/location_sublocation')
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .reply(200, response)
-
-      const output = await whereaboutsApiClient.getCellsWithCapacity(accessToken, 'BXI', 'location_sublocation')
-      expect(output).toEqual(response)
-    })
-  })
-
   describe('moveToCell', () => {
     it('should return data from api', async () => {
       const requestData = {

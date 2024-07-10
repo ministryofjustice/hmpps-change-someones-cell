@@ -21,7 +21,7 @@ describe('nonAssociationsApiClient', () => {
     nock.cleanAll()
   })
 
-  describe('getNonAssociationsLegacy', () => {
+  describe('getNonAssociations', () => {
     it('should return data from api', async () => {
       const response = { data: 'data' }
 
@@ -30,7 +30,7 @@ describe('nonAssociationsApiClient', () => {
         .matchHeader('authorization', `Bearer ${accessToken}`)
         .reply(200, response)
 
-      const output = await nonAssociationsApiClient.getNonAssociationsLegacy(accessToken, 'A1234')
+      const output = await nonAssociationsApiClient.getNonAssociations(accessToken, 'A1234')
       expect(output).toEqual(response)
     })
   })

@@ -1,60 +1,38 @@
 import { alertFlagLabels, cellMoveAlertCodes } from '../../shared/alertFlagValues'
 
-import { putLastNameFirst, hasLength, properCaseName, formatName, formatLocation, stripAgencyPrefix } from '../../utils'
+import { putLastNameFirst, hasLength, properCaseName, formatName, formatLocation } from '../../utils'
 
 import {
   userHasAccess,
   getNonAssociationsInEstablishment,
   renderLocationOptions,
   cellAttributes,
-  translateCsra,
 } from './cellMoveUtils'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
 import NonAssociationsService from '../../services/nonAssociationsService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import LocationService from '../../services/locationService'
-import { OffenderNonAssociationLegacy } from '../../data/nonAssociationsApiClient'
+import { CellLocation } from '../../data/locationsInsidePrisonApiClient'
+import { PrisonerNonAssociation } from '../../data/nonAssociationsApiClient'
 import config from '../../config'
-import { OffenderCell } from '../../data/prisonApiClient'
 
 const defaultSubLocationsValue = { text: 'Select area in residential unit', value: '' }
 const noAreasSelectedDropDownValue = { text: 'No areas to select', value: '' }
 const toDropDownValue = entry => ({ text: entry.name, value: entry.key })
 
-const sortByDescription = (a, b) => a.description.localeCompare(b.description)
+const getCellOccupants = async ({
+  cells,
+  nonAssociations,
+}: {
+  cells: CellLocation[]
+  nonAssociations: PrisonerNonAssociation
+}) => {
+  if (!hasLength(cells)) return []
 
-const getCellOccupants = async (
-  req,
-  res,
-  {
-    prisonerCellAllocationService,
-    activeCaseLoadId,
-    cells,
-    nonAssociations,
-  }: {
-    prisonerCellAllocationService: PrisonerCellAllocationService
-    activeCaseLoadId: string
-    cells: OffenderCell[]
-    nonAssociations: OffenderNonAssociationLegacy
-  },
-) => {
-  const cellDescriptions = cells.map(cell => stripAgencyPrefix(cell.description, activeCaseLoadId))
-
-  let currentCellOccupants = []
-
-  if (cellDescriptions.length)
-    currentCellOccupants = await prisonerCellAllocationService.getPrisonersAtLocations(
-      res.locals.systemClientToken,
-      activeCaseLoadId,
-      cellDescriptions,
-    )
-
-  if (!hasLength(currentCellOccupants)) return []
+  const currentCellOccupants = cells.filter(cell => cell.prisonersInCell).flatMap(cell => cell.prisonersInCell)
 
   return cells.flatMap(cell => {
-    const occupants = currentCellOccupants.filter(
-      o => o.cellLocation === stripAgencyPrefix(cell.description, activeCaseLoadId),
-    )
+    const occupants = currentCellOccupants.filter(prisoner => prisoner.cellLocation === cell.pathHierarchy)
     return occupants.map(occupant => {
       const csraInfo = occupant.csra
 
@@ -63,7 +41,7 @@ const getCellOccupants = async (
         .map(alert => alert.alertCode)
 
       return {
-        cellId: cell.id,
+        cellId: cell.pathHierarchy,
         name: `${properCaseName(occupant.lastName)}, ${properCaseName(occupant.firstName)}`,
         viewOffenderDetails: `/prisoner/${occupant.prisonerNumber}/cell-move/prisoner-details`,
         alerts: alertFlagLabels.filter(label => label.alertCodes.some(code => alertCodes.includes(code))),
@@ -71,7 +49,7 @@ const getCellOccupants = async (
           nonAssociations &&
             nonAssociations.nonAssociations &&
             nonAssociations.nonAssociations.find(
-              na => na.offenderNonAssociation.offenderNo === occupant.prisonerNumber,
+              na => na.otherPrisonerDetails.prisonerNumber === occupant.prisonerNumber,
             ),
         ),
         csra: csraInfo || 'Not entered',
@@ -81,37 +59,27 @@ const getCellOccupants = async (
   })
 }
 
-const getResidentialLevelNonAssociations = async (
-  res,
-  {
-    nonAssociations,
-    cellId,
-    agencyId,
-    location,
-  }: {
-    nonAssociations: OffenderNonAssociationLegacy
-    cellId: string
-    agencyId: string
-    location: string
-  },
-) => {
+const getResidentialLevelNonAssociations = async ({
+  nonAssociations,
+  cellId,
+  location,
+}: {
+  nonAssociations: PrisonerNonAssociation
+  cellId: string
+  location: string
+}) => {
   if (!nonAssociations || !cellId) return []
 
   if (!location || location === 'ALL') {
-    return nonAssociations.nonAssociations.filter(
-      nonAssociation =>
-        nonAssociation.offenderNonAssociation.assignedLivingUnitDescription &&
-        nonAssociation.offenderNonAssociation.assignedLivingUnitDescription.includes(agencyId),
-    )
+    return nonAssociations.nonAssociations
   }
 
-  const [topLevel, firstChild] = cellId.split('-')
-  const locationPrefix = `${topLevel}-${firstChild}`
+  const [locationPrefix] = cellId.split('-')
 
   return nonAssociations.nonAssociations.filter(
     nonAssociation =>
-      nonAssociation.offenderNonAssociation.assignedLivingUnitDescription &&
-      nonAssociation.offenderNonAssociation.assignedLivingUnitDescription.includes(locationPrefix),
+      nonAssociation.otherPrisonerDetails.cellLocation &&
+      nonAssociation.otherPrisonerDetails.cellLocation.startsWith(locationPrefix),
   )
 }
 
@@ -133,18 +101,17 @@ export default ({
     const { location = 'ALL', subLocation, cellType, locationId } = req.query
 
     const { systemClientToken, user } = res.locals
-    const { userRoles, allCaseloads: userCaseLoads, activeCaseLoad } = user
-    const { caseLoadId: activeCaseLoadId } = activeCaseLoad
+    const { userRoles, allCaseloads: userCaseLoads } = user
 
     try {
-      const prisonerDetails = await prisonerDetailsService.getDetails(systemClientToken, offenderNo, true)
+      const prisonerDetails = await prisonerDetailsService.getPrisoner(systemClientToken, offenderNo)
 
-      if (!userHasAccess({ userRoles, userCaseLoads, offenderCaseload: prisonerDetails.agencyId })) {
+      if (!userHasAccess({ userRoles, userCaseLoads, offenderCaseload: prisonerDetails.prisonId })) {
         return res.render('notFound.njk', { url: '/prisoner-search' })
       }
 
       const nonAssociations = await nonAssociationsService.getNonAssociations(systemClientToken, offenderNo)
-      const locationsData = await locationService.searchGroups(systemClientToken, prisonerDetails.agencyId)
+      const locationsData = await locationService.searchGroups(systemClientToken, prisonerDetails.prisonId)
 
       if (req.xhr) {
         return res.render('cellMove/partials/subLocationsSelect.njk', {
@@ -184,40 +151,31 @@ export default ({
       // we can directly call prisonApi.
       const cells = await prisonerCellAllocationService.getCellsWithCapacity(
         systemClientToken,
-        prisonerDetails.agencyId,
+        prisonerDetails.prisonId,
         location,
         subLocation,
       )
 
-      const residentialLevelNonAssociations = await getResidentialLevelNonAssociations(res, {
+      const residentialLevelNonAssociations = await getResidentialLevelNonAssociations({
         nonAssociations,
-        cellId: hasLength(cells) && cells[0].description,
-        agencyId: prisonerDetails.agencyId,
+        cellId: hasLength(cells) && cells[0].pathHierarchy,
         location,
       })
 
       const selectedCells = cells.filter(cell => {
-        if (cellType === 'SO') return cell.capacity === 1
-        if (cellType === 'MO') return cell.capacity > 1
+        if (cellType === 'SO') return cell.maxCapacity === 1
+        if (cellType === 'MO') return cell.maxCapacity > 1
         return cell
       })
 
-      const cellOccupants = await getCellOccupants(req, res, {
-        prisonerCellAllocationService,
-        activeCaseLoadId,
-        cells: selectedCells,
-        nonAssociations,
-      })
+      const cellOccupants = await getCellOccupants({ cells: selectedCells, nonAssociations })
 
-      const numberOfNonAssociations = (
-        await getNonAssociationsInEstablishment(nonAssociations, res.locals.systemClientToken, prisonerDetailsService)
-      ).length
+      const numberOfNonAssociations = getNonAssociationsInEstablishment(nonAssociations).length
 
       const prisonerDetailsWithFormattedLocation = {
         ...prisonerDetails,
         assignedLivingUnit: {
-          ...prisonerDetails.assignedLivingUnit,
-          description: formatLocation(prisonerDetails?.assignedLivingUnit?.description),
+          description: formatLocation(prisonerDetails?.cellLocation),
         },
       }
 
@@ -233,14 +191,12 @@ export default ({
         showNonAssociationsLink: numberOfNonAssociations > 0,
         alerts: alertsToShow,
         showNonAssociationWarning: Boolean(residentialLevelNonAssociations.length),
-        cells: selectedCells
-          ?.map(cell => ({
-            ...cell,
-            occupants: cellOccupants.filter(occupant => occupant.cellId === cell.id).filter(Boolean),
-            spaces: cell.capacity - cell.noOfOccupants,
-            type: hasLength(cell.attributes) && cell.attributes.sort(sortByDescription),
-          }))
-          .sort(sortByDescription),
+        cells: selectedCells?.map(cell => ({
+          ...cell,
+          occupants: cellOccupants.filter(occupant => occupant.cellId === cell.pathHierarchy).filter(Boolean),
+          spaces: cell.maxCapacity - cell.noOfOccupants,
+          type: hasLength(cell.specialistCellTypes) && cell.specialistCellTypes.sort(),
+        })),
         locations: renderLocationOptions(locationsData),
         subLocations,
         cellAttributes,
@@ -252,7 +208,7 @@ export default ({
         searchForCellRootUrl: `/prisoner/${offenderNo}/cell-move/search-for-cell`,
         selectCellRootUrl: `/prisoner/${offenderNo}/cell-move/select-cell`,
         formAction: `/prisoner/${offenderNo}/cell-move/select-cell`,
-        convertedCsra: translateCsra(prisonerDetails.csraClassificationCode),
+        convertedCsra: prisonerDetails.csra,
         backUrl: `/prisoner/${offenderNo}/cell-move/search-for-cell`,
       })
     } catch (error) {

@@ -84,7 +84,7 @@ describe('Consider risks reception', () => {
   const prisonerCellAllocationService = jest.mocked(
     new PrisonerCellAllocationService(undefined, undefined, undefined, undefined),
   )
-  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined))
+  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
 
   beforeEach(() => {
     prisonerDetailsService.getDetails.mockResolvedValue(prisonerDetails)

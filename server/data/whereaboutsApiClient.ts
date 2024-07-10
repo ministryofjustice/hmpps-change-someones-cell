@@ -30,12 +30,6 @@ export default class WhereaboutsApiClient {
     return new RestClient('Whereabouts Api Client', config.apis.whereaboutsApi, token)
   }
 
-  getCellsWithCapacity(token: string, agencyId: string, groupName: string) {
-    return WhereaboutsApiClient.restClient(token).get<OffenderCell[]>({
-      path: `/locations/cellsWithCapacity/${agencyId}/${groupName}`,
-    })
-  }
-
   moveToCell(
     token: string,
     bookingId: number,
@@ -56,6 +50,9 @@ export default class WhereaboutsApiClient {
     })
   }
 
+  /**
+   * @deprecated locations can be obtained from location API
+   */
   async getAgencyGroupLocationPrefix(token: string, agencyId: string, groupName: string): Promise<LocationPrefix> {
     return WhereaboutsApiClient.restClient(token).get<LocationPrefix>({
       path: `/locations/${agencyId}/${groupName}/location-prefix`,

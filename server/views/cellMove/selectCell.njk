@@ -13,9 +13,9 @@
   {% set cellClass = 'govuk-table__cell govuk-table__cell--last' if last else 'govuk-table__cell' %}
 
   {% if index === 1 %}
-    <td class="{{ cellClass }}">{{ cell.description }}</th>
-    <td class="{{ cellClass }}">{{ cell.type | join(',<br>', 'description') | safe if cell.type.length else 'Nothing entered' }}</td>
-    <td class="{{ cellClass }}">{{ cell.capacity }}</td>
+    <td class="{{ cellClass }}">{{ cell.key }}</th>
+    <td class="{{ cellClass }}">{{ cell.type | join(',<br>', 'typeDescription') | safe if cell.type.length else 'Nothing entered' }}</td>
+    <td class="{{ cellClass }}">{{ cell.maxCapacity }}</td>
     <td class="{{ cellClass }}">{{ cell.spaces }}</td>
   {% else %}
     <td class="{{ cellClass }}">
@@ -68,7 +68,7 @@
   {% endif %}
 
   {% if index === 1 %}
-     <td class="{{ cellClass }}"><a href="{{ '/prisoner/' + offenderNo + '/cell-move/consider-risks?cellId=' + cell.description }}" class="govuk-link">Select cell</a></td>
+     <td class="{{ cellClass }}"><a href="{{ '/prisoner/' + offenderNo + '/cell-move/consider-risks?cellId=' + cell.key }}" class="govuk-link">Select cell</a></td>
   {% else %}
       <td class="{{ cellClass }}">
       </td>

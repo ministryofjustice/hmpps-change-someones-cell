@@ -329,6 +329,9 @@ export default class PrisonApiClient {
     return new RestClient('Prison Api Client', { ...config.apis.prisonApi, ...extraConfig }, token)
   }
 
+  /**
+   * @deprecated Use prisoner search to find prisoners
+   */
   getInmates(token: string, locationId: string, keywords?: string, returnAlerts: boolean = false): Promise<Offender[]> {
     const query: Record<string, string> = { returnAlerts: returnAlerts ? 'true' : 'false' }
     if (keywords) {
@@ -365,7 +368,9 @@ export default class PrisonApiClient {
     return PrisonApiClient.restClient(token).get<CaseLoad[]>({ path: '/api/users/me/caseLoads' })
   }
 
-  // TODO: remove this - use search
+  /**
+   * @deprecated Use prisoner search to get prisoners
+   */
   getDetails(token: string, offenderNo: string, fullInfo = false) {
     const fullInfoString = fullInfo ? 'true' : 'false'
     return PrisonApiClient.restClient(token).get<OffenderDetails>({
@@ -387,12 +392,6 @@ export default class PrisonApiClient {
     })
   }
 
-  getCellsWithCapacity(token: string, agencyId: string) {
-    return PrisonApiClient.restClient(token, { timeout: { deadline: 30000 } }).get<OffenderCell[]>({
-      path: `/api/agencies/${agencyId}/cellsWithCapacity`,
-    })
-  }
-
   getCellMoveReasonTypes(token: string) {
     const headers = { 'Page-Limit': '1000' }
 
@@ -408,6 +407,9 @@ export default class PrisonApiClient {
     })
   }
 
+  /**
+   * @deprecated Main offence can be obtained from prisoner search
+   */
   getMainOffence(token: string, bookingId: number) {
     return PrisonApiClient.restClient(token).get<OffenceDetail[]>({
       path: `/api/bookings/${bookingId}/mainOffence`,
@@ -432,6 +434,9 @@ export default class PrisonApiClient {
     })
   }
 
+  /**
+   * @deprecated Use prisoner search to find prisoners
+   */
   getPrisoners(token: string, offenderNos: string[]) {
     const searchCriteria: PrisonerDetailSearchCriteria = { offenderNos }
     const headers = {
@@ -452,12 +457,18 @@ export default class PrisonApiClient {
     })
   }
 
+  /**
+   * @todo Move functionality to location API
+   */
   getReceptionsWithCapacity(token: string, agencyId: string) {
     return PrisonApiClient.restClient(token, { timeout: { deadline: 30000 } }).get<OffenderCell[]>({
       path: `/api/agencies/${agencyId}/receptionsWithCapacity`,
     })
   }
 
+  /**
+   * @todo Reception roll count should be obtainable from prisoner search
+   */
   getOffendersInReception(token: string, agencyId: string) {
     return PrisonApiClient.restClient(token).get<OffenderInReception[]>({
       path: `/api/movements/rollcount/${agencyId}/in-reception`,

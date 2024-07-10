@@ -1,5 +1,6 @@
 import config from '../config'
 import RestClient from './restClient'
+import { Prisoner } from './prisonerSearchApiClient'
 
 export interface Location {
   prisonId: string
@@ -7,6 +8,26 @@ export interface Location {
   key: string
   pathHierarchy: string
   capacity: { maxCapacity: number; workingCapacity?: number }
+}
+
+export interface CellLocation {
+  id: string
+  key: string
+  prisonId: string
+  pathHierarchy: string
+  noOfOccupants: number
+  maxCapacity: number
+  workingCapacity: number
+  localName?: string
+  specialistCellTypes: {
+    typeCode: string
+    typeDescription: string
+  }[]
+  legacyAttributes: {
+    typeCode: string
+    typeDescription: string
+  }[]
+  prisonersInCell?: Prisoner[]
 }
 
 export interface LocationGroup {
@@ -54,6 +75,14 @@ export default class LocationsInsidePrisonApiClient {
   getInmatesAtLocation(token: string, key: string): Promise<Occupant[]> {
     return this.restClient(token).get<Occupant[]>({
       path: `/prisoner-locations/key/${key}`,
+    })
+  }
+
+  getCellsWithCapacity(token: string, agencyId: string, groupName: string = null): Promise<CellLocation[]> {
+    return this.restClient(token).get<CellLocation[]>({
+      path: `/location-occupancy/cells-with-capacity/${agencyId}?includePrisonerInformation=true${
+        groupName ? `&groupName=${groupName}` : ''
+      }`,
     })
   }
 }

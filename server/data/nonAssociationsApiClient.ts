@@ -1,33 +1,41 @@
 import config from '../config'
 import RestClient from './restClient'
 
-export interface OffenderNonAssociationLegacy {
-  offenderNo: string
+export interface PrisonerNonAssociation {
+  prisonerNumber: string
   firstName: string
   lastName: string
-  agencyDescription: string
-  assignedLivingUnitDescription: string
-  assignedLivingUnitId: number
-  nonAssociations: {
-    reasonCode: string
-    reasonDescription: string
-    typeCode: string
-    typeDescription: string
-    effectiveDate: string
-    expiryDate: string | null
-    authorisedBy: string
-    comments: string
-    offenderNonAssociation: {
-      offenderNo: string
-      firstName: string
-      lastName: string
-      reasonCode: string
-      reasonDescription: string
-      agencyDescription: string
-      assignedLivingUnitDescription: string
-      assignedLivingUnitId: number
-    }
-  }[]
+  prisonId: string
+  prisonName: string
+  cellLocation: string
+  openCount: number
+  closedCount: number
+  nonAssociations: NonAssociation[]
+}
+
+export interface NonAssociation {
+  id: number
+  role: string
+  roleDescription: string
+  reason: string
+  reasonDescription: string
+  restrictionType: string
+  restrictionTypeDescription: string
+  comment: string
+  isOpen: boolean
+  whenCreated: string
+  whenUpdated: string
+  updatedBy: string
+  otherPrisonerDetails: {
+    prisonerNumber: string
+    role: string
+    roleDescription: string
+    firstName: string
+    lastName: string
+    prisonId: string
+    prisonName: string
+    cellLocation: string
+  }
 }
 
 export default class NonAssociationsApiClient {
@@ -37,9 +45,9 @@ export default class NonAssociationsApiClient {
     return new RestClient('Non-associations Api Client', config.apis.nonAssociationsApi, token)
   }
 
-  getNonAssociationsLegacy(token: string, offenderNo: string): Promise<OffenderNonAssociationLegacy> {
-    return NonAssociationsApiClient.restClient(token).get<OffenderNonAssociationLegacy>({
-      path: `/legacy/api/offenders/${offenderNo}/non-association-details`,
+  getNonAssociations(token: string, prisonerNumber: string): Promise<PrisonerNonAssociation> {
+    return NonAssociationsApiClient.restClient(token).get<PrisonerNonAssociation>({
+      path: `/prisoner/${prisonerNumber}/non-associations?includeOpen=true&includeClosed=false&includeOtherPrisons=false&sortBy=WHEN_UPDATED&sortDirection=DESC`,
     })
   }
 }

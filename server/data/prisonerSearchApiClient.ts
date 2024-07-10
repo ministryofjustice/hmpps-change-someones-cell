@@ -1,5 +1,5 @@
 import config from '../config'
-import { Page } from './prisonApiClient'
+import { OffenderDetails, Page } from './prisonApiClient'
 import RestClient from './restClient'
 
 export interface Prisoner {
@@ -10,9 +10,11 @@ export interface Prisoner {
   lastName: string
   gender: string
   prisonId: string
+  prisonName: string
   cellLocation?: string
   csra?: string
   category?: string
+  mostSeriousOffence: string
   alerts: Alert[]
 }
 
@@ -28,6 +30,12 @@ export default class PrisonerSearchApiClient {
 
   private static restClient(token: string, extraConfig: object = {}): RestClient {
     return new RestClient('Prisoner Search Api Client', { ...config.apis.prisonerSearchApi, ...extraConfig }, token)
+  }
+
+  getPrisoner(token: string, prisonerNumber: string): Promise<Prisoner> {
+    return PrisonerSearchApiClient.restClient(token).get<Prisoner>({
+      path: `/prisoner/${prisonerNumber}`,
+    })
   }
 
   getPrisonersAtLocations(token: string, prisonId: string, locations: string[]): Promise<Page<Prisoner>> {

@@ -10,7 +10,7 @@ jest.mock('../../services/prisonerDetailsService')
 
 describe('view CSRA details', () => {
   const locationService = jest.mocked(new LocationService(undefined, undefined, undefined))
-  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined))
+  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
 
   let req
   let res

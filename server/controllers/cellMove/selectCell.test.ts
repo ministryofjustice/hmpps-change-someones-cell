@@ -21,7 +21,7 @@ describe('Select a cell', () => {
   const prisonerCellAllocationService = jest.mocked(
     new PrisonerCellAllocationService(undefined, undefined, undefined, undefined),
   )
-  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined))
+  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
 
   let controller
   let req
@@ -359,11 +359,25 @@ describe('Select a cell', () => {
       }
       prisonerCellAllocationService.getCellsWithCapacity.mockResolvedValue([
         {
-          id: 1,
-          description: 'MDI-1',
+          id: 'aaaa-bbbb-cccc-dddd',
+          key: 'MDI-1',
+          pathHierarchy: '1',
           noOfOccupants: 0,
-          capacity: 2,
-          attributes: [],
+          maxCapacity: 2,
+          prisonId: 'MDI',
+          workingCapacity: 1,
+          legacyAttributes: [
+            {
+              typeCode: 'LC',
+              typeDescription: 'Listener Cell',
+            },
+          ],
+          specialistCellTypes: [
+            {
+              typeCode: 'CAT_A',
+              typeDescription: 'Category A Cell',
+            },
+          ],
         },
       ])
       await controller(req, res)
@@ -379,11 +393,25 @@ describe('Select a cell', () => {
       }
       prisonerCellAllocationService.getCellsWithCapacity.mockResolvedValue([
         {
-          id: 1,
-          description: 'MDI-1',
+          id: 'aaaa-bbbb-cccc-dddd',
+          key: 'MDI-1',
+          pathHierarchy: '1',
           noOfOccupants: 0,
-          capacity: 1,
-          attributes: [],
+          maxCapacity: 2,
+          prisonId: 'MDI',
+          workingCapacity: 1,
+          legacyAttributes: [
+            {
+              typeCode: 'LC',
+              typeDescription: 'Listener Cell',
+            },
+          ],
+          specialistCellTypes: [
+            {
+              typeCode: 'CAT_A',
+              typeDescription: 'Category A Cell',
+            },
+          ],
         },
       ])
       await controller(req, res)
@@ -399,11 +427,25 @@ describe('Select a cell', () => {
       }
       prisonerCellAllocationService.getCellsWithCapacity.mockResolvedValue([
         {
-          id: 1,
-          description: 'MDI-1',
+          id: 'aaaa-bbbb-cccc-dddd',
+          key: 'MDI-1',
+          pathHierarchy: '1',
           noOfOccupants: 0,
-          capacity: 2,
-          attributes: [],
+          maxCapacity: 2,
+          prisonId: 'MDI',
+          workingCapacity: 1,
+          legacyAttributes: [
+            {
+              typeCode: 'LC',
+              typeDescription: 'Listener Cell',
+            },
+          ],
+          specialistCellTypes: [
+            {
+              typeCode: 'CAT_A',
+              typeDescription: 'Category A Cell',
+            },
+          ],
         },
       ])
       await controller(req, res)

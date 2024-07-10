@@ -10,7 +10,6 @@ import {
   getNonAssociationsInEstablishment,
   renderLocationOptions,
   cellAttributes,
-  translateCsra,
 } from './cellMoveUtils'
 
 type Params = {
@@ -27,14 +26,14 @@ export default ({ locationService, nonAssociationsService, prisonerDetailsServic
       const { systemClientToken, user } = res.locals
       const { userRoles, allCaseloads: userCaseLoads } = user
 
-      const prisonerDetails = await prisonerDetailsService.getDetails(systemClientToken, offenderNo, true)
+      const prisonerDetails = await prisonerDetailsService.getPrisoner(systemClientToken, offenderNo)
 
-      if (!userHasAccess({ userRoles, userCaseLoads, offenderCaseload: prisonerDetails.agencyId })) {
+      if (!userHasAccess({ userRoles, userCaseLoads, offenderCaseload: prisonerDetails.prisonId })) {
         return res.render('notFound.njk', { url: '/prisoner-search' })
       }
 
       const nonAssociations = await nonAssociationsService.getNonAssociations(systemClientToken, offenderNo)
-      const locationsData = await locationService.searchGroups(systemClientToken, prisonerDetails.agencyId)
+      const locationsData = await locationService.searchGroups(systemClientToken, prisonerDetails.prisonId)
 
       const prisonersActiveAlertCodes = prisonerDetails.alerts
         .filter(alert => !alert.expired)
@@ -44,15 +43,12 @@ export default ({ locationService, nonAssociationsService, prisonerDetailsServic
           alert => prisonersActiveAlertCodes.includes(alert) && cellMoveAlertCodes.includes(alert),
         ),
       )
-      const numberOfNonAssociations = (
-        await getNonAssociationsInEstablishment(nonAssociations, systemClientToken, prisonerDetailsService)
-      ).length
+      const numberOfNonAssociations = getNonAssociationsInEstablishment(nonAssociations).length
 
       const prisonerDetailsWithFormattedLocation = {
         ...prisonerDetails,
         assignedLivingUnit: {
-          ...prisonerDetails.assignedLivingUnit,
-          description: formatLocation(prisonerDetails.assignedLivingUnit.description),
+          description: formatLocation(prisonerDetails.cellLocation),
         },
       }
 
@@ -79,7 +75,7 @@ export default ({ locationService, nonAssociationsService, prisonerDetailsServic
         csraDetailsUrl: `/prisoner/${offenderNo}/cell-move/cell-sharing-risk-assessment-details`,
         formAction: `/prisoner/${offenderNo}/cell-move/select-cell`,
         profileUrl: `${config.prisonerProfileUrl}/prisoner/${offenderNo}`,
-        convertedCsra: translateCsra(prisonerDetails.csraClassificationCode),
+        convertedCsra: prisonerDetails.csra,
         backUrl,
       })
     } catch (error) {

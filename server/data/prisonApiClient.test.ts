@@ -159,20 +159,6 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('getCellsWithCapacity', () => {
-    it('should return available cells from api', async () => {
-      const response = { data: 'data' }
-
-      fakePrisonApiClient
-        .get('/api/agencies/BXI/cellsWithCapacity')
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .reply(200, response)
-
-      const output = await prisonApiClient.getCellsWithCapacity(accessToken, 'BXI')
-      expect(output).toEqual(response)
-    })
-  })
-
   describe('getCellMoveReasonTypes', () => {
     it('should return data from api', async () => {
       const response = { data: 'data' }

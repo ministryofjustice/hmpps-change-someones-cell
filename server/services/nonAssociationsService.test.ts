@@ -1,5 +1,5 @@
 import { NonAssociationsApiClient } from '../data'
-import { OffenderNonAssociationLegacy } from '../data/nonAssociationsApiClient'
+import { PrisonerNonAssociation } from '../data/nonAssociationsApiClient'
 import NonAssociationsService from './nonAssociationsService'
 
 jest.mock('../data/nonAssociationsApiClient')
@@ -16,18 +16,20 @@ describe('Non-associations service', () => {
       nonAssociationsService = new NonAssociationsService(nonAssociationsApiClient)
     })
 
-    const nonAssociations: OffenderNonAssociationLegacy = {
-      offenderNo: '1234',
+    const nonAssociations: PrisonerNonAssociation = {
+      prisonerNumber: '1234',
       firstName: 'Ezmerelda',
       lastName: 'Humperdink',
-      agencyDescription: 'Leeds (HMP)',
-      assignedLivingUnitDescription: '1-1-1-001',
-      assignedLivingUnitId: 12345,
+      prisonName: 'Leeds (HMP)',
+      cellLocation: '1-1-1-001',
+      prisonId: 'LEI',
+      openCount: 0,
+      closedCount: 0,
       nonAssociations: [],
     }
 
     it('Retrieves and formats user name', async () => {
-      nonAssociationsApiClient.getNonAssociationsLegacy.mockResolvedValue(nonAssociations)
+      nonAssociationsApiClient.getNonAssociations.mockResolvedValue(nonAssociations)
 
       const results = await nonAssociationsService.getNonAssociations(token, 'BXI')
 
@@ -35,9 +37,11 @@ describe('Non-associations service', () => {
     })
 
     it('Propagates error', async () => {
-      nonAssociationsApiClient.getNonAssociationsLegacy.mockRejectedValue(new Error('some error'))
+      nonAssociationsApiClient.getNonAssociations.mockRejectedValue(new Error('some error'))
 
-      await expect(nonAssociationsService.getNonAssociations(token, 'BXI')).rejects.toEqual(new Error('some error'))
+      await expect(nonAssociationsService.getNonAssociations(token, 'BXI')).rejects.toEqual(
+        new Error('some error'),
+      )
     })
   })
 })

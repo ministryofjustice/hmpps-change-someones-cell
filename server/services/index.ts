@@ -28,7 +28,7 @@ export const services = () => {
     prisonerSearchApiClient,
     locationsInsidePrisonApiClient,
   )
-  const prisonerDetailsService = new PrisonerDetailsService(prisonApiClient)
+  const prisonerDetailsService = new PrisonerDetailsService(prisonApiClient, prisonerSearchApiClient)
   const locationService = new LocationService(prisonApiClient, whereaboutsApiClient, locationsInsidePrisonApiClient)
   const nonAssociationsService = new NonAssociationsService(nonAssociationsApiClient)
   const analyticsService = new AnalyticsService(googleAnalyticsClient)
