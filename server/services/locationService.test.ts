@@ -94,7 +94,7 @@ describe('Location service', () => {
     }
 
     it('retrieves location prefix', async () => {
-      whereaboutsApiClient.getAgencyGroupLocationPrefix.mockResolvedValue(locationPrefix)
+      locationsInsidePrisonApiClient.getAgencyGroupLocationPrefix.mockResolvedValue(locationPrefix)
 
       const result = await locationService.getAgencyGroupLocationPrefix(token, 'MDI', 'Houseblock 1')
 
@@ -109,7 +109,7 @@ describe('Location service', () => {
         status: 404,
       }
 
-      whereaboutsApiClient.getAgencyGroupLocationPrefix.mockRejectedValue(notFoundError)
+      locationsInsidePrisonApiClient.getAgencyGroupLocationPrefix.mockRejectedValue(notFoundError)
 
       const result = await locationService.getAgencyGroupLocationPrefix(token, 'MDI', 'Houseblock 1')
 
@@ -117,7 +117,7 @@ describe('Location service', () => {
     })
 
     it('propagates other errors', async () => {
-      whereaboutsApiClient.getAgencyGroupLocationPrefix.mockRejectedValue(new Error('some error'))
+      locationsInsidePrisonApiClient.getAgencyGroupLocationPrefix.mockRejectedValue(new Error('some error'))
 
       await expect(locationService.getAgencyGroupLocationPrefix(token, 'MDI', 'Houseblock 1')).rejects.toEqual(
         new Error('some error'),
