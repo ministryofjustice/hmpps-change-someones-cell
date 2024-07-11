@@ -7,7 +7,7 @@ export interface PrisonerNonAssociation {
   lastName: string
   prisonId: string
   prisonName: string
-  cellLocation: string
+  cellLocation?: string
   openCount: number
   closedCount: number
   nonAssociations: NonAssociation[]
@@ -21,7 +21,7 @@ export interface NonAssociation {
   reasonDescription: string
   restrictionType: string
   restrictionTypeDescription: string
-  comment: string
+  comment?: string
   isOpen: boolean
   whenCreated: string
   whenUpdated: string
@@ -34,7 +34,7 @@ export interface NonAssociation {
     lastName: string
     prisonId: string
     prisonName: string
-    cellLocation: string
+    cellLocation?: string
   }
 }
 

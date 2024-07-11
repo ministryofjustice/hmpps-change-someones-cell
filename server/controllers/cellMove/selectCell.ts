@@ -12,50 +12,43 @@ import PrisonerCellAllocationService from '../../services/prisonerCellAllocation
 import NonAssociationsService from '../../services/nonAssociationsService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import LocationService from '../../services/locationService'
-import { CellLocation } from '../../data/locationsInsidePrisonApiClient'
 import { PrisonerNonAssociation } from '../../data/nonAssociationsApiClient'
 import config from '../../config'
+import { Prisoner } from '../../data/prisonerSearchApiClient'
 
 const defaultSubLocationsValue = { text: 'Select area in residential unit', value: '' }
 const noAreasSelectedDropDownValue = { text: 'No areas to select', value: '' }
 const toDropDownValue = entry => ({ text: entry.name, value: entry.key })
 
-const getCellOccupants = async ({
-  cells,
+const getCellOccupants = ({
+  prisonersInCell,
   nonAssociations,
 }: {
-  cells: CellLocation[]
+  prisonersInCell: Prisoner[]
   nonAssociations: PrisonerNonAssociation
 }) => {
-  if (!hasLength(cells)) return []
+  if (!hasLength(prisonersInCell)) return []
 
-  const currentCellOccupants = cells.filter(cell => cell.prisonersInCell).flatMap(cell => cell.prisonersInCell)
+  return prisonersInCell.map(occupant => {
+    const alertCodes = occupant.alerts
+      .filter(alert => !alert.expired && cellMoveAlertCodes.includes(alert.alertCode))
+      .map(alert => alert.alertCode)
 
-  return cells.flatMap(cell => {
-    const occupants = currentCellOccupants.filter(prisoner => prisoner.cellLocation === cell.pathHierarchy)
-    return occupants.map(occupant => {
-      const csraInfo = occupant.csra
-
-      const alertCodes = occupant.alerts
-        .filter(alert => !alert.expired && cellMoveAlertCodes.includes(alert.alertCode))
-        .map(alert => alert.alertCode)
-
-      return {
-        cellId: cell.pathHierarchy,
-        name: `${properCaseName(occupant.lastName)}, ${properCaseName(occupant.firstName)}`,
-        viewOffenderDetails: `/prisoner/${occupant.prisonerNumber}/cell-move/prisoner-details`,
-        alerts: alertFlagLabels.filter(label => label.alertCodes.some(code => alertCodes.includes(code))),
-        nonAssociation: Boolean(
-          nonAssociations &&
-            nonAssociations.nonAssociations &&
-            nonAssociations.nonAssociations.find(
-              na => na.otherPrisonerDetails.prisonerNumber === occupant.prisonerNumber,
-            ),
-        ),
-        csra: csraInfo || 'Not entered',
-        csraDetailsUrl: `/prisoner/${occupant.prisonerNumber}/cell-move/cell-sharing-risk-assessment-details`,
-      }
-    })
+    return {
+      cellId: occupant.cellLocation,
+      name: `${properCaseName(occupant.lastName)}, ${properCaseName(occupant.firstName)}`,
+      viewOffenderDetails: `/prisoner/${occupant.prisonerNumber}/cell-move/prisoner-details`,
+      alerts: alertFlagLabels.filter(label => label.alertCodes.some(code => alertCodes.includes(code))),
+      nonAssociation: Boolean(
+        nonAssociations &&
+          nonAssociations.nonAssociations &&
+          nonAssociations.nonAssociations.find(
+            na => na.otherPrisonerDetails.prisonerNumber === occupant.prisonerNumber,
+          ),
+      ),
+      csra: occupant.csra || 'Not entered',
+      csraDetailsUrl: `/prisoner/${occupant.prisonerNumber}/cell-move/cell-sharing-risk-assessment-details`,
+    }
   })
 }
 
@@ -168,8 +161,6 @@ export default ({
         return cell
       })
 
-      const cellOccupants = await getCellOccupants({ cells: selectedCells, nonAssociations })
-
       const numberOfNonAssociations = getNonAssociationsInEstablishment(nonAssociations).length
 
       const prisonerDetailsWithFormattedLocation = {
@@ -192,10 +183,11 @@ export default ({
         alerts: alertsToShow,
         showNonAssociationWarning: Boolean(residentialLevelNonAssociations.length),
         cells: selectedCells?.map(cell => ({
-          ...cell,
-          occupants: cellOccupants.filter(occupant => occupant.cellId === cell.pathHierarchy).filter(Boolean),
-          spaces: cell.maxCapacity - cell.noOfOccupants,
+          key: cell.key,
           type: hasLength(cell.legacyAttributes) && cell.legacyAttributes.sort(),
+          maxCapacity: cell.maxCapacity,
+          spaces: cell.maxCapacity - cell.noOfOccupants,
+          occupants: getCellOccupants({ prisonersInCell: cell.prisonersInCell, nonAssociations }),
         })),
         locations: renderLocationOptions(locationsData),
         subLocations,

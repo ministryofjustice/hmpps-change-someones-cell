@@ -3,6 +3,7 @@ import viewNonAssociations from './viewNonAssociations'
 import NonAssociationsService from '../../services/nonAssociationsService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import config from '../../config'
+import { PrisonerNonAssociation } from '../../data/nonAssociationsApiClient'
 
 Reflect.deleteProperty(process.env, 'APPINSIGHTS_INSTRUMENTATIONKEY')
 
@@ -17,21 +18,16 @@ describe('view non associations', () => {
   let res
   let controller
 
-  const tomorrow = moment().add(1, 'days')
-
   const offenderNo = 'ABC123'
 
   const getDetailsResponse = {
     bookingId: 1234,
-    offenderNo,
+    prisonerNumber: offenderNo,
     firstName: 'Test',
     lastName: 'User',
-    assignedLivingUnit: {
-      agencyId: 'MDI',
-      locationId: 12345,
-      description: '1-2-012',
-      agencyName: 'Moorland (HMP & YOI)',
-    },
+    prisonId: 'MDI',
+    cellLocation: '1-2-012',
+    prisonName: 'Moorland (HMP & YOI)',
   }
 
   const systemClientToken = 'system_token'
@@ -58,94 +54,63 @@ describe('view non associations', () => {
       status: jest.fn(),
     }
 
-    prisonerDetailsService.getDetails = jest.fn().mockImplementation((_, requestedOffenderNo) => ({
+    prisonerDetailsService.getPrisoner = jest.fn().mockImplementation((_, requestedOffenderNo) => ({
       ...getDetailsResponse,
-      offenderNo: requestedOffenderNo,
+      prisonerNumber: requestedOffenderNo,
     }))
 
     nonAssociationsService.getNonAssociations = jest.fn().mockResolvedValue({
-      offenderNo: 'ABC123',
+      prisonerNumber: 'ABC123',
       firstName: 'Fred',
       lastName: 'Bloggs',
-      agencyDescription: 'Moorland (HMP & YOI)',
-      assignedLivingUnitDescription: 'MDI-1-1-3',
+      prisonId: 'MDI',
+      prisonName: 'Moorland (HMP & YOI)',
+      cellLocation: '1-1-3',
+      openCount: 2,
+      closedCount: 0,
       nonAssociations: [
         {
-          reasonCode: 'VIC',
-          reasonDescription: 'Victim',
-          typeCode: 'WING',
-          typeDescription: 'Do Not Locate on Same Wing',
-          effectiveDate: moment().add(7, 'days').format('YYYY-MM-DDTHH:mm:ss'),
-          authorisedBy: 'string',
-          comments: 'Test comment 1',
-          offenderNonAssociation: {
-            offenderNo: 'ABC124',
+          reason: 'GANG',
+          reasonDescription: 'Gangs',
+          role: 'VIC',
+          roleDescription: 'Victim',
+          restrictionType: 'WING',
+          restrictionTypeDescription: 'Do Not Locate on Same Wing',
+          whenCreated: moment().format('YYYY-MM-DDTHH:mm:ss'),
+          comment: 'Test comment 1',
+          otherPrisonerDetails: {
+            prisonerNumber: 'ABC124',
             firstName: 'Joseph',
             lastName: 'Bloggs',
-            reasonCode: 'PER',
-            reasonDescription: 'Perpetrator',
-            agencyDescription: 'Moorland (HMP & YOI)',
-            assignedLivingUnitDescription: 'MDI-2-1-3',
+            role: 'PER',
+            roleDescription: 'Perpetrator',
+            prisonId: 'MDI',
+            prisonName: 'Moorland (HMP & YOI)',
+            cellLocation: '2-1-3',
           },
         },
         {
-          reasonCode: 'VIC',
-          reasonDescription: 'Victim',
-          typeCode: 'WING',
-          typeDescription: 'Do Not Locate on Same Wing',
-          effectiveDate: moment().format('YYYY-MM-DDTHH:mm:ss'),
-          authorisedBy: 'string',
-          comments: 'Test comment 1',
-          offenderNonAssociation: {
-            offenderNo: 'ABC124',
-            firstName: 'Joseph',
-            lastName: 'Bloggs',
-            reasonCode: 'PER',
-            reasonDescription: 'Perpetrator',
-            agencyDescription: 'Moorland (HMP & YOI)',
-            assignedLivingUnitDescription: 'MDI-2-1-3',
-          },
-        },
-        {
-          reasonCode: 'RIV',
-          reasonDescription: 'Rival gang',
-          typeCode: 'WING',
-          typeDescription: 'Do Not Locate on Same Wing',
-          effectiveDate: moment().subtract(1, 'years').format('YYYY-MM-DDTHH:mm:ss'),
-          expiryDate: tomorrow,
-          authorisedBy: 'string',
-          comments: 'Test comment 2',
-          offenderNonAssociation: {
-            offenderNo: 'ABC125',
+          reason: 'GANG',
+          reasonDescription: 'Gangs',
+          role: 'RIV',
+          roleDescription: 'Rival gang',
+          restrictionType: 'WING',
+          restrictionTypeDescription: 'Do Not Locate on Same Wing',
+          whenCreated: moment().subtract(1, 'years').format('YYYY-MM-DDTHH:mm:ss'),
+          comment: 'Test comment 2',
+          otherPrisonerDetails: {
+            prisonerNumber: 'ABC125',
             firstName: 'Jim',
             lastName: 'Bloggs',
-            reasonCode: 'RIV',
-            reasonDescription: 'Rival gang',
-            agencyDescription: 'Moorland (HMP & YOI)',
-            assignedLivingUnitDescription: 'MDI-2-1-3',
-          },
-        },
-        {
-          reasonCode: 'VIC',
-          reasonDescription: 'Victim',
-          typeCode: 'WING',
-          typeDescription: 'Do Not Locate on Same Wing',
-          effectiveDate: '2018-12-01T13:34:00',
-          expiryDate: '2019-12-01T13:34:00',
-          authorisedBy: 'string',
-          comments: 'Test comment 3',
-          offenderNonAssociation: {
-            offenderNo: 'ABC125',
-            firstName: 'Jim',
-            lastName: 'Bloggs',
-            reasonCode: 'PER',
-            reasonDescription: 'Perpetrator',
-            agencyDescription: 'Moorland (HMP & YOI)',
-            assignedLivingUnitDescription: 'MDI-2-1-3',
+            role: 'RIV',
+            roleDescription: 'Rival gang',
+            prisonId: 'MDI',
+            prisonName: 'Moorland (HMP & YOI)',
+            cellLocation: '2-1-3',
           },
         },
       ],
-    })
+    } as PrisonerNonAssociation)
 
     controller = viewNonAssociations({ prisonerDetailsService, nonAssociationsService })
   })
@@ -153,13 +118,13 @@ describe('view non associations', () => {
   it('Makes the expected API calls', async () => {
     await controller(req, res)
 
-    expect(prisonerDetailsService.getDetails).toHaveBeenCalledWith(systemClientToken, offenderNo)
+    expect(prisonerDetailsService.getPrisoner).toHaveBeenCalledWith(systemClientToken, offenderNo)
     expect(nonAssociationsService.getNonAssociations).toHaveBeenCalledWith(systemClientToken, offenderNo)
   })
 
   it('Should render error template when there is an API error', async () => {
     const error = new Error('Network error')
-    prisonerDetailsService.getDetails.mockImplementation(() => Promise.reject(error))
+    prisonerDetailsService.getPrisoner.mockImplementation(() => Promise.reject(error))
 
     await expect(controller(req, res)).rejects.toThrow(error)
 
@@ -176,19 +141,20 @@ describe('view non associations', () => {
           {
             comment: 'Test comment 1',
             effectiveDate: moment().format('D MMMM YYYY'),
-            location: '1-2-012',
+            location: '2-1-3',
             name: 'Bloggs, Joseph',
             otherOffenderKey: 'Joseph Bloggs is',
             otherOffenderRole: 'Perpetrator',
             prisonNumber: 'ABC124',
+            reason: 'Gangs',
             selectedOffenderKey: 'Test User is',
             selectedOffenderRole: 'Victim',
             type: 'Do Not Locate on Same Wing',
           },
           {
             comment: 'Test comment 2',
-            effectiveDate: moment().subtract(1, 'years').format('D MMMM YYYY'),
-            location: '1-2-012',
+            effectiveDate: moment().format('D MMMM YYYY'),
+            location: '2-1-3',
             name: 'Bloggs, Jim',
             otherOffenderKey: 'Jim Bloggs is',
             otherOffenderRole: 'Rival gang',

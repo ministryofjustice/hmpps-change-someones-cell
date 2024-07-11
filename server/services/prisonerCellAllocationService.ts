@@ -2,7 +2,7 @@ import { LocationsInsidePrisonApiClient, PrisonApiClient, WhereaboutsApiClient }
 import { Alert, Offender, OffenderInReception } from '../data/prisonApiClient'
 import logger from '../../logger'
 import PrisonerSearchApiClient from '../data/prisonerSearchApiClient'
-import { Occupant } from '../data/locationsInsidePrisonApiClient'
+import { CellLocation, Occupant } from '../data/locationsInsidePrisonApiClient'
 
 export interface OffenderWithAlerts extends OffenderInReception {
   alerts?: string[]
@@ -24,12 +24,12 @@ export default class PrisonerCellAllocationService {
     return await this.locationsInsidePrisonApiClient.getInmatesAtLocation(token, locationId)
   }
 
-  async getPrisonersAtLocations(token: string, agencyId: string, locationDescriptions: string[]) {
-    const result = await this.prisonerSearchApiClient.getPrisonersAtLocations(token, agencyId, locationDescriptions)
-    return result.content
-  }
-
-  async getCellsWithCapacity(token: string, agencyId: string, location: string, subLocation?: string) {
+  async getCellsWithCapacity(
+    token: string,
+    agencyId: string,
+    location: string,
+    subLocation?: string,
+  ): Promise<CellLocation[]> {
     if (location === 'ALL') {
       return await this.locationsInsidePrisonApiClient.getCellsWithCapacity(token, agencyId)
     }

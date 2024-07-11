@@ -58,11 +58,11 @@ describe('Confirm reception move', () => {
   beforeEach(() => {
     jest.clearAllMocks()
 
-    prisonerDetailsService.getDetails = jest.fn().mockResolvedValue({
+    prisonerDetailsService.getPrisoner = jest.fn().mockResolvedValue({
       bookingId: 1,
       firstName: 'Bob',
       lastName: 'Doe',
-      agencyId: 'MDI',
+      prisonId: 'MDI',
     })
 
     prisonerCellAllocationService.getCellMoveReasonTypes = jest.fn().mockResolvedValue([
@@ -89,7 +89,7 @@ describe('Confirm reception move', () => {
   describe('view', () => {
     it('Should get prisoner details', async () => {
       await controller.view(req, res)
-      expect(prisonerDetailsService.getDetails).toHaveBeenCalledWith(systemClientToken, 'A12345', false)
+      expect(prisonerDetailsService.getPrisoner).toHaveBeenCalledWith(systemClientToken, 'A12345')
     })
 
     it('Should set backUrl to the previous page', async () => {
@@ -211,7 +211,7 @@ describe('Confirm reception move', () => {
       prisonerCellAllocationService.getReceptionsWithCapacity.mockResolvedValue([reception])
 
       await controller.post(req, res)
-      expect(prisonerDetailsService.getDetails).toHaveBeenCalledWith(systemClientToken, 'A12345', true)
+      expect(prisonerDetailsService.getPrisoner).toHaveBeenCalledWith(systemClientToken, 'A12345')
       expect(prisonerCellAllocationService.moveToCell).toHaveBeenCalledWith(
         systemClientToken,
         1,

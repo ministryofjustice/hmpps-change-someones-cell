@@ -164,7 +164,7 @@ describe('select location', () => {
   it('Makes the expected API calls', async () => {
     await controller(req, res)
 
-    expect(prisonerDetailsService.getDetails).toHaveBeenCalledWith('system_token', offenderNo, true)
+    expect(prisonerDetailsService.getPrisoner).toHaveBeenCalledWith('system_token', offenderNo)
     expect(nonAssociationsService.getNonAssociations).toHaveBeenCalledWith('system_token', offenderNo)
     expect(locationService.searchGroups).toHaveBeenCalledWith('system_token', 'MDI')
   })

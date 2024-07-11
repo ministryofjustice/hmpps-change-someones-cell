@@ -8,7 +8,6 @@ import {
   Page,
   ReferenceCode,
 } from '../data/prisonApiClient'
-import { Prisoner } from '../data/prisonerSearchApiClient'
 import { CellMoveResponse } from '../data/whereaboutsApiClient'
 import PrisonerCellAllocationService from './prisonerCellAllocationService'
 import { CellLocation, Occupant } from '../data/locationsInsidePrisonApiClient'
@@ -71,75 +70,6 @@ describe('Prisoner cell allocation service', () => {
       await expect(prisonerCellAllocationService.getInmates(token, 'BXI', 'Smith', true)).rejects.toEqual(
         new Error('some error'),
       )
-    })
-  })
-
-  describe('getPrisonersAtLocations', () => {
-    const prisoners: Prisoner[] = [
-      {
-        bookingId: 1,
-        prisonerNumber: 'A1234BC',
-        firstName: 'JOHN',
-        lastName: 'SMITH',
-        prisonId: 'MDI',
-        prisonName: 'Moorland',
-        category: 'C',
-        gender: 'Male',
-        mostSeriousOffence: 'Robbery',
-        alerts: [
-          {
-            active: true,
-            alertCode: 'HA',
-            alertType: 'H',
-            expired: false,
-          },
-        ],
-      },
-    ]
-
-    const pagedResult = {
-      totalPages: 1,
-      totalElements: 1,
-      first: true,
-      last: true,
-      size: 1,
-      content: prisoners,
-      number: 1,
-      sort: {
-        empty: false,
-        sorted: true,
-        unsorted: false,
-      },
-      numberOfElements: 1,
-      pageable: {
-        offset: 0,
-        sort: {
-          empty: false,
-          sorted: true,
-          unsorted: false,
-        },
-        pageSize: 0,
-        pageNumber: 0,
-        paged: true,
-        unpaged: false,
-      },
-      empty: false,
-    }
-
-    it('Retrieves inmates at location', async () => {
-      prisonerSearchApiClient.getPrisonersAtLocations.mockResolvedValue(pagedResult)
-
-      const result = await prisonerCellAllocationService.getPrisonersAtLocations(token, 'MDI', ['A-1-001', 'A-1-002'])
-
-      expect(result[0].prisonerNumber).toEqual('A1234BC')
-    })
-
-    it('Propagates error', async () => {
-      prisonerSearchApiClient.getPrisonersAtLocations.mockRejectedValue(new Error('some error'))
-
-      await expect(
-        prisonerCellAllocationService.getPrisonersAtLocations(token, 'MDI', ['A-1-001', 'A-1-002']),
-      ).rejects.toEqual(new Error('some error'))
     })
   })
 

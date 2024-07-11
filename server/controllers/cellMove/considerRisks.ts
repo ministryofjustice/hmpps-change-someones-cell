@@ -190,7 +190,7 @@ export default ({
           prisonNumber: nonAssociation.otherPrisonerDetails.prisonerNumber,
           location:
             nonAssociation.otherPrisonerDetails.cellLocation || nonAssociation.otherPrisonerDetails.prisonerNumber,
-          type: nonAssociation.roleDescription,
+          type: nonAssociation.restrictionTypeDescription,
           reason: nonAssociation.reasonDescription,
           comment: nonAssociation.comment || 'None entered',
         })),

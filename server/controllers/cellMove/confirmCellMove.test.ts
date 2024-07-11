@@ -55,11 +55,11 @@ describe('Change cell play back details', () => {
     jest.clearAllMocks()
     req.query = { cellId }
 
-    prisonerDetailsService.getDetails = jest.fn().mockResolvedValue({
+    prisonerDetailsService.getPrisoner = jest.fn().mockResolvedValue({
       bookingId: 1,
       firstName: 'Bob',
       lastName: 'Doe',
-      agencyId: 'MDI',
+      prisonId: 'MDI',
     })
     prisonerCellAllocationService.moveToCell = jest.fn()
     prisonerCellAllocationService.moveToCellSwap = jest.fn()

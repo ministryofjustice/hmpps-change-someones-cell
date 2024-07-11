@@ -1,4 +1,3 @@
-import moment from 'moment'
 import considerRisksController from './considerRisks'
 import LocationService from '../../services/locationService'
 import AnalyticsService from '../../services/analyticsService'
@@ -8,6 +7,7 @@ import { OffenderDetails } from '../../data/prisonApiClient'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
 
 import config from '../../config'
+import { PrisonerNonAssociation } from '../../data/nonAssociationsApiClient'
 
 Reflect.deleteProperty(process.env, 'APPINSIGHTS_INSTRUMENTATIONKEY')
 
@@ -269,87 +269,109 @@ describe('move validation', () => {
     locationService.getLocation = jest.fn().mockResolvedValueOnce(cellLocationData)
     analyticsService.sendEvents = jest.fn().mockResolvedValue(Promise.resolve({}))
     nonAssociationsService.getNonAssociations = jest.fn().mockResolvedValue({
-      offenderNo: 'ABC123',
+      prisonerNumber: 'ABC123',
       firstName: 'Fred',
       lastName: 'Bloggs',
-      agencyDescription: 'Moorland (HMP & YOI)',
-      assignedLivingUnitDescription: 'MDI-1-1-3',
+      prisonId: 'MDI',
+      prisonName: 'Moorland (HMP & YOI)',
+      cellLocation: '1-1-3',
+      openCount: 3,
+      closedCount: 0,
       nonAssociations: [
         {
-          reasonCode: 'VIC',
-          reasonDescription: 'Victim',
-          typeCode: 'WING',
-          typeDescription: 'Do Not Locate on Same Wing',
-          effectiveDate: moment().add(7, 'days').format('YYYY-MM-DDTHH:mm:ss'),
-          authorisedBy: 'string',
-          comments: 'Test comment 1',
-          offenderNonAssociation: {
-            offenderNo: 'ABC124',
+          id: 1,
+          reason: 'BUL',
+          reasonDescription: 'Bullying',
+          role: 'VIC',
+          roleDescription: 'Victim',
+          restrictionType: 'WING',
+          restrictionTypeDescription: 'Do Not Locate on Same Wing',
+          comment: 'Test comment 1',
+          isOpen: true,
+          whenCreated: 'string',
+          whenUpdated: 'string',
+          updatedBy: 'string',
+          otherPrisonerDetails: {
+            prisonerNumber: 'ABC124',
             firstName: 'Joseph',
             lastName: 'Bloggs',
-            reasonCode: 'PER',
-            reasonDescription: 'Perpetrator',
-            agencyDescription: 'Moorland (HMP & YOI)',
-            assignedLivingUnitDescription: 'MDI-2-1-3',
+            role: 'PER',
+            roleDescription: 'Perpetrator',
+            prisonName: 'Moorland (HMP & YOI)',
+            cellLocation: '2-1-3',
           },
         },
         {
-          reasonCode: 'VIC',
-          reasonDescription: 'Victim',
-          typeCode: 'WING',
-          typeDescription: 'Do Not Locate on Same Wing',
-          effectiveDate: moment().format('YYYY-MM-DDTHH:mm:ss'),
-          authorisedBy: 'string',
-          comments: 'Test comment 1',
-          offenderNonAssociation: {
-            offenderNo: 'ABC124',
+          id: 2,
+          role: 'VIC',
+          roleDescription: 'Victim',
+          reason: 'BUL',
+          reasonDescription: 'Bully',
+          restrictionType: 'WING',
+          restrictionTypeDescription: 'Do Not Locate on Same Wing',
+          comment: 'Test comment 1',
+          isOpen: true,
+          whenCreated: 'string',
+          whenUpdated: 'string',
+          updatedBy: 'string',
+          otherPrisonerDetails: {
+            prisonerNumber: 'ABC124',
             firstName: 'Joseph',
             lastName: 'Bloggs',
-            reasonCode: 'PER',
-            reasonDescription: 'Perpetrator',
-            agencyDescription: 'Moorland (HMP & YOI)',
-            assignedLivingUnitDescription: 'MDI-2-1-3',
+            role: 'PER',
+            roleDescription: 'Perpetrator',
+            prisonName: 'Moorland (HMP & YOI)',
+            cellLocation: '2-1-3',
           },
         },
         {
-          reasonCode: 'RIV',
+          id: 3,
+          role: 'PER',
+          roleDescription: 'Perp',
+          reason: 'RIV',
           reasonDescription: 'Rival gang',
-          typeCode: 'WING',
-          typeDescription: 'Do Not Locate on Same Wing',
-          effectiveDate: moment().subtract(1, 'years').format('YYYY-MM-DDTHH:mm:ss'),
-          authorisedBy: 'string',
-          comments: 'Test comment 2',
-          offenderNonAssociation: {
-            offenderNo: 'ABC125',
+          restrictionType: 'WING',
+          restrictionTypeDescription: 'Do Not Locate on Same Wing',
+          comment: 'Test comment 2',
+          isOpen: true,
+          whenCreated: 'string',
+          whenUpdated: 'string',
+          updatedBy: 'string',
+          otherPrisonerDetails: {
+            prisonerNumber: 'ABC125',
             firstName: 'Jim',
             lastName: 'Bloggs',
-            reasonCode: 'RIV',
-            reasonDescription: 'Rival gang',
-            agencyDescription: 'Moorland (HMP & YOI)',
-            assignedLivingUnitDescription: 'MDI-1-1-3',
+            role: 'VIC',
+            roleDescription: 'Victim',
+            prisonName: 'Moorland (HMP & YOI)',
+            cellLocation: '1-1-3',
           },
         },
         {
-          reasonCode: 'VIC',
-          reasonDescription: 'Victim',
-          typeCode: 'WING',
-          typeDescription: 'Do Not Locate on Same Wing',
-          effectiveDate: '2018-12-01T13:34:00',
-          expiryDate: '2019-12-01T13:34:00',
-          authorisedBy: 'string',
-          comments: 'Test comment 3',
-          offenderNonAssociation: {
-            offenderNo: 'ABC125',
+          id: 4,
+          role: 'VIC',
+          roleDescription: 'Victim',
+          reason: 'RIV',
+          reasonDescription: 'Rival gang',
+          restrictionType: 'WING',
+          restrictionTypeDescription: 'Do Not Locate on Same Wing',
+          comment: 'Test comment 3',
+          isOpen: true,
+          whenCreated: 'string',
+          whenUpdated: 'string',
+          updatedBy: 'string',
+          otherPrisonerDetails: {
+            prisonerNumber: 'ABC125',
             firstName: 'Jim',
             lastName: 'Bloggs',
-            reasonCode: 'PER',
-            reasonDescription: 'Perpetrator',
-            agencyDescription: 'Moorland (HMP & YOI)',
-            assignedLivingUnitDescription: 'MDI-2-1-3',
+            role: 'PER',
+            roleDescription: 'Perpetrator',
+            prisonName: 'Moorland (HMP & YOI)',
+            cellLocation: '2-1-3',
           },
         },
       ],
-    })
+    } as PrisonerNonAssociation)
 
     controller = considerRisksController({
       analyticsService,
@@ -461,7 +483,7 @@ describe('move validation', () => {
       nonAssociations: [
         {
           comment: 'Test comment 2',
-          location: 'MDI-1-1-3',
+          location: '1-1-3',
           name: 'Bloggs, Jim',
           prisonNumber: 'ABC125',
           reason: 'Rival gang',

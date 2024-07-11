@@ -24,52 +24,14 @@ describe('prisonerSearchApiClient', () => {
   describe('getPrisoners', () => {
     it('should search for prisoners', async () => {
       const response = { data: 'data' }
-      const offenderNos = ['A1234BC', 'B4321CD']
+      const prisonerNumbers = { prisonerNumbers: ['A1234BC', 'B4321CD'] }
 
       fakePrisonerSearchApiClient
-        .post('/prisoner-search/prisoner-numbers', offenderNos)
+        .post('/prisoner-search/prisoner-numbers', prisonerNumbers)
         .matchHeader('authorization', `Bearer ${accessToken}`)
         .reply(200, response)
 
-      const output = await prisonerSearchApiClient.getPrisoners(accessToken, offenderNos)
-      expect(output).toEqual(response)
-    })
-  })
-
-  describe('getPrisonersAtLocations', () => {
-    it('should return data from api', async () => {
-      const params = {
-        joinType: 'AND',
-        queries: [
-          {
-            joinType: 'AND',
-            matchers: [
-              {
-                type: 'String',
-                attribute: 'prisonId',
-                condition: 'IS',
-                searchTerm: 'MDI',
-              },
-              {
-                type: 'String',
-                attribute: 'cellLocation',
-                condition: 'IN',
-                searchTerm: 'A-1-001,A-1-002',
-              },
-            ],
-          },
-        ],
-      }
-
-      const response = { data: 'data' }
-
-      fakePrisonerSearchApiClient
-        .post('/attribute-search', params)
-        .query({ size: 10000 })
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .reply(200, response)
-
-      const output = await prisonerSearchApiClient.getPrisonersAtLocations(accessToken, 'MDI', ['A-1-001', 'A-1-002'])
+      const output = await prisonerSearchApiClient.getPrisoners(accessToken, prisonerNumbers.prisonerNumbers)
       expect(output).toEqual(response)
     })
   })
