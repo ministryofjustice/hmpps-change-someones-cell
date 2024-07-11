@@ -1,7 +1,6 @@
 import { LocationsInsidePrisonApiClient, PrisonApiClient, WhereaboutsApiClient } from '../data'
 import { Alert, Offender, OffenderInReception } from '../data/prisonApiClient'
 import logger from '../../logger'
-import PrisonerSearchApiClient from '../data/prisonerSearchApiClient'
 import { CellLocation, Occupant } from '../data/locationsInsidePrisonApiClient'
 
 export interface OffenderWithAlerts extends OffenderInReception {
@@ -12,7 +11,6 @@ export default class PrisonerCellAllocationService {
   constructor(
     private readonly prisonApiClient: PrisonApiClient,
     private readonly whereaboutsApiClient: WhereaboutsApiClient,
-    private readonly prisonerSearchApiClient: PrisonerSearchApiClient,
     private readonly locationsInsidePrisonApiClient: LocationsInsidePrisonApiClient,
   ) {}
 

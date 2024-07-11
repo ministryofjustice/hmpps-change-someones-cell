@@ -25,7 +25,6 @@ export const services = () => {
   const prisonerCellAllocationService = new PrisonerCellAllocationService(
     prisonApiClient,
     whereaboutsApiClient,
-    prisonerSearchApiClient,
     locationsInsidePrisonApiClient,
   )
   const prisonerDetailsService = new PrisonerDetailsService(prisonApiClient, prisonerSearchApiClient)

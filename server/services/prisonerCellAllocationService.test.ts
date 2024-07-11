@@ -1,4 +1,4 @@
-import { LocationsInsidePrisonApiClient, PrisonApiClient, PrisonerSearchApiClient, WhereaboutsApiClient } from '../data'
+import { LocationsInsidePrisonApiClient, PrisonApiClient, WhereaboutsApiClient } from '../data'
 import {
   BedAssignment,
   Offender,
@@ -21,19 +21,16 @@ const token = 'some token'
 
 describe('Prisoner cell allocation service', () => {
   let prisonApiClient: jest.Mocked<PrisonApiClient>
-  let prisonerSearchApiClient: jest.Mocked<PrisonerSearchApiClient>
   let whereaboutsApiClient: jest.Mocked<WhereaboutsApiClient>
   let prisonerCellAllocationService: PrisonerCellAllocationService
   let locationsInsidePrisonApiClient: jest.Mocked<LocationsInsidePrisonApiClient>
   beforeEach(() => {
     prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
-    prisonerSearchApiClient = new PrisonerSearchApiClient() as jest.Mocked<PrisonerSearchApiClient>
     whereaboutsApiClient = new WhereaboutsApiClient() as jest.Mocked<WhereaboutsApiClient>
     locationsInsidePrisonApiClient = new LocationsInsidePrisonApiClient() as jest.Mocked<LocationsInsidePrisonApiClient>
     prisonerCellAllocationService = new PrisonerCellAllocationService(
       prisonApiClient,
       whereaboutsApiClient,
-      prisonerSearchApiClient,
       locationsInsidePrisonApiClient,
     )
   })
