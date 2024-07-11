@@ -32,7 +32,10 @@ export default ({ locationService, nonAssociationsService, prisonerDetailsServic
         return res.render('notFound.njk', { url: '/prisoner-search' })
       }
 
-      const nonAssociations = await nonAssociationsService.getNonAssociations(systemClientToken, offenderNo)
+      const nonAssociations = await nonAssociationsService.getNonAssociations(
+        systemClientToken,
+        prisonerDetails.prisonerNumber,
+      )
       const locationsData = await locationService.searchGroups(systemClientToken, prisonerDetails.prisonId)
 
       const prisonersActiveAlertCodes = prisonerDetails.alerts

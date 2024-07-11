@@ -3,6 +3,7 @@ import searchForCell from './searchForCell'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import LocationService from '../../services/locationService'
 import NonAssociationsService from '../../services/nonAssociationsService'
+import { Prisoner } from '../../data/prisonerSearchApiClient'
 
 Reflect.deleteProperty(process.env, 'APPINSIGHTS_INSTRUMENTATIONKEY')
 
@@ -19,92 +20,44 @@ describe('select location', () => {
 
   const getDetailsResponse = {
     bookingId: 1234,
-    offenderNo,
+    prisonerNumber: offenderNo,
     firstName: 'Test',
     lastName: 'User',
     csra: 'High',
-    csraClassificationCode: 'HI',
-    agencyId: 'MDI',
-    assessments: [],
-    assignedLivingUnit: {},
+    prisonId: 'MDI',
     alerts: [
       {
         active: true,
-        addedByFirstName: 'John',
-        addedByLastName: 'Smith',
         alertCode: 'XRF',
-        alertCodeDescription: 'Risk to females',
-        alertId: 1,
         alertType: 'X',
-        alertTypeDescription: 'Security',
-        bookingId: 14,
-        comment: 'has a large poster on cell wall',
-        dateCreated: '2019-08-20',
-        dateExpires: null,
         expired: false,
-        expiredByFirstName: 'John',
-        expiredByLastName: 'Smith',
-        offenderNo,
       },
       {
         active: true,
-        addedByFirstName: 'John',
-        addedByLastName: 'Smith',
         alertCode: 'XGANG',
-        alertCodeDescription: 'Gang member',
-        alertId: 1,
         alertType: 'X',
-        alertTypeDescription: 'Security',
-        bookingId: 14,
-        comment: 'has a large poster on cell wall',
-        dateCreated: '2019-08-20',
-        dateExpires: null,
         expired: false,
-        expiredByFirstName: 'John',
-        expiredByLastName: 'Smith',
-        offenderNo,
       },
       {
-        alertId: 3,
         alertType: 'V',
-        alertTypeDescription: 'Vulnerability',
         alertCode: 'VIP',
-        alertCodeDescription: 'Isolated Prisoner',
-        comment: 'test',
-        dateCreated: '2020-08-20',
         expired: false,
         active: true,
-        addedByFirstName: 'John',
-        addedByLastName: 'Smith',
       },
       {
-        alertId: 4,
         alertType: 'H',
-        alertTypeDescription: 'Self Harm',
         alertCode: 'HA',
-        alertCodeDescription: 'ACCT open',
-        comment: 'Test comment',
-        dateCreated: '2021-02-18',
         expired: false,
         active: true,
-        addedByFirstName: 'John',
-        addedByLastName: 'Smith',
       },
       {
-        alertId: 5,
         alertType: 'H',
-        alertTypeDescription: 'Self Harm',
         alertCode: 'HA1',
-        alertCodeDescription: 'ACCT post closure',
-        comment: '',
-        dateCreated: '2021-02-19',
         expired: false,
         active: true,
-        addedByFirstName: 'John',
-        addedByLastName: 'Smith',
       },
     ],
-  }
+  } as Prisoner
 
   beforeEach(() => {
     req = {
@@ -133,7 +86,7 @@ describe('select location', () => {
       status: jest.fn(),
     }
 
-    prisonerDetailsService.getDetails = jest.fn().mockImplementation((_, requestedOffenderNo) => ({
+    prisonerDetailsService.getPrisoner = jest.fn().mockImplementation((_, requestedOffenderNo) => ({
       ...getDetailsResponse,
       offenderNo: requestedOffenderNo,
     }))
@@ -178,7 +131,7 @@ describe('select location', () => {
 
   it('Should render error template when there is an API error', async () => {
     const error = new Error('Network error')
-    prisonerDetailsService.getDetails.mockImplementation(() => Promise.reject(error))
+    prisonerDetailsService.getPrisoner.mockImplementation(() => Promise.reject(error))
 
     await expect(controller(req, res)).rejects.toThrow(error)
 
@@ -192,10 +145,9 @@ describe('select location', () => {
       expect(res.render).toHaveBeenCalledWith(
         'cellMove/searchForCell.njk',
         expect.objectContaining({
-          prisonerDetails: getDetailsResponse,
-          breadcrumbPrisonerName: 'User, Test',
           prisonerName: 'Test User',
-          numberOfNonAssociations: 0,
+          profileUrl: 'http://localhost:3000/prisoner/ABC123',
+          searchForCellRootUrl: '/prisoner/ABC123/cell-move/search-for-cell',
           showNonAssociationsLink: false,
           alerts: [
             {
@@ -225,12 +177,9 @@ describe('select location', () => {
     })
 
     it('shows the CSWAP description as the location', async () => {
-      prisonerDetailsService.getDetails = jest.fn().mockResolvedValue({
+      prisonerDetailsService.getPrisoner = jest.fn().mockResolvedValue({
         ...getDetailsResponse,
-        assignedLivingUnit: {
-          ...getDetailsResponse.assignedLivingUnit,
-          description: 'CSWAP',
-        },
+        cellLocation: 'CSWAP',
       })
 
       await controller(req, res)
@@ -239,11 +188,48 @@ describe('select location', () => {
         'cellMove/searchForCell.njk',
         expect.objectContaining({
           prisonerDetails: {
-            ...getDetailsResponse,
+            alerts: [
+              {
+                active: true,
+                alertCode: 'XRF',
+                alertType: 'X',
+                expired: false,
+              },
+              {
+                active: true,
+                alertCode: 'XGANG',
+                alertType: 'X',
+                expired: false,
+              },
+              {
+                active: true,
+                alertCode: 'VIP',
+                alertType: 'V',
+                expired: false,
+              },
+              {
+                active: true,
+                alertCode: 'HA',
+                alertType: 'H',
+                expired: false,
+              },
+              {
+                active: true,
+                alertCode: 'HA1',
+                alertType: 'H',
+                expired: false,
+              },
+            ],
             assignedLivingUnit: {
-              ...getDetailsResponse.assignedLivingUnit,
               description: 'No cell allocated',
             },
+            bookingId: 1234,
+            cellLocation: 'CSWAP',
+            csra: 'High',
+            firstName: 'Test',
+            lastName: 'User',
+            prisonId: 'MDI',
+            prisonerNumber: offenderNo,
           },
         }),
       )
@@ -331,12 +317,11 @@ describe('select location', () => {
 
     it('populates the data correctly when some non-associations in the same establishment', async () => {
       nonAssociationsService.getNonAssociations = jest.fn().mockResolvedValue({
-        agencyDescription: 'MOORLAND',
+        prisonId: 'MDI',
         nonAssociations: [
           {
-            effectiveDate: moment(),
-            offenderNonAssociation: {
-              agencyDescription: 'MOORLAND',
+            otherPrisonerDetails: {
+              prisonId: 'MDI',
             },
           },
         ],
