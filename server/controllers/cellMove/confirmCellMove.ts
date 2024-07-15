@@ -6,12 +6,17 @@ import PrisonerCellAllocationService from '../../services/prisonerCellAllocation
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import { properCaseName, putLastNameFirst } from '../../utils'
 import { getConfirmBackLinkData } from './cellMoveUtils'
+import { ReferenceCode } from '../../data/prisonApiClient'
 
 const CSWAP = 'C-SWAP'
 
-const sortOnListSeq = (a, b) => a.listSeq - b.listSeq
+const sortOnListSeq = (a: ReferenceCode, b: ReferenceCode) => a.listSeq - b.listSeq
 
-const cellMoveReasons = async (token, prisonerCellAllocationService: PrisonerCellAllocationService, selectedReason) => {
+const cellMoveReasons = async (
+  token,
+  prisonerCellAllocationService: PrisonerCellAllocationService,
+  selectedReason: string,
+) => {
   const cellMoveReasonTypes = await prisonerCellAllocationService.getCellMoveReasonTypes(token)
   return cellMoveReasonTypes
     .filter(type => type.activeFlag === 'Y')
@@ -49,7 +54,7 @@ export default ({
       ? { pathHierarchy: 'swap' }
       : await locationService.getLocation(systemClientToken, cellId)
 
-    const { firstName, lastName } = await prisonerDetailsService.getDetails(systemClientToken, offenderNo)
+    const { firstName, lastName } = await prisonerDetailsService.getPrisoner(systemClientToken, offenderNo)
 
     const formValues = req.flash('formValues')
     const { reason, comment } = (formValues && formValues[0]) || {}
@@ -171,8 +176,8 @@ export default ({
     }
 
     try {
-      const { bookingId, agencyId } = await prisonerDetailsService.getDetails(systemClientToken, offenderNo)
-
+      const { bookingId, prisonId } = await prisonerDetailsService.getPrisoner(systemClientToken, offenderNo)
+      const agencyId = prisonId
       if (cellId === CSWAP) return await makeCSwap(req, res, { agencyId, bookingId, offenderNo })
 
       return await makeCellMove(req, res, {

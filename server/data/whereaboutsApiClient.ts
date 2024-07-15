@@ -1,5 +1,4 @@
 import config from '../config'
-import { OffenderCell } from './prisonApiClient'
 import RestClient from './restClient'
 
 export interface LocationGroup {
@@ -28,12 +27,6 @@ export default class WhereaboutsApiClient {
 
   private static restClient(token: string): RestClient {
     return new RestClient('Whereabouts Api Client', config.apis.whereaboutsApi, token)
-  }
-
-  getCellsWithCapacity(token: string, agencyId: string, groupName: string) {
-    return WhereaboutsApiClient.restClient(token).get<OffenderCell[]>({
-      path: `/locations/cellsWithCapacity/${agencyId}/${groupName}`,
-    })
   }
 
   moveToCell(

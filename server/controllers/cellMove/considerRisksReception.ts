@@ -66,7 +66,7 @@ export default ({ nonAssociationsService, prisonerCellAllocationService, prisone
       }
 
       const offenderNumbersOfAllNonAssociations = nonAssociations.nonAssociations.map(
-        offender => offender.offenderNonAssociation.offenderNo,
+        offender => offender.otherPrisonerDetails.prisonerNumber,
       )
       const offendersInReception = await prisonerCellAllocationService.getOffendersInReception(
         systemClientToken,
@@ -101,40 +101,30 @@ export default ({ nonAssociationsService, prisonerCellAllocationService, prisone
             .sort((left, right) => left.label.localeCompare(right.label, 'en', { ignorePunctuation: true })),
         }))
 
-      const nonAssociationsInEstablishment = await getNonAssociationsInEstablishment(
-        nonAssociations,
-        systemClientToken,
-        prisonerDetailsService,
+      const nonAssociationsInEstablishment = getNonAssociationsInEstablishment(nonAssociations)
+      const sortedNonAssociationsInReceptionWithinCurrentEstablishment = nonAssociationsInEstablishment.filter(
+        nonAssociationPrisoner =>
+          offenderNumbersOfAllInReception.includes(nonAssociationPrisoner.otherPrisonerDetails.prisonerNumber),
       )
-      const sortedNonAssociationsInReceptionWithinCurrentEstablishment = nonAssociationsInEstablishment
-        .sort((left, right) => {
-          if (left.effectiveDate < right.effectiveDate) return 1
-          if (right.effectiveDate < left.effectiveDate) return -1
-          if (left.offenderNonAssociation.lastName > right.offenderNonAssociation.lastName) return 1
-          if (right.offenderNonAssociation.lastName > left.offenderNonAssociation.lastName) return -1
-          return 0
-        })
-        .filter(nonAssociationPrisoner =>
-          offenderNumbersOfAllInReception.includes(nonAssociationPrisoner.offenderNonAssociation.offenderNo),
-        )
 
-      const { firstName, lastName } = await prisonerDetailsService.getDetails(systemClientToken, offenderNo)
+      const { firstName, lastName } = await prisonerDetailsService.getPrisoner(systemClientToken, offenderNo)
 
       const nonAssociationsRows = sortedNonAssociationsInReceptionWithinCurrentEstablishment?.map(nonAssociation => ({
         name: putLastNameFirst(
-          nonAssociation.offenderNonAssociation.firstName,
-          nonAssociation.offenderNonAssociation.lastName,
+          nonAssociation.otherPrisonerDetails.firstName,
+          nonAssociation.otherPrisonerDetails.lastName,
         ),
-        prisonNumber: nonAssociation.offenderNonAssociation.offenderNo,
-        type: nonAssociation.typeDescription,
+        prisonNumber: nonAssociation.otherPrisonerDetails.prisonerNumber,
+        reason: nonAssociation.reasonDescription,
+        type: nonAssociation.restrictionTypeDescription,
         selectedOffenderKey: `${formatName(firstName, lastName)} is`,
-        selectedOffenderRole: nonAssociation.reasonDescription,
+        selectedOffenderRole: nonAssociation.roleDescription,
         otherOffenderKey: `${formatName(
-          nonAssociation.offenderNonAssociation.firstName,
-          nonAssociation.offenderNonAssociation.lastName,
+          nonAssociation.otherPrisonerDetails.firstName,
+          nonAssociation.otherPrisonerDetails.lastName,
         )} is`,
-        otherOffenderRole: nonAssociation.offenderNonAssociation.reasonDescription,
-        comment: nonAssociation.comments || 'Not entered',
+        otherOffenderRole: nonAssociation.otherPrisonerDetails.roleDescription,
+        comment: nonAssociation.comment || 'Not entered',
       }))
 
       const personOrPeople = otherOffenders.length === 1 ? 'person' : 'people'

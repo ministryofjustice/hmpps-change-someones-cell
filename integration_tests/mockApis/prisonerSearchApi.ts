@@ -1,50 +1,53 @@
 import { stubFor } from './wiremock'
 
-export const stubPrisonersAtLocations = prisoners => {
-  const pagedResult = {
-    totalPages: 1,
-    totalElements: 1,
-    first: true,
-    last: true,
-    size: 1,
-    content: prisoners,
-    number: 1,
-    sort: {
-      empty: false,
-      sorted: true,
-      unsorted: false,
+export const stubHealth = (status = 200) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      urlPath: '/prisoner-search/health/ping',
     },
-    numberOfElements: 1,
-    pageable: {
-      offset: 0,
-      sort: {
-        empty: false,
-        sorted: true,
-        unsorted: false,
+    response: {
+      status,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
       },
-      pageSize: 0,
-      pageNumber: 0,
-      paged: true,
-      unpaged: false,
     },
-    empty: false,
-  }
+  })
 
+export const stubGetPrisoner = prisoner => {
   return stubFor({
     request: {
-      method: 'POST',
-      urlPathPattern: '/prisoner-search/attribute-search',
+      method: 'GET',
+      urlPathPattern: `/prisoner-search/prisoner/${prisoner.prisonerNumber}`,
     },
     response: {
       status: 200,
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
       },
-      jsonBody: prisoners ? pagedResult : [],
+      jsonBody: prisoner,
+    },
+  })
+}
+
+export const stubGetPrisoners = prisoners => {
+  return stubFor({
+    request: {
+      method: 'POST',
+      urlPathPattern: `/prisoner-search/prisoner-search/prisoner-numbers`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: prisoners,
     },
   })
 }
 
 export default {
-  stubPrisonersAtLocations,
+  stubHealth,
+  stubGetPrisoner,
+  stubGetPrisoners,
 }

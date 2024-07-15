@@ -154,9 +154,41 @@ export const stubInmatesAtLocation = inmates => {
   })
 }
 
+export const stubCellsWithCapacityByGroupName = ({ prisonId, groupName, response }) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      url: `/locations-inside-prison-api/location-occupancy/cells-with-capacity/${prisonId}?includePrisonerInformation=true&groupName=${groupName}`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: response,
+    },
+  })
+
+export const stubCellsWithCapacity = ({ prisonId, response }) =>
+  stubFor({
+    request: {
+      method: 'GET',
+      url: `/locations-inside-prison-api/location-occupancy/cells-with-capacity/${prisonId}?includePrisonerInformation=true`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: response,
+    },
+  })
+
 export default {
   stubHealth,
   stubGroups,
   stubLocation,
   stubInmatesAtLocation,
+  stubCellsWithCapacity,
+  stubCellsWithCapacityByGroupName,
 }

@@ -1,8 +1,7 @@
-import { PrisonApiClient, WhereaboutsApiClient, LocationsInsidePrisonApiClient } from '../data'
+import { LocationsInsidePrisonApiClient, PrisonApiClient, WhereaboutsApiClient } from '../data'
 import { Alert, Offender, OffenderInReception } from '../data/prisonApiClient'
 import logger from '../../logger'
-import PrisonerSearchApiClient from '../data/prisonerSearchApiClient'
-import { Occupant } from '../data/locationsInsidePrisonApiClient'
+import { CellLocation, Occupant } from '../data/locationsInsidePrisonApiClient'
 
 export interface OffenderWithAlerts extends OffenderInReception {
   alerts?: string[]
@@ -12,7 +11,6 @@ export default class PrisonerCellAllocationService {
   constructor(
     private readonly prisonApiClient: PrisonApiClient,
     private readonly whereaboutsApiClient: WhereaboutsApiClient,
-    private readonly prisonerSearchApiClient: PrisonerSearchApiClient,
     private readonly locationsInsidePrisonApiClient: LocationsInsidePrisonApiClient,
   ) {}
 
@@ -24,20 +22,18 @@ export default class PrisonerCellAllocationService {
     return await this.locationsInsidePrisonApiClient.getInmatesAtLocation(token, locationId)
   }
 
-  async getPrisonersAtLocations(token: string, agencyId, locationDescriptions: string[]) {
-    const result = await this.prisonerSearchApiClient.getPrisonersAtLocations(token, agencyId, locationDescriptions)
-    return result.content
-  }
-
-  async getCellsWithCapacity(token: string, agencyId: string, location: string, subLocation?: string) {
-    // If the location is 'ALL' we do not need to call the whereabouts API,
-    // we can directly call prisonApi.
+  async getCellsWithCapacity(
+    token: string,
+    agencyId: string,
+    location: string,
+    subLocation?: string,
+  ): Promise<CellLocation[]> {
     if (location === 'ALL') {
-      return await this.prisonApiClient.getCellsWithCapacity(token, agencyId)
+      return await this.locationsInsidePrisonApiClient.getCellsWithCapacity(token, agencyId)
     }
 
     const groupName = subLocation ? `${location}_${subLocation}` : location
-    return await this.whereaboutsApiClient.getCellsWithCapacity(token, agencyId, groupName)
+    return await this.locationsInsidePrisonApiClient.getCellsWithCapacity(token, agencyId, groupName)
   }
 
   async getCellMoveReasonTypes(token: string) {

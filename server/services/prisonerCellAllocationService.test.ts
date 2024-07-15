@@ -1,4 +1,4 @@
-import { PrisonApiClient, PrisonerSearchApiClient, WhereaboutsApiClient, LocationsInsidePrisonApiClient } from '../data'
+import { LocationsInsidePrisonApiClient, PrisonApiClient, WhereaboutsApiClient } from '../data'
 import {
   BedAssignment,
   Offender,
@@ -8,10 +8,9 @@ import {
   Page,
   ReferenceCode,
 } from '../data/prisonApiClient'
-import { Prisoner } from '../data/prisonerSearchApiClient'
 import { CellMoveResponse } from '../data/whereaboutsApiClient'
 import PrisonerCellAllocationService from './prisonerCellAllocationService'
-import { Occupant } from '../data/locationsInsidePrisonApiClient'
+import { CellLocation, Occupant } from '../data/locationsInsidePrisonApiClient'
 
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/prisonerSearchApiClient')
@@ -22,19 +21,16 @@ const token = 'some token'
 
 describe('Prisoner cell allocation service', () => {
   let prisonApiClient: jest.Mocked<PrisonApiClient>
-  let prisonerSearchApiClient: jest.Mocked<PrisonerSearchApiClient>
   let whereaboutsApiClient: jest.Mocked<WhereaboutsApiClient>
   let prisonerCellAllocationService: PrisonerCellAllocationService
   let locationsInsidePrisonApiClient: jest.Mocked<LocationsInsidePrisonApiClient>
   beforeEach(() => {
     prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
-    prisonerSearchApiClient = new PrisonerSearchApiClient() as jest.Mocked<PrisonerSearchApiClient>
     whereaboutsApiClient = new WhereaboutsApiClient() as jest.Mocked<WhereaboutsApiClient>
     locationsInsidePrisonApiClient = new LocationsInsidePrisonApiClient() as jest.Mocked<LocationsInsidePrisonApiClient>
     prisonerCellAllocationService = new PrisonerCellAllocationService(
       prisonApiClient,
       whereaboutsApiClient,
-      prisonerSearchApiClient,
       locationsInsidePrisonApiClient,
     )
   })
@@ -74,73 +70,6 @@ describe('Prisoner cell allocation service', () => {
     })
   })
 
-  describe('getPrisonersAtLocations', () => {
-    const prisoners: Prisoner[] = [
-      {
-        bookingId: 1,
-        prisonerNumber: 'A1234BC',
-        firstName: 'JOHN',
-        lastName: 'SMITH',
-        prisonId: 'MDI',
-        category: 'C',
-        gender: 'Male',
-        alerts: [
-          {
-            active: true,
-            alertCode: 'HA',
-            alertType: 'H',
-            expired: false,
-          },
-        ],
-      },
-    ]
-
-    const pagedResult = {
-      totalPages: 1,
-      totalElements: 1,
-      first: true,
-      last: true,
-      size: 1,
-      content: prisoners,
-      number: 1,
-      sort: {
-        empty: false,
-        sorted: true,
-        unsorted: false,
-      },
-      numberOfElements: 1,
-      pageable: {
-        offset: 0,
-        sort: {
-          empty: false,
-          sorted: true,
-          unsorted: false,
-        },
-        pageSize: 0,
-        pageNumber: 0,
-        paged: true,
-        unpaged: false,
-      },
-      empty: false,
-    }
-
-    it('Retrieves inmates at location', async () => {
-      prisonerSearchApiClient.getPrisonersAtLocations.mockResolvedValue(pagedResult)
-
-      const result = await prisonerCellAllocationService.getPrisonersAtLocations(token, 'MDI', ['A-1-001', 'A-1-002'])
-
-      expect(result[0].prisonerNumber).toEqual('A1234BC')
-    })
-
-    it('Propagates error', async () => {
-      prisonerSearchApiClient.getPrisonersAtLocations.mockRejectedValue(new Error('some error'))
-
-      await expect(
-        prisonerCellAllocationService.getPrisonersAtLocations(token, 'MDI', ['A-1-001', 'A-1-002']),
-      ).rejects.toEqual(new Error('some error'))
-    })
-  })
-
   describe('getInmatesAtLocation', () => {
     const occupants: Occupant[] = [
       {
@@ -176,43 +105,77 @@ describe('Prisoner cell allocation service', () => {
   })
 
   describe('getCellsWithCapacity', () => {
-    const cell: OffenderCell = {
-      id: 1,
-      description: 'LEI-1-1',
-      userDescription: 'LEI-1-1',
-      capacity: 2,
-      noOfOccupants: 2,
-      attributes: [
+    const cell: CellLocation = {
+      id: '01909bbe-7ed4-782c-9d86-50f3d40ba204',
+      key: 'LEI-1-1',
+      pathHierarchy: '1-1',
+      localName: 'LEI-1-1',
+      prisonId: 'LEI',
+      workingCapacity: 2,
+      maxCapacity: 2,
+      noOfOccupants: 1,
+      legacyAttributes: [
         {
-          code: 'LC',
-          description: 'Listener Cell',
+          typeCode: 'LC',
+          typeDescription: 'Listener Cell',
+        },
+      ],
+      specialistCellTypes: [
+        {
+          typeCode: 'CAT_A',
+          typeDescription: 'Category A Cell',
+        },
+      ],
+      prisonersInCell: [
+        {
+          bookingId: 1,
+          prisonerNumber: 'A1234BC',
+          firstName: 'JOHN',
+          lastName: 'SMITH',
+          prisonId: 'MDI',
+          prisonName: 'Moorland',
+          category: 'C',
+          gender: 'Male',
+          mostSeriousOffence: 'Robbery',
+          alerts: [
+            {
+              active: true,
+              alertCode: 'HA',
+              alertType: 'H',
+              expired: false,
+            },
+          ],
         },
       ],
     }
 
-    const prisonApiCells = [cell]
-    const whereaboutsApiCells = [{ ...cell, id: 2 }]
+    const prisonApiCells: CellLocation[] = [cell]
+    const whereaboutsApiCells: CellLocation[] = [{ ...cell, id: '01909bc6-c0f6-75b2-af0f-ffb935211faf' }]
 
     it('calls Prison API when searching for ALL', async () => {
-      prisonApiClient.getCellsWithCapacity.mockResolvedValue(prisonApiCells)
+      locationsInsidePrisonApiClient.getCellsWithCapacity.mockResolvedValue(prisonApiCells)
 
       const result = await prisonerCellAllocationService.getCellsWithCapacity(token, 'LEI', 'ALL')
 
-      expect(prisonApiClient.getCellsWithCapacity).toHaveBeenCalledWith(token, 'LEI')
-      expect(result[0].id).toEqual(1)
+      expect(locationsInsidePrisonApiClient.getCellsWithCapacity).toHaveBeenCalledWith(token, 'LEI')
+      expect(result[0].id).toEqual(prisonApiCells[0].id)
     })
 
     it('calls Whereabouts API when not searching for ALL', async () => {
-      whereaboutsApiClient.getCellsWithCapacity.mockResolvedValue(whereaboutsApiCells)
+      locationsInsidePrisonApiClient.getCellsWithCapacity.mockResolvedValue(whereaboutsApiCells)
 
       const result = await prisonerCellAllocationService.getCellsWithCapacity(token, 'LEI', 'location', 'subLocation')
 
-      expect(whereaboutsApiClient.getCellsWithCapacity).toHaveBeenCalledWith(token, 'LEI', 'location_subLocation')
-      expect(result[0].id).toEqual(2)
+      expect(locationsInsidePrisonApiClient.getCellsWithCapacity).toHaveBeenCalledWith(
+        token,
+        'LEI',
+        'location_subLocation',
+      )
+      expect(result[0].id).toEqual(whereaboutsApiCells[0].id)
     })
 
     it('Propagates error', async () => {
-      prisonApiClient.getCellsWithCapacity.mockRejectedValue(new Error('some error'))
+      locationsInsidePrisonApiClient.getCellsWithCapacity.mockRejectedValue(new Error('some error'))
 
       await expect(prisonerCellAllocationService.getCellsWithCapacity(token, 'LEI', 'ALL')).rejects.toEqual(
         new Error('some error'),

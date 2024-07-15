@@ -5,6 +5,8 @@ import considerRisksPage from '../pages/receptionConsiderRisksPage'
 const offenderFullDetails = require('../mockApis/responses/offenderFullDetails.json')
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const offenderBasicDetails = require('../mockApis/responses/offenderBasicDetails.json')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const prisonerFullDetails = require('../mockApis/responses/prisonerFullDetails.json')
 
 const offenderNo = 'G3878UK'
 
@@ -93,6 +95,7 @@ before(() => {
       },
     ],
   })
+  cy.task('stubGetPrisoner', prisonerFullDetails)
   cy.task('stubOffenderBasicDetails', offenderBasicDetails)
   cy.task('stubReceptionWithCapacity', {
     agencyId: 'MDI',
@@ -218,20 +221,19 @@ before(() => {
       subCodes: [],
     },
   ])
-  cy.task('stubOffenderNonAssociationsLegacy', {
-    agencyDescription: 'HMP Moorland',
-    offenderNo: 'G3878UK',
+  cy.task('stubGetPrisonerNonAssociations', {
+    prisonName: 'HMP Moorland',
+    prisonId: 'MDI',
+    prisonerNumber: 'G3878UK',
     nonAssociations: [
       {
-        effectiveDate: moment(),
-        expiryDate: moment().add(2, 'days'),
-        offenderNonAssociation: {
-          agencyDescription: 'HMP Moorland',
-          assignedLivingUnitDescription: 'HMP Moorland',
-          offenderNo: 'G3878UK',
+        whenCreated: moment(),
+        otherPrisonerDetails: {
+          prisonName: 'HMP Moorland',
+          prisonerNumber: 'G0873UU',
           firstName: 'UIENCOT',
           lastName: 'BLANCYANA',
-          agencyId: 'MDI',
+          prisonId: 'MDI',
         },
       },
     ],

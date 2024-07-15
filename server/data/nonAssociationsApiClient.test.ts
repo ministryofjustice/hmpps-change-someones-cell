@@ -21,16 +21,18 @@ describe('nonAssociationsApiClient', () => {
     nock.cleanAll()
   })
 
-  describe('getNonAssociationsLegacy', () => {
+  describe('getNonAssociations', () => {
     it('should return data from api', async () => {
       const response = { data: 'data' }
-
+      const prisonerNumber = 'A1234'
       fakeNonAssociationsApiClient
-        .get('/legacy/api/offenders/A1234/non-association-details')
+        .get(
+          `/prisoner/${prisonerNumber}/non-associations?includeOpen=true&includeClosed=false&includeOtherPrisons=false&sortBy=WHEN_UPDATED&sortDirection=DESC`,
+        )
         .matchHeader('authorization', `Bearer ${accessToken}`)
         .reply(200, response)
 
-      const output = await nonAssociationsApiClient.getNonAssociationsLegacy(accessToken, 'A1234')
+      const output = await nonAssociationsApiClient.getNonAssociations(accessToken, prisonerNumber)
       expect(output).toEqual(response)
     })
   })

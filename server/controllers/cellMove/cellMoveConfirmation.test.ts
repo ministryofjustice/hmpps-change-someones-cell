@@ -7,8 +7,8 @@ jest.mock('../../services/locationService')
 jest.mock('../../services/prisonerDetailsService')
 
 describe('Cell move confirmation', () => {
-  const locationService = jest.mocked(new LocationService(undefined, undefined, undefined))
-  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined))
+  const locationService = jest.mocked(new LocationService(undefined, undefined))
+  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
 
   let controller
   const req = { params: { offenderNo: 'A12345' }, query: { cellId: 'MDI-A-1-1' }, originalUrl: 'http://localhost' }

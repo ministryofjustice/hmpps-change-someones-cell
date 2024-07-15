@@ -1,8 +1,7 @@
 import jwt from 'jsonwebtoken'
-import { stubUserMe, stubUser } from './users'
-import { stubFor, getMatchingRequests } from './wiremock'
+import { stubUser, stubUserMe } from './users'
+import { getMatchingRequests, stubFor } from './wiremock'
 import { stubStaffRoles, stubUserLocations } from './prisonApi'
-import { stubLocationConfig } from './whereabouts'
 
 const createToken = roles => {
   const payload = {
@@ -14,8 +13,7 @@ const createToken = roles => {
     client_id: 'dev',
   }
 
-  const token = jwt.sign(payload, 'secret', { expiresIn: '1h' })
-  return token
+  return jwt.sign(payload, 'secret', { expiresIn: '1h' })
 }
 
 const getSignInUrl = () =>
@@ -138,7 +136,6 @@ export default {
       stubUser(username, caseloadId),
       stubUserLocations(),
       stubStaffRoles(),
-      stubLocationConfig({ agencyId: caseloadId, response: { enabled: false } }),
     ]),
   stubSignInCourt: () =>
     Promise.all([

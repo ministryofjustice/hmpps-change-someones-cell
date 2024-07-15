@@ -1,4 +1,4 @@
-import { PrisonApiClient, WhereaboutsApiClient, LocationsInsidePrisonApiClient } from '../data'
+import { PrisonApiClient, LocationsInsidePrisonApiClient } from '../data'
 import { Agency } from '../data/prisonApiClient'
 import { LocationGroup, LocationPrefix } from '../data/whereaboutsApiClient'
 import { Location } from '../data/locationsInsidePrisonApiClient'
@@ -10,7 +10,6 @@ jest.mock('../data/whereaboutsApiClient')
 jest.mock('../data/locationsInsidePrisonApiClient')
 
 const prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
-const whereaboutsApiClient = new WhereaboutsApiClient() as jest.Mocked<WhereaboutsApiClient>
 const locationsInsidePrisonApiClient =
   new LocationsInsidePrisonApiClient() as jest.Mocked<LocationsInsidePrisonApiClient>
 
@@ -22,7 +21,7 @@ describe('Location service', () => {
   beforeEach(() => {
     jest.resetAllMocks()
 
-    locationService = new LocationService(prisonApiClient, whereaboutsApiClient, locationsInsidePrisonApiClient)
+    locationService = new LocationService(prisonApiClient, locationsInsidePrisonApiClient)
   })
 
   describe('searchGroups', () => {
