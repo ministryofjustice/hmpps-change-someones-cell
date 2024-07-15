@@ -73,9 +73,8 @@ export default ({
           offenderNo,
         )
         nonAssociationsWithinLocation =
-          currentOffenderNonAssociations?.nonAssociations?.filter(
-            nonAssociation =>
-              nonAssociation.offenderNonAssociation.assignedLivingUnitDescription?.includes(locationPrefix),
+          currentOffenderNonAssociations?.nonAssociations?.filter(nonAssociation =>
+            nonAssociation.offenderNonAssociation.assignedLivingUnitDescription?.includes(locationPrefix),
           ) || []
       }
       const currentOffenderWithOccupants = [currentOffenderDetails, ...currentOccupantsDetails]
