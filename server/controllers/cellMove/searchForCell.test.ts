@@ -1,4 +1,3 @@
-import moment from 'moment'
 import searchForCell from './searchForCell'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import LocationService from '../../services/locationService'
