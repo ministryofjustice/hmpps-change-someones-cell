@@ -4,6 +4,8 @@ import receptionConfirmMovePage from '../pages/receptionConfirmMovePage'
 const offenderFullDetails = require('../mockApis/responses/offenderFullDetails.json')
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const offenderBasicDetails = require('../mockApis/responses/offenderBasicDetails.json')
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const prisonerFullDetails = require('../mockApis/responses/prisonerFullDetails.json')
 
 const offenderNo = 'G3878UK'
 
@@ -71,6 +73,7 @@ before(() => {
     ],
   })
   cy.task('stubOffenderBasicDetails', offenderBasicDetails)
+  cy.task('stubGetPrisoner', prisonerFullDetails)
   cy.task('stubReceptionWithCapacity', {
     agencyId: 'MDI',
     reception: [

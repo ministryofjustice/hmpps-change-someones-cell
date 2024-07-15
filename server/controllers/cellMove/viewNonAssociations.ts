@@ -16,38 +16,29 @@ export default ({ prisonerDetailsService, nonAssociationsService }: Params) =>
     const { systemClientToken } = res.locals
 
     try {
-      const { firstName, lastName } = await prisonerDetailsService.getDetails(systemClientToken, offenderNo)
+      const { firstName, lastName } = await prisonerDetailsService.getPrisoner(systemClientToken, offenderNo)
       const nonAssociations = await nonAssociationsService.getNonAssociations(systemClientToken, offenderNo)
 
-      // Only show active non-associations in the same establishment
-      // Active means the effective date is not in the future and the expiry date is not in the past
-      const sortedNonAssociationsInEstablishment = (
-        await getNonAssociationsInEstablishment(nonAssociations, systemClientToken, prisonerDetailsService)
-      ).sort((left, right) => {
-        if (left.effectiveDate < right.effectiveDate) return 1
-        if (right.effectiveDate < left.effectiveDate) return -1
-        if (left.offenderNonAssociation.lastName > right.offenderNonAssociation.lastName) return 1
-        if (right.offenderNonAssociation.lastName > left.offenderNonAssociation.lastName) return -1
-        return 0
-      })
+      const sortedNonAssociationsInEstablishment = getNonAssociationsInEstablishment(nonAssociations)
 
       const nonAssociationsRows = sortedNonAssociationsInEstablishment?.map(nonAssociation => ({
         name: putLastNameFirst(
-          nonAssociation.offenderNonAssociation.firstName,
-          nonAssociation.offenderNonAssociation.lastName,
+          nonAssociation.otherPrisonerDetails.firstName,
+          nonAssociation.otherPrisonerDetails.lastName,
         ),
-        prisonNumber: nonAssociation.offenderNonAssociation.offenderNo,
-        location: nonAssociation.offenderNonAssociation.assignedLivingUnitDescription,
-        type: nonAssociation.typeDescription,
+        prisonNumber: nonAssociation.otherPrisonerDetails.prisonerNumber,
+        location: nonAssociation.otherPrisonerDetails.cellLocation,
+        reason: nonAssociation.reasonDescription,
+        type: nonAssociation.restrictionTypeDescription,
         selectedOffenderKey: `${formatName(firstName, lastName)} is`,
-        selectedOffenderRole: nonAssociation.reasonDescription,
+        selectedOffenderRole: nonAssociation.roleDescription,
         otherOffenderKey: `${formatName(
-          nonAssociation.offenderNonAssociation.firstName,
-          nonAssociation.offenderNonAssociation.lastName,
+          nonAssociation.otherPrisonerDetails.firstName,
+          nonAssociation.otherPrisonerDetails.lastName,
         )} is`,
-        otherOffenderRole: nonAssociation.offenderNonAssociation.reasonDescription,
-        comment: nonAssociation.comments || 'None entered',
-        effectiveDate: moment(nonAssociation.effectiveDate).format('D MMMM YYYY'),
+        otherOffenderRole: nonAssociation.otherPrisonerDetails.roleDescription,
+        comment: nonAssociation.comment || 'None entered',
+        effectiveDate: moment(nonAssociation.whenCreated).format('D MMMM YYYY'),
       }))
 
       return res.render('cellMove/nonAssociations.njk', {

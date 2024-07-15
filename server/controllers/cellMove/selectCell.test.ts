@@ -3,8 +3,11 @@ import LocationService from '../../services/locationService'
 import NonAssociationsService from '../../services/nonAssociationsService'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
-import { Alert, Offender } from '../../data/prisonApiClient'
+import { Alert } from '../../data/prisonApiClient'
 import { LocationGroup } from '../../data/whereaboutsApiClient'
+import { Prisoner } from '../../data/prisonerSearchApiClient'
+import { PrisonerNonAssociation } from '../../data/nonAssociationsApiClient'
+import { CellLocation } from '../../data/locationsInsidePrisonApiClient'
 
 jest.mock('../../services/locationService')
 jest.mock('../../services/nonAssociationsService')
@@ -16,30 +19,32 @@ const someBookingId = -10
 const someAgency = 'LEI'
 
 describe('Select a cell', () => {
-  const locationService = jest.mocked(new LocationService(undefined, undefined, undefined))
+  const locationService = jest.mocked(new LocationService(undefined, undefined))
   const nonAssociationsService = jest.mocked(new NonAssociationsService(undefined))
-  const prisonerCellAllocationService = jest.mocked(
-    new PrisonerCellAllocationService(undefined, undefined, undefined, undefined),
-  )
-  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined))
+  const prisonerCellAllocationService = jest.mocked(new PrisonerCellAllocationService(undefined, undefined, undefined))
+  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
 
   let controller
   let req
   let res
 
-  const offender: Offender = {
+  const offender: Prisoner = {
     bookingId: 1,
-    offenderNo: 'A1234BC',
+    prisonerNumber: 'A1234BC',
     firstName: 'JOHN',
     lastName: 'SMITH',
-    dateOfBirth: '1990-10-12',
-    age: 29,
-    agencyId: 'MDI',
-    assignedLivingUnitId: 1,
-    assignedLivingUnitDesc: 'UNIT-1',
-    categoryCode: 'C',
-    alertsDetails: ['PEEP', 'DCC', 'HA', 'HA1'],
-    alertsCodes: ['PEEP', 'DCC', 'HA', 'HA1'],
+    prisonId: 'MDI',
+    prisonName: 'Moorlands',
+    gender: 'Male',
+    cellLocation: 'UNIT-1',
+    category: 'C',
+    csra: 'High',
+    alerts: [
+      { alertType: 'TEST', alertCode: 'PEEP', active: true, expired: false },
+      { alertType: 'TEST', alertCode: 'DCC', active: true, expired: false },
+      { alertType: 'TEST', alertCode: 'HA', active: true, expired: false },
+      { alertType: 'TEST', alertCode: 'HA1', active: true, expired: false },
+    ],
   }
 
   const alert: Alert = {
@@ -74,20 +79,15 @@ describe('Select a cell', () => {
   })
 
   beforeEach(() => {
-    prisonerDetailsService.getDetails = jest.fn().mockImplementation((_, offenderNo) =>
+    prisonerDetailsService.getPrisoner = jest.fn().mockImplementation((_, prisonerNumber) =>
       Promise.resolve({
         firstName: 'John',
         lastName: 'Doe',
-        offenderNo,
+        prisonerNumber,
         bookingId: someBookingId,
-        agencyId: someAgency,
-        assignedLivingUnit: {
-          agencyId: someAgency,
-          locationId: 12345,
-          description: '1-2-012',
-          agencyName: 'ye olde prisone',
-        },
-        csraClassificationCode: 'HI',
+        prisonId: someAgency,
+        prisonName: 'ye olde prisone',
+        csra: 'High',
         alerts: [
           { ...alert, expired: false, alertCode: 'PEEP' },
           { ...alert, expired: true, alertCode: 'DCC' },
@@ -95,12 +95,8 @@ describe('Select a cell', () => {
           { ...alert, expired: false, alertCode: 'HA1' },
         ],
         dateOfBirth: '1990-10-12',
-        age: 29,
-        assignedLivingUnitId: 5432,
-        assignedLivingUnitDesc: '1-1-001',
-        categoryCode: 'C',
-        alertsDetails: ['PEEP', 'DCC', 'HA', 'HA1'],
-        alertsCodes: ['PEEP', 'DCC', 'HA', 'HA1'],
+        cellLocation: '1-1-001',
+        category: 'C',
       }),
     )
 
@@ -113,7 +109,6 @@ describe('Select a cell', () => {
     ]
 
     prisonerCellAllocationService.getCellsWithCapacity = jest.fn().mockResolvedValue([])
-    prisonerCellAllocationService.getPrisonersAtLocations = jest.fn().mockResolvedValue([])
 
     locationService.searchGroups = jest.fn().mockResolvedValue(locationGroups)
 
@@ -153,7 +148,7 @@ describe('Select a cell', () => {
     it('should make the correct api calls to display default data', async () => {
       await controller(req, res)
 
-      expect(prisonerDetailsService.getDetails).toHaveBeenCalledWith(systemClientToken, someOffenderNumber, true)
+      expect(prisonerDetailsService.getPrisoner).toHaveBeenCalledWith(systemClientToken, someOffenderNumber)
       expect(nonAssociationsService.getNonAssociations).toHaveBeenCalledWith(systemClientToken, someOffenderNumber)
       expect(locationService.searchGroups).toHaveBeenCalledWith(systemClientToken, someAgency)
     })
@@ -252,8 +247,6 @@ describe('Select a cell', () => {
           prisonerName: 'John Doe',
           offenderNo: 'A12345',
           prisonerDetails: expect.objectContaining({
-            age: 29,
-            agencyId: 'LEI',
             alerts: [
               expect.objectContaining({ alertCode: 'PEEP', expired: false }),
               expect.objectContaining({ alertCode: 'DCC', expired: true }),
@@ -263,13 +256,10 @@ describe('Select a cell', () => {
             bookingId: -10,
             firstName: 'John',
             lastName: 'Doe',
-            offenderNo: 'A12345',
-            assignedLivingUnit: {
-              agencyId: someAgency,
-              locationId: 12345,
-              description: '1-2-012',
-              agencyName: 'ye olde prisone',
-            },
+            prisonerNumber: 'A12345',
+            prisonId: 'LEI',
+            cellLocation: '1-1-001',
+            prisonName: 'ye olde prisone',
           }),
         }),
       )
@@ -359,16 +349,28 @@ describe('Select a cell', () => {
       }
       prisonerCellAllocationService.getCellsWithCapacity.mockResolvedValue([
         {
-          id: 1,
-          description: 'MDI-1',
+          id: 'aaaa-bbbb-cccc-dddd',
+          key: 'MDI-1',
+          pathHierarchy: '1',
           noOfOccupants: 0,
-          capacity: 2,
-          attributes: [],
+          maxCapacity: 2,
+          prisonId: 'MDI',
+          workingCapacity: 1,
+          legacyAttributes: [
+            {
+              typeCode: 'LC',
+              typeDescription: 'Listener Cell',
+            },
+          ],
+          specialistCellTypes: [
+            {
+              typeCode: 'CAT_A',
+              typeDescription: 'Category A Cell',
+            },
+          ],
         },
       ])
       await controller(req, res)
-
-      expect(prisonerCellAllocationService.getPrisonersAtLocations).not.toHaveBeenCalled()
     })
 
     it('should not make a call to retrieve prisoners to get multi capacity cells if there are only single capacity cells at that location', async () => {
@@ -379,16 +381,28 @@ describe('Select a cell', () => {
       }
       prisonerCellAllocationService.getCellsWithCapacity.mockResolvedValue([
         {
-          id: 1,
-          description: 'MDI-1',
+          id: 'aaaa-bbbb-cccc-dddd',
+          key: 'MDI-1',
+          pathHierarchy: '1',
           noOfOccupants: 0,
-          capacity: 1,
-          attributes: [],
+          maxCapacity: 2,
+          prisonId: 'MDI',
+          workingCapacity: 1,
+          legacyAttributes: [
+            {
+              typeCode: 'LC',
+              typeDescription: 'Listener Cell',
+            },
+          ],
+          specialistCellTypes: [
+            {
+              typeCode: 'CAT_A',
+              typeDescription: 'Category A Cell',
+            },
+          ],
         },
       ])
       await controller(req, res)
-
-      expect(prisonerCellAllocationService.getPrisonersAtLocations).not.toHaveBeenCalled()
     })
 
     it('should make a call to retrieve prisoners at location', async () => {
@@ -399,16 +413,28 @@ describe('Select a cell', () => {
       }
       prisonerCellAllocationService.getCellsWithCapacity.mockResolvedValue([
         {
-          id: 1,
-          description: 'MDI-1',
+          id: 'aaaa-bbbb-cccc-dddd',
+          key: 'MDI-1',
+          pathHierarchy: '1',
           noOfOccupants: 0,
-          capacity: 2,
-          attributes: [],
+          maxCapacity: 2,
+          prisonId: 'MDI',
+          workingCapacity: 1,
+          legacyAttributes: [
+            {
+              typeCode: 'LC',
+              typeDescription: 'Listener Cell',
+            },
+          ],
+          specialistCellTypes: [
+            {
+              typeCode: 'CAT_A',
+              typeDescription: 'Category A Cell',
+            },
+          ],
         },
       ])
       await controller(req, res)
-
-      expect(prisonerCellAllocationService.getPrisonersAtLocations).toHaveBeenCalled()
     })
   })
 
@@ -416,23 +442,31 @@ describe('Select a cell', () => {
     beforeEach(() => {
       prisonerCellAllocationService.getCellsWithCapacity = jest.fn().mockResolvedValue([
         {
-          id: 1,
-          description: 'MDI-1-1',
-          capacity: 1,
+          id: 'aaaa',
+          key: 'MDI-1-1',
+          maxCapacity: 1,
           noOfOccupants: 0,
-          attributes: [
-            { description: 'Single occupancy', code: 'SO' },
-            { description: 'Listener Cell', code: 'LC' },
+          legacyAttributes: [
+            { typeDescription: 'Single occupancy', typeCode: 'SO' },
+            { typeDescription: 'Listener Cell', typeCode: 'LC' },
+          ],
+          specialistCellTypes: [
+            { typeDescription: 'Single occupancy', typeCode: 'SO' },
+            { typeDescription: 'Listener Cell', typeCode: 'LC' },
           ],
         },
         {
-          id: 2,
-          description: 'MDI-1-2',
-          capacity: 2,
+          id: 'bbbb',
+          key: 'MDI-1-2',
+          maxCapacity: 2,
           noOfOccupants: 0,
-          attributes: [
-            { description: 'Special Cell', code: 'SPC' },
-            { description: 'Gated Cell', code: 'GC' },
+          legacyAttributes: [
+            { typeDescription: 'Special Cell', typeCode: 'SPC' },
+            { typeDescription: 'Gated Cell', typeCode: 'GC' },
+          ],
+          specialistCellTypes: [
+            { typeDescription: 'Special Cell', typeCode: 'SPC' },
+            { typeDescription: 'Gated Cell', typeCode: 'GC' },
           ],
         },
       ])
@@ -449,20 +483,20 @@ describe('Select a cell', () => {
           expect.objectContaining({
             cells: [
               {
-                attributes: [
-                  { code: 'LC', description: 'Listener Cell' },
-                  { code: 'SO', description: 'Single occupancy' },
+                key: 'MDI-1-1',
+                type: [
+                  {
+                    typeCode: 'SO',
+                    typeDescription: 'Single occupancy',
+                  },
+                  {
+                    typeCode: 'LC',
+                    typeDescription: 'Listener Cell',
+                  },
                 ],
-                capacity: 1,
-                description: 'MDI-1-1',
-                id: 1,
-                noOfOccupants: 0,
+                maxCapacity: 1,
                 occupants: [],
                 spaces: 1,
-                type: [
-                  { code: 'LC', description: 'Listener Cell' },
-                  { code: 'SO', description: 'Single occupancy' },
-                ],
               },
             ],
           }),
@@ -481,19 +515,13 @@ describe('Select a cell', () => {
           expect.objectContaining({
             cells: [
               {
-                attributes: [
-                  { code: 'GC', description: 'Gated Cell' },
-                  { code: 'SPC', description: 'Special Cell' },
-                ],
-                capacity: 2,
-                description: 'MDI-1-2',
-                id: 2,
-                noOfOccupants: 0,
+                key: 'MDI-1-2',
+                maxCapacity: 2,
                 occupants: [],
                 spaces: 2,
                 type: [
-                  { code: 'GC', description: 'Gated Cell' },
-                  { code: 'SPC', description: 'Special Cell' },
+                  { typeCode: 'SPC', typeDescription: 'Special Cell' },
+                  { typeCode: 'GC', typeDescription: 'Gated Cell' },
                 ],
               },
             ],
@@ -505,100 +533,123 @@ describe('Select a cell', () => {
 
   describe('Cell view model data', () => {
     beforeEach(() => {
-      prisonerCellAllocationService.getPrisonersAtLocations = jest.fn().mockResolvedValue([
-        { firstName: 'bob', lastName: 'doe', offenderNo: 'A11111' },
-        { firstName: 'dave', lastName: 'doe1', offenderNo: 'A22222' },
-      ])
-
       prisonerCellAllocationService.getCellsWithCapacity = jest.fn().mockResolvedValue([
         {
-          id: 1,
-          description: 'LEI-1-1-3',
-          capacity: 4,
+          id: 'ffff',
+          key: 'LEI-1-1-3',
+          pathHierarchy: '1-1-3',
+          prisonId: 'MDI',
+          workingCapacity: 4,
+          maxCapacity: 4,
           noOfOccupants: 1,
-          attributes: [
-            { description: 'Single occupancy', code: 'SO' },
-            { description: 'Listener Cell', code: 'LC' },
+          legacyAttributes: [
+            { typeDescription: 'Single occupancy', typeCode: 'SO' },
+            { typeDescription: 'Listener Cell', typeCode: 'LC' },
+          ],
+          specialistCellTypes: [
+            { typeDescription: 'Single occupancy', typeCode: 'SO' },
+            { typeDescription: 'Listener Cell', typeCode: 'LC' },
           ],
         },
         {
-          id: 2,
-          description: 'LEI-1-1-2',
-          capacity: 5,
+          id: 'gggg',
+          key: 'LEI-1-1-2',
+          pathHierarchy: '1-1-2',
+          maxCapacity: 5,
           noOfOccupants: 1,
-          attributes: [
-            { description: 'Special Cell', code: 'SPC' },
-            { description: 'Gated Cell', code: 'GC' },
+          prisonId: 'MDI',
+          workingCapacity: 5,
+          legacyAttributes: [
+            { typeDescription: 'Special Cell', typeCode: 'SPC' },
+            { typeDescription: 'Gated Cell', typeCode: 'GC' },
+          ],
+          specialistCellTypes: [
+            { typeDescription: 'Special Cell', typeCode: 'SPC' },
+            { typeDescription: 'Gated Cell', typeCode: 'GC' },
           ],
         },
         {
-          id: 3,
-          description: 'LEI-1-1-1',
-          capacity: 3,
+          id: 'kkkk',
+          key: 'LEI-1-1-1',
+          maxCapacity: 3,
           noOfOccupants: 1,
-          attributes: [{ description: 'Wheelchair Access', code: 'WA' }],
+          prisonId: 'MDI',
+          pathHierarchy: '1-1-1',
+          workingCapacity: 3,
+          legacyAttributes: [{ typeDescription: 'Wheelchair Access', typeCode: 'WA' }],
+          specialistCellTypes: [{ typeDescription: 'Wheelchair Access', typeCode: 'WA' }],
         },
-      ])
+      ] as CellLocation[])
     })
 
     it('should make the relevant calls to gather cell occupant data', async () => {
       await controller(req, res)
-
-      expect(prisonerCellAllocationService.getPrisonersAtLocations).toHaveBeenCalledWith(systemClientToken, 'LEI', [
-        '1-1-3',
-        '1-1-2',
-        '1-1-1',
-      ])
     })
 
     it('should return the correctly formatted cell details', async () => {
-      prisonerCellAllocationService.getPrisonersAtLocations = jest.fn().mockResolvedValue(
+      prisonerCellAllocationService.getCellsWithCapacity = jest.fn().mockResolvedValue(
         Promise.resolve([
           {
-            ...offender,
-            firstName: 'bob1',
-            lastName: 'doe1',
-            prisonerNumber: 'A111111',
-            cellLocation: '1-1-3',
-            alerts: [
+            key: 'MDI-1-1-3',
+            pathHierarchy: '1-1-3',
+            prisonId: 'MDI',
+            noOfOccupants: 1,
+            maxCapacity: 2,
+            legacyAttributes: [{ typeDescription: 'Wheelchair Access', typeCode: 'WA' }],
+            specialistCellTypes: [{ typeDescription: 'Wheelchair Access', typeCode: 'WA' }],
+            prisonersInCell: [
               {
-                ...alert,
-                alertCode: 'URS',
-                alertCodeDescription: 'Refusing to shield',
+                ...offender,
+                firstName: 'bob1',
+                lastName: 'doe1',
+                prisonId: 'MDI',
+                prisonerNumber: 'A111111',
+                cellLocation: '1-1-3',
+                csra: 'Standard',
               },
             ],
-            csra: 'Standard',
           },
           {
-            ...offender,
-            firstName: 'bob2',
-            lastName: 'doe2',
-            prisonerNumber: 'A222222',
-            cellLocation: '1-1-2',
-            alerts: [
+            key: 'MDI-1-1-2',
+            pathHierarchy: '1-1-2',
+            prisonId: 'MDI',
+            noOfOccupants: 1,
+            maxCapacity: 2,
+            legacyAttributes: [{ typeDescription: 'Wheelchair Access', typeCode: 'WA' }],
+            specialistCellTypes: [{ typeDescription: 'Wheelchair Access', typeCode: 'WA' }],
+            prisonersInCell: [
               {
-                ...alert,
-                alertCode: 'XEL',
-                alertCodeDescription: 'E-list',
+                ...offender,
+                firstName: 'bob2',
+                lastName: 'doe2',
+                prisonerNumber: 'A222222',
+                cellLocation: '1-1-2',
+                csra: 'High',
+                prisonId: 'MDI',
               },
             ],
-            csra: 'High',
           },
           {
-            ...offender,
-            firstName: 'bob3',
-            lastName: 'doe3',
-            prisonerNumber: 'A333333',
-            cellLocation: '1-1-1',
-            alerts: [
+            key: 'MDI-1-1-1',
+            pathHierarchy: '1-1-1',
+            prisonId: 'MDI',
+            noOfOccupants: 1,
+            maxCapacity: 2,
+            legacyAttributes: [{ typeDescription: 'Wheelchair Access', typeCode: 'WA' }],
+            specialistCellTypes: [{ typeDescription: 'Wheelchair Access', typeCode: 'WA' }],
+            prisonersInCell: [
               {
-                ...alert,
-                alertCode: 'PEEP',
-                alertCodeDescription: 'PEEP',
+                ...offender,
+                firstName: 'bob3',
+                lastName: 'doe3',
+                prisonerNumber: 'A333333',
+                cellLocation: '1-1-1',
+                csra: 'High',
+                prisonId: 'MDI',
               },
             ],
           },
-        ]),
+        ] as CellLocation[]),
       )
 
       await controller(req, res)
@@ -608,101 +659,116 @@ describe('Select a cell', () => {
         expect.objectContaining({
           cells: [
             {
-              attributes: [{ code: 'WA', description: 'Wheelchair Access' }],
-              capacity: 3,
-              description: 'LEI-1-1-1',
-              id: 3,
-              noOfOccupants: 1,
+              key: 'MDI-1-1-3',
+              maxCapacity: 2,
               occupants: [
                 {
                   alerts: [
+                    {
+                      alertCodes: ['HA'],
+                      classes: 'alert-status alert-status--self-harm',
+                      label: 'ACCT open',
+                    },
+                    {
+                      alertCodes: ['HA1'],
+                      classes: 'alert-status alert-status--self-harm',
+                      label: 'ACCT post closure',
+                    },
                     {
                       alertCodes: ['PEEP'],
                       classes: 'alert-status alert-status--medical',
                       label: 'PEEP',
                     },
                   ],
-                  nonAssociation: false,
-                  cellId: 3,
-                  csra: 'Not entered',
-                  csraDetailsUrl: '/prisoner/A333333/cell-move/cell-sharing-risk-assessment-details',
-                  name: 'Doe3, Bob3',
-                  viewOffenderDetails: '/prisoner/A333333/cell-move/prisoner-details',
-                },
-              ],
-              spaces: 2,
-              type: [{ code: 'WA', description: 'Wheelchair Access' }],
-            },
-            {
-              attributes: [
-                { code: 'GC', description: 'Gated Cell' },
-                {
-                  code: 'SPC',
-                  description: 'Special Cell',
-                },
-              ],
-              capacity: 5,
-              description: 'LEI-1-1-2',
-              id: 2,
-              noOfOccupants: 1,
-              occupants: [
-                {
-                  alerts: [
-                    {
-                      alertCodes: ['XEL'],
-                      classes: 'alert-status alert-status--elist',
-                      label: 'E-list',
-                    },
-                  ],
-                  nonAssociation: false,
-                  cellId: 2,
-                  csra: 'High',
-                  csraDetailsUrl: '/prisoner/A222222/cell-move/cell-sharing-risk-assessment-details',
-                  name: 'Doe2, Bob2',
-                  viewOffenderDetails: '/prisoner/A222222/cell-move/prisoner-details',
-                },
-              ],
-              spaces: 4,
-              type: [
-                { code: 'GC', description: 'Gated Cell' },
-                { code: 'SPC', description: 'Special Cell' },
-              ],
-            },
-            {
-              attributes: [
-                { code: 'LC', description: 'Listener Cell' },
-                {
-                  code: 'SO',
-                  description: 'Single occupancy',
-                },
-              ],
-              capacity: 4,
-              description: 'LEI-1-1-3',
-              id: 1,
-              noOfOccupants: 1,
-              occupants: [
-                {
-                  alerts: [
-                    {
-                      alertCodes: ['URS'],
-                      classes: 'alert-status alert-status--refusing-to-shield',
-                      label: 'Refusing to shield',
-                    },
-                  ],
-                  nonAssociation: false,
-                  cellId: 1,
+                  cellId: '1-1-3',
                   csra: 'Standard',
                   csraDetailsUrl: '/prisoner/A111111/cell-move/cell-sharing-risk-assessment-details',
                   name: 'Doe1, Bob1',
+                  nonAssociation: false,
                   viewOffenderDetails: '/prisoner/A111111/cell-move/prisoner-details',
                 },
               ],
-              spaces: 3,
+              spaces: 1,
               type: [
-                { code: 'LC', description: 'Listener Cell' },
                 {
-                  code: 'SO',
-                  description: 'Single occupancy',
+                  typeCode: 'WA',
+                  typeDescription: 'Wheelchair Access',
+                },
+              ],
+            },
+            {
+              key: 'MDI-1-1-2',
+              maxCapacity: 2,
+              occupants: [
+                {
+                  alerts: [
+                    {
+                      alertCodes: ['HA'],
+                      classes: 'alert-status alert-status--self-harm',
+                      label: 'ACCT open',
+                    },
+                    {
+                      alertCodes: ['HA1'],
+                      classes: 'alert-status alert-status--self-harm',
+                      label: 'ACCT post closure',
+                    },
+                    {
+                      alertCodes: ['PEEP'],
+                      classes: 'alert-status alert-status--medical',
+                      label: 'PEEP',
+                    },
+                  ],
+                  cellId: '1-1-2',
+                  csra: 'High',
+                  csraDetailsUrl: '/prisoner/A222222/cell-move/cell-sharing-risk-assessment-details',
+                  name: 'Doe2, Bob2',
+                  nonAssociation: false,
+                  viewOffenderDetails: '/prisoner/A222222/cell-move/prisoner-details',
+                },
+              ],
+              spaces: 1,
+              type: [
+                {
+                  typeCode: 'WA',
+                  typeDescription: 'Wheelchair Access',
+                },
+              ],
+            },
+            {
+              key: 'MDI-1-1-1',
+              maxCapacity: 2,
+              occupants: [
+                {
+                  alerts: [
+                    {
+                      alertCodes: ['HA'],
+                      classes: 'alert-status alert-status--self-harm',
+                      label: 'ACCT open',
+                    },
+                    {
+                      alertCodes: ['HA1'],
+                      classes: 'alert-status alert-status--self-harm',
+                      label: 'ACCT post closure',
+                    },
+                    {
+                      alertCodes: ['PEEP'],
+                      classes: 'alert-status alert-status--medical',
+                      label: 'PEEP',
+                    },
+                  ],
+                  cellId: '1-1-1',
+                  csra: 'High',
+                  csraDetailsUrl: '/prisoner/A333333/cell-move/cell-sharing-risk-assessment-details',
+                  name: 'Doe3, Bob3',
+                  nonAssociation: false,
+                  viewOffenderDetails: '/prisoner/A333333/cell-move/prisoner-details',
+                },
+              ],
+              spaces: 1,
+              type: [
+                {
+                  typeCode: 'WA',
+                  typeDescription: 'Wheelchair Access',
                 },
               ],
             },
@@ -715,31 +781,36 @@ describe('Select a cell', () => {
   describe('Non associations', () => {
     beforeEach(() => {
       nonAssociationsService.getNonAssociations = jest.fn().mockResolvedValue({
-        offenderNo: 'G6123VU',
+        prisonerNumber: offender.prisonerNumber,
         firstName: 'JOHN',
         lastName: 'SAUNDERS',
-        agencyDescription: 'MOORLAND (HMP & YOI)',
-        assignedLivingUnitId: 1,
-        assignedLivingUnitDescription: 'MDI-1-1-015',
+        prisonId: offender.prisonId,
+        prisonName: 'MOORLAND (HMP & YOI)',
+        cellLocation: offender.cellLocation,
+        openCount: 1,
+        closedCount: 0,
         nonAssociations: [
           {
-            reasonCode: 'RIV',
-            reasonDescription: 'Rival Gang',
-            typeCode: 'LAND',
-            typeDescription: 'Do Not Locate on Same Landing',
-            effectiveDate: '2020-06-17T00:00:00',
-            expiryDate: '2020-07-17T00:00:00',
-            authorisedBy: 'string',
-            comments: 'Gang violence',
-            offenderNonAssociation: {
-              offenderNo: 'A111111',
+            id: 1,
+            role: 'VIC',
+            roleDescription: 'Victim',
+            reason: 'GANG',
+            reasonDescription: 'Gangs',
+            restrictionType: 'LAND',
+            restrictionTypeDescription: 'Do Not Locate on Same Landing',
+            whenCreated: 'string',
+            whenUpdated: 'string',
+            updatedBy: 'string',
+            comment: 'Gang violence',
+            otherPrisonerDetails: {
+              prisonerNumber: 'A111111',
               firstName: 'bob1',
               lastName: 'doe1',
-              reasonCode: 'RIV',
-              reasonDescription: 'Rival Gang',
-              agencyDescription: 'MOORLAND (HMP & YOI)',
-              assignedLivingUnitId: 2,
-              assignedLivingUnitDescription: 'MDI-1-3-026',
+              role: 'RIV',
+              roleDescription: 'Rival Gang',
+              prisonId: 'MDI',
+              prisonName: 'MOORLAND (HMP & YOI)',
+              cellLocation: '1-3-026',
             },
           },
         ],
@@ -747,21 +818,23 @@ describe('Select a cell', () => {
 
       prisonerCellAllocationService.getCellsWithCapacity = jest.fn().mockResolvedValue([
         {
-          id: 1,
-          description: 'LEI-1-1-1',
-          capacity: 4,
+          id: 'aaaa',
+          key: 'LEI-1-1-1',
+          maxCapacity: 4,
           noOfOccupants: 1,
-          attributes: [],
-        },
-      ])
-      prisonerCellAllocationService.getPrisonersAtLocations = jest.fn().mockResolvedValue([
-        {
-          ...offender,
-          firstName: 'bob1',
-          lastName: 'doe1',
-          prisonerNumber: 'A111111',
-          cellLocation: '1-1-1',
-          alerts: [],
+          pathHierarchy: '1-1-1',
+          legacyAttributes: [{ typeDescription: 'Wheelchair Access', typeCode: 'WA' }],
+          specialistCellTypes: [{ typeDescription: 'Wheelchair Access', typeCode: 'WA' }],
+          prisonersInCell: [
+            {
+              ...offender,
+              firstName: 'bob1',
+              lastName: 'doe1',
+              prisonerNumber: 'A111111',
+              cellLocation: '1-1-1',
+              alerts: [],
+            },
+          ],
         },
       ])
 
@@ -794,24 +867,26 @@ describe('Select a cell', () => {
         expect.objectContaining({
           cells: [
             {
-              attributes: [],
-              capacity: 4,
-              description: 'LEI-1-1-1',
-              id: 1,
-              noOfOccupants: 1,
+              key: 'LEI-1-1-1',
+              maxCapacity: 4,
               occupants: [
                 {
                   alerts: [],
-                  nonAssociation: true,
-                  cellId: 1,
-                  csra: 'Not entered',
+                  cellId: '1-1-1',
+                  csra: 'High',
                   csraDetailsUrl: '/prisoner/A111111/cell-move/cell-sharing-risk-assessment-details',
                   name: 'Doe1, Bob1',
+                  nonAssociation: true,
                   viewOffenderDetails: '/prisoner/A111111/cell-move/prisoner-details',
                 },
               ],
               spaces: 3,
-              type: false,
+              type: [
+                {
+                  typeCode: 'WA',
+                  typeDescription: 'Wheelchair Access',
+                },
+              ],
             },
           ],
         }),
@@ -821,16 +896,23 @@ describe('Select a cell', () => {
     it('should set show non association value to true when there are res unit level non-associations', async () => {
       prisonerCellAllocationService.getCellsWithCapacity = jest.fn().mockResolvedValue([
         {
-          id: 1,
-          description: 'MDI-1-3',
-          capacity: 4,
+          id: 'aaaa',
+          key: 'MDI-1-3',
+          maxCapacity: 4,
           noOfOccupants: 1,
-          attributes: [
-            { description: 'Single occupancy', code: 'SO' },
-            { description: 'Listener Cell', code: 'LC' },
+          prisonId: 'MDI',
+          workingCapacity: 4,
+          pathHierarchy: '1-3',
+          specialistCellTypes: [
+            { typeDescription: 'Single occupancy', typeCode: 'SO' },
+            { typeDescription: 'Listener Cell', typeCode: 'LC' },
+          ],
+          legacyAttributes: [
+            { typeDescription: 'Single occupancy', typeCode: 'SO' },
+            { typeDescription: 'Listener Cell', typeCode: 'LC' },
           ],
         },
-      ])
+      ] as CellLocation[])
 
       req.query = { location: 'Houseblock 1' }
       await controller(req, res)
@@ -845,34 +927,25 @@ describe('Select a cell', () => {
 
     it('should set show non association value to true when there are non-associations within the establishment', async () => {
       res.locals.user.allCaseloads = [{ caseLoadId: 'MDI' }]
-      prisonerDetailsService.getDetails = jest.fn().mockImplementation((_, offenderNo) =>
+      prisonerDetailsService.getPrisoner = jest.fn().mockImplementation((_, offenderNo) =>
         Promise.resolve({
           firstName: 'John',
           lastName: 'Doe',
-          offenderNo,
+          prisonerNumber: offenderNo,
           bookingId: someBookingId,
-          agencyId: 'MDI',
-          csraClassificationCode: 'HI',
+          prisonId: 'MDI',
+          csra: 'High',
+          gender: 'Male',
           alerts: [
             { ...alert, expired: false, alertCode: 'PEEP' },
             { ...alert, expired: true, alertCode: 'DCC' },
             { ...alert, expired: false, alertCode: 'HA' },
             { ...alert, expired: false, alertCode: 'HA1' },
           ],
-          assignedLivingUnit: {
-            agencyId: 'MDI',
-            locationId: 12345,
-            description: '1-2-012',
-            agencyName: 'ye olde prisone',
-          },
-          dateOfBirth: '1990-10-12',
-          age: 29,
-          assignedLivingUnitId: 5432,
-          assignedLivingUnitDesc: '1-1-001',
-          categoryCode: 'C',
-          alertsDetails: ['PEEP', 'DCC', 'HA', 'HA1'],
-          alertsCodes: ['PEEP', 'DCC', 'HA', 'HA1'],
-        }),
+          cellLocation: '1-2-012',
+          prisonName: 'ye olde prisone',
+          category: 'C',
+        } as Prisoner),
       )
 
       req.query = {}
@@ -888,47 +961,36 @@ describe('Select a cell', () => {
     })
 
     it('should set show non association value to false', async () => {
-      await controller(req, res)
-
-      expect(res.render).toHaveBeenCalledWith(
-        'cellMove/selectCell.njk',
-        expect.objectContaining({
-          showNonAssociationWarning: false,
-        }),
-      )
-    })
-
-    it('should set show non association value to false when non association offender does not have assigned living unit', async () => {
       nonAssociationsService.getNonAssociations = jest.fn().mockResolvedValue({
-        offenderNo: 'G6123VU',
+        prisonerNumber: 'G6123VU',
         firstName: 'JOHN',
         lastName: 'SAUNDERS',
-        agencyDescription: 'MOORLAND (HMP & YOI)',
-        assignedLivingUnitId: 1,
-        assignedLivingUnitDescription: 'MDI-1-1-015',
+        prisonName: 'MOORLAND (HMP & YOI)',
+        cellLocation: '1-1-015',
         nonAssociations: [
           {
-            reasonCode: 'RIV',
-            reasonDescription: 'Rival Gang',
-            typeCode: 'LAND',
-            typeDescription: 'Do Not Locate on Same Landing',
-            effectiveDate: '2020-06-17T00:00:00',
-            expiryDate: '2020-07-17T00:00:00',
-            comments: 'Gang violence',
-            authorisedBy: 'string',
-            offenderNonAssociation: {
-              offenderNo: 'A111111',
+            role: 'VIC',
+            roleDescription: 'Victim',
+            reason: 'GANG',
+            reasonDescription: 'Gangs',
+            restrictionType: 'LAND',
+            restrictionTypeDescription: 'Do Not Locate on Same Landing',
+            whenCreated: 'string',
+            whenUpdated: 'string',
+            updatedBy: 'string',
+            comment: 'Gang violence',
+            otherPrisonerDetails: {
+              prisonerNumber: 'A111111',
               firstName: 'bob1',
               lastName: 'doe1',
-              reasonCode: 'RIV',
-              reasonDescription: 'Rival Gang',
-              agencyDescription: 'OUTSIDE',
-              assignedLivingUnitId: 2,
-              assignedLivingUnitDescription: 'MDI-1-1-026',
+              role: 'PER',
+              roleDescription: 'Perp',
+              cellLocation: '2-1-026',
             },
           },
         ],
-      })
+      } as PrisonerNonAssociation)
+
       await controller(req, res)
 
       expect(res.render).toHaveBeenCalledWith(
@@ -943,24 +1005,22 @@ describe('Select a cell', () => {
   describe('Current location is not a cell', () => {
     it('shows the CSWAP description as the location', async () => {
       res.locals.user.allCaseloads = [{ caseLoadId: 'MDI' }]
-      prisonerDetailsService.getDetails = jest.fn().mockResolvedValue({
+      prisonerDetailsService.getPrisoner = jest.fn().mockResolvedValue({
         firstName: 'John',
         lastName: 'Doe',
-        offenderNo: someOffenderNumber,
+        prisonerNumber: someOffenderNumber,
         bookingId: someBookingId,
-        agencyId: 'MDI',
+        prisonId: 'MDI',
         alerts: [],
-        assignedLivingUnit: {
-          description: 'CSWAP',
-        },
+        cellLocation: 'CSWAP',
       })
       nonAssociationsService.getNonAssociations = jest.fn().mockResolvedValue({
-        offenderNo: someOffenderNumber,
+        prisonerNumber: someOffenderNumber,
         firstName: 'JOHN',
         lastName: 'SAUNDERS',
-        agencyDescription: 'MOORLAND (HMP & YOI)',
-        assignedLivingUnitId: 1,
-        assignedLivingUnitDescription: 'MDI-1-1-015',
+        prisonName: 'MOORLAND (HMP & YOI)',
+        cellLocation: '1-1-015',
+        prisonId: 'MDI',
         nonAssociations: [],
       })
 
@@ -970,12 +1030,13 @@ describe('Select a cell', () => {
         'cellMove/selectCell.njk',
         expect.objectContaining({
           prisonerDetails: {
-            agencyId: 'MDI',
+            prisonId: 'MDI',
             alerts: [],
             bookingId: -10,
             firstName: 'John',
             lastName: 'Doe',
-            offenderNo: 'A12345',
+            prisonerNumber: 'A12345',
+            cellLocation: 'CSWAP',
             assignedLivingUnit: {
               description: 'No cell allocated',
             },

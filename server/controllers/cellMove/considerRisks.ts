@@ -9,9 +9,10 @@ import AnalyticsService from '../../services/analyticsService'
 import LocationService from '../../services/locationService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import NonAssociationsService from '../../services/nonAssociationsService'
+import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
 import logger from '../../../logger'
 import config from '../../config'
-import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
+import { NonAssociation } from '../../data/nonAssociationsApiClient'
 
 const activeCellMoveAlertsExcludingDisabled = alert =>
   !alert.expired && cellMoveAlertCodes.includes(alert.alertCode) && alert.alertCode !== 'PEEP'
@@ -33,7 +34,7 @@ export default ({
   prisonerDetailsService,
   prisonerCellAllocationService,
 }: Params) => {
-  const getOccupantsDetails = async (context, offenders) =>
+  const getOccupantsDetails = async (context, offenders: string[]) =>
     Promise.all(offenders.map(offender => prisonerDetailsService.getDetails(context, offender, true)))
 
   const alertString = alertDescription => `${indefiniteArticle(alertDescription)} ${alertDescription} alert`
@@ -61,11 +62,10 @@ export default ({
       const currentOccupantsDetails =
         occupants && (await getOccupantsDetails(systemClientToken, currentOccupantsOffenderNos))
       const locationDetail = await locationService.getLocation(systemClientToken, cellId)
-      let nonAssociationsWithinLocation = []
+      let nonAssociationsWithinLocation: NonAssociation[] = []
 
       if (locationDetail.parentId) {
-        const [topLevel, firstChild] = cellId.split('-')
-        const locationPrefix = `${topLevel}-${firstChild}`
+        const [, locationPrefix] = cellId.split('-')
         // Get non-associations for the offender and filter them down to ones
         // that are currently in the same residential unit as the selected cell
         const currentOffenderNonAssociations = await nonAssociationsService.getNonAssociations(
@@ -73,9 +73,8 @@ export default ({
           offenderNo,
         )
         nonAssociationsWithinLocation =
-          currentOffenderNonAssociations?.nonAssociations?.filter(
-            nonAssociation =>
-              nonAssociation.offenderNonAssociation.assignedLivingUnitDescription?.includes(locationPrefix),
+          currentOffenderNonAssociations?.nonAssociations?.filter(nonAssociation =>
+            nonAssociation.otherPrisonerDetails.cellLocation.startsWith(locationPrefix),
           ) || []
       }
       const currentOffenderWithOccupants = [currentOffenderDetails, ...currentOccupantsDetails]
@@ -185,16 +184,15 @@ export default ({
         offendersFormattedNamesWithCsra,
         nonAssociations: nonAssociationsWithinLocation.map(nonAssociation => ({
           name: `${putLastNameFirst(
-            nonAssociation.offenderNonAssociation.firstName,
-            nonAssociation.offenderNonAssociation.lastName,
+            nonAssociation.otherPrisonerDetails.firstName,
+            nonAssociation.otherPrisonerDetails.lastName,
           )}`,
-          prisonNumber: nonAssociation.offenderNonAssociation.offenderNo,
+          prisonNumber: nonAssociation.otherPrisonerDetails.prisonerNumber,
           location:
-            nonAssociation.offenderNonAssociation.assignedLivingUnitDescription ||
-            nonAssociation.offenderNonAssociation.agencyDescription,
-          type: nonAssociation.typeDescription,
-          reason: nonAssociation.offenderNonAssociation.reasonDescription,
-          comment: nonAssociation.comments || 'None entered',
+            nonAssociation.otherPrisonerDetails.cellLocation || nonAssociation.otherPrisonerDetails.prisonerNumber,
+          type: nonAssociation.restrictionTypeDescription,
+          reason: nonAssociation.reasonDescription,
+          comment: nonAssociation.comment || 'None entered',
         })),
         currentOffenderActiveAlerts,
         currentOccupantsWithFormattedActiveAlerts,

@@ -96,7 +96,7 @@ context('Cell move history', () => {
         subCodes: [],
       },
     ])
-    cy.task('stubGetPrisoners', [{ offenderNo: 'A12345', firstName: 'BOB', lastName: 'DOE', latestBookingId: 1234 }])
+    cy.task('stubGetPrisoners', [{ prisonerNumber: 'A12345', firstName: 'BOB', lastName: 'DOE', bookingId: 1234 }])
     cy.task('stubStaff', { staffId: 'SA', firstName: 'Pow', lastName: 'Now' })
     cy.task('stubOffenderCellHistory', offenderCellHistory)
   })

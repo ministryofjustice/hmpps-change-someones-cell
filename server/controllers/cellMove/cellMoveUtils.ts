@@ -1,49 +1,15 @@
-import moment from 'moment'
 import { csraTranslations } from '../../shared/csraHelpers'
-import { OffenderNonAssociationLegacy } from '../../data/nonAssociationsApiClient'
-import PrisonerDetailsService from '../../services/prisonerDetailsService'
+import { PrisonerNonAssociation } from '../../data/nonAssociationsApiClient'
 
-export const getNonAssociationsInEstablishment = async (
-  nonAssociations: OffenderNonAssociationLegacy,
-  token: string,
-  prisonerDetailsService: PrisonerDetailsService,
-) => {
+export const getNonAssociationsInEstablishment = (nonAssociations: PrisonerNonAssociation) => {
   const validNonAssociations = nonAssociations?.nonAssociations?.filter(
-    nonAssociation =>
-      nonAssociation.offenderNonAssociation &&
-      (!nonAssociation.expiryDate || moment(nonAssociation.expiryDate, 'YYYY-MM-DDTHH:mm:ss') > moment()) &&
-      nonAssociation.effectiveDate &&
-      moment(nonAssociation.effectiveDate, 'YYYY-MM-DDTHH:mm:ss') <= moment(),
+    nonAssociation => nonAssociation.otherPrisonerDetails,
   )
-
   if (!validNonAssociations) return []
-
-  const offenderNos = validNonAssociations.map(nonAssociation => nonAssociation.offenderNonAssociation.offenderNo)
-  offenderNos.push(nonAssociations.offenderNo)
-
-  const offenders = await Promise.all(
-    offenderNos.map(async offenderNo => prisonerDetailsService.getDetails(token, offenderNo, true)),
-  )
-
-  const offenderMap = offenders.reduce((memo, offender) => ({ ...memo, [offender.offenderNo]: offender }), {})
-
-  validNonAssociations.forEach(nonAssociation => {
-    const livingUnit = offenderMap[nonAssociation.offenderNonAssociation.offenderNo].assignedLivingUnit
-
-    /* eslint-disable no-param-reassign */
-    nonAssociation.offenderNonAssociation.agencyDescription = livingUnit?.agencyName
-    nonAssociation.offenderNonAssociation.assignedLivingUnitDescription = livingUnit?.description
-    /* eslint-enable no-param-reassign */
-  })
-
-  return validNonAssociations.filter(
-    nonAssociation =>
-      offenderMap[nonAssociations.offenderNo].agencyId ===
-      offenderMap[nonAssociation.offenderNonAssociation.offenderNo]?.agencyId,
-  )
+  return validNonAssociations
 }
 
-export const getBackLinkData = (referer, offenderNo) => {
+export const getBackLinkData = (referer: string, offenderNo: string) => {
   const backLink = referer || `/prisoner/${offenderNo}/cell-move/search-for-cell`
   let backLinkText = 'Return to select an available cell'
 
@@ -91,14 +57,4 @@ export const cellAttributes = [
 export const translateCsra = (csraClassificationCode: string): string => {
   if (!csraClassificationCode) return 'not entered'
   return csraTranslations[csraClassificationCode]
-}
-
-export default {
-  getNonAssociationsInEstablishment,
-  getBackLinkData,
-  userHasAccess,
-  renderLocationOptions,
-  getConfirmBackLinkData,
-  cellAttributes,
-  translateCsra,
 }

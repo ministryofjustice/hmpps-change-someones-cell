@@ -6,7 +6,7 @@ import config from '../../config'
 jest.mock('../../services/prisonerDetailsService')
 
 describe('Space created', () => {
-  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined))
+  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
 
   let req
   let res

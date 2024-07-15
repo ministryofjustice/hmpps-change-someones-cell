@@ -159,20 +159,6 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('getCellsWithCapacity', () => {
-    it('should return available cells from api', async () => {
-      const response = { data: 'data' }
-
-      fakePrisonApiClient
-        .get('/api/agencies/BXI/cellsWithCapacity')
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .reply(200, response)
-
-      const output = await prisonApiClient.getCellsWithCapacity(accessToken, 'BXI')
-      expect(output).toEqual(response)
-    })
-  })
-
   describe('getCellMoveReasonTypes', () => {
     it('should return data from api', async () => {
       const response = { data: 'data' }
@@ -255,24 +241,6 @@ describe('prisonApiClient', () => {
         .reply(200, response)
 
       const output = await prisonApiClient.getStaffDetails(accessToken, 'SGAMGEE_GEN')
-      expect(output).toEqual(response)
-    })
-  })
-
-  describe('getPrisoners', () => {
-    it('should search for prisoners', async () => {
-      const response = { data: 'data' }
-      const offenderNos = ['A1234BC', 'B4321CD']
-      const searchCriteria = { offenderNos }
-
-      fakePrisonApiClient
-        .post('/api/prisoners', searchCriteria)
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .matchHeader('Page-Offset', '0')
-        .matchHeader('Page-Limit', '2')
-        .reply(200, response)
-
-      const output = await prisonApiClient.getPrisoners(accessToken, offenderNos)
       expect(output).toEqual(response)
     })
   })

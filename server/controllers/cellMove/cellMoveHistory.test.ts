@@ -11,11 +11,9 @@ jest.mock('../../services/prisonerCellAllocationService')
 jest.mock('../../services/prisonerDetailsService')
 
 describe('Cell move history', () => {
-  const locationService = jest.mocked(new LocationService(undefined, undefined, undefined))
-  const prisonerCellAllocationService = jest.mocked(
-    new PrisonerCellAllocationService(undefined, undefined, undefined, undefined),
-  )
-  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined))
+  const locationService = jest.mocked(new LocationService(undefined, undefined))
+  const prisonerCellAllocationService = jest.mocked(new PrisonerCellAllocationService(undefined, undefined, undefined))
+  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
   const userService = jest.mocked(new UserService(undefined, undefined))
 
   let req
@@ -144,7 +142,7 @@ describe('Cell move history', () => {
     it('should return the offenders name properly formatted, and the offender number', async () => {
       prisonerDetailsService.getPrisoners = jest
         .fn()
-        .mockResolvedValue([{ bookingId: -34, offenderNo: 'A12345', firstName: 'BOB', lastName: 'LAST' }])
+        .mockResolvedValue([{ bookingId: -34, prisonerNumber: 'A12345', firstName: 'BOB', lastName: 'LAST' }])
 
       await controller(req, res)
 
@@ -274,7 +272,7 @@ describe('Cell move history', () => {
     it('should make a call for offender cell history', async () => {
       await controller(req, res)
 
-      expect(prisonerCellAllocationService.getOffenderCellHistory).toHaveBeenCalledWith(systemClientToken, undefined)
+      expect(prisonerCellAllocationService.getOffenderCellHistory).toHaveBeenCalledWith(systemClientToken, -34)
     })
 
     it('should make a call to get prisoner data using client credentials', async () => {

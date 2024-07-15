@@ -37,7 +37,7 @@ const details: OffenderDetails = {
 const systemClientToken = 'system_token'
 
 describe('Reception full', () => {
-  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined))
+  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
 
   beforeEach(() => {
     prisonerDetailsService.getDetails.mockResolvedValue(details)

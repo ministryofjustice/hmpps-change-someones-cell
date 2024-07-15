@@ -1,202 +1,82 @@
 import moment from 'moment'
 import { getNonAssociationsInEstablishment, getBackLinkData } from './cellMoveUtils'
-import PrisonerDetailsService from '../../services/prisonerDetailsService'
-import { OffenderDetails } from '../../data/prisonApiClient'
+import { PrisonerNonAssociation } from '../../data/nonAssociationsApiClient'
 
 jest.mock('../../services/prisonerDetailsService')
 
 describe('Cell move utils', () => {
-  const nonAssociations = {
-    offenderNo: 'ABC123',
+  const nonAssociations: PrisonerNonAssociation = {
+    prisonerNumber: 'ABC123',
     firstName: 'Fred',
     lastName: 'Bloggs',
-    agencyDescription: 'Moorland (HMP & YOI)',
-    assignedLivingUnitDescription: 'MDI-1-1-3',
-    assignedLivingUnitId: 180353,
+    prisonId: 'MDI',
+    prisonName: 'Moorland (HMP & YOI)',
+    cellLocation: 'MDI-1-1-3',
+    openCount: 2,
+    closedCount: 0,
     nonAssociations: [
       {
-        reasonCode: 'VIC',
-        reasonDescription: 'Victim',
-        typeCode: 'WING',
-        typeDescription: 'Do Not Locate on Same Wing',
-        effectiveDate: moment().add(7, 'days').format('YYYY-MM-DDTHH:mm:ss'),
-        expiryDate: null,
-        authorisedBy: 'string',
-        comments: 'Not effective yet',
-        offenderNonAssociation: {
-          offenderNo: 'ABC124',
-          firstName: 'Andy',
-          lastName: 'Adams',
-          reasonCode: 'PER',
-          reasonDescription: 'Perpetrator',
-          agencyDescription: 'Moorland (HMP & YOI)',
-          assignedLivingUnitDescription: 'MDI-2-1-3',
-          assignedLivingUnitId: 123,
-        },
-      },
-      {
-        reasonCode: 'VIC',
-        reasonDescription: 'Victim',
-        typeCode: 'WING',
-        typeDescription: 'Do Not Locate on Same Wing',
-        effectiveDate: moment().format('YYYY-MM-DDTHH:mm:ss'),
-        expiryDate: null,
-        authorisedBy: 'string',
-        comments: 'Effective from today',
-        offenderNonAssociation: {
-          offenderNo: 'ABC125',
+        id: 1,
+        reason: 'GANG',
+        reasonDescription: 'Rival Gang',
+        role: 'VIC',
+        roleDescription: 'Victim',
+        restrictionType: 'WING',
+        restrictionTypeDescription: 'Do Not Locate on Same Wing',
+        comment: 'Effective from today',
+        isOpen: true,
+        updatedBy: 'Test',
+        whenCreated: moment().format('YYYY-MM-DDTHH:mm:ss'),
+        whenUpdated: moment().format('YYYY-MM-DDTHH:mm:ss'),
+        otherPrisonerDetails: {
+          prisonerNumber: 'ABC125',
           firstName: 'Brian',
           lastName: 'Blessed',
-          reasonCode: 'PER',
-          reasonDescription: 'Perpetrator',
-          agencyDescription: 'Moorland (HMP & YOI)',
-          assignedLivingUnitDescription: 'MDI-2-1-3',
-          assignedLivingUnitId: 123,
+          role: 'PER',
+          roleDescription: 'Perpetrator',
+          prisonId: 'MDI',
+          prisonName: 'Moorland (HMP & YOI)',
+          cellLocation: 'MDI-2-1-3',
         },
       },
       {
-        reasonCode: 'RIV',
-        reasonDescription: 'Rival gang',
-        typeCode: 'WING',
-        typeDescription: 'Do Not Locate on Same Wing',
-        effectiveDate: moment().subtract(1, 'years').format('YYYY-MM-DDTHH:mm:ss'),
-        expiryDate: moment().add(1, 'days').format('YYYY-MM-DDTHH:mm:ss'),
-        authorisedBy: 'string',
-        comments: 'Effective until tomorrow',
-        offenderNonAssociation: {
-          offenderNo: 'ABC126',
+        id: 2,
+        reason: 'GANG',
+        reasonDescription: 'Rival Gang',
+        role: 'RIV',
+        roleDescription: 'Rival gang',
+        restrictionType: 'WING',
+        restrictionTypeDescription: 'Do Not Locate on Same Wing',
+        updatedBy: 'Test',
+        comment: 'Effective until tomorrow',
+        isOpen: true,
+        whenCreated: moment().format('YYYY-MM-DDTHH:mm:ss'),
+        whenUpdated: moment().format('YYYY-MM-DDTHH:mm:ss'),
+        otherPrisonerDetails: {
+          prisonerNumber: 'ABC126',
           firstName: 'Clarence',
           lastName: 'Cook',
-          reasonCode: 'RIV',
-          reasonDescription: 'Rival gang',
-          agencyDescription: 'Moorland (HMP & YOI)',
-          assignedLivingUnitDescription: 'MDI-2-1-3',
-          assignedLivingUnitId: 123,
-        },
-      },
-      {
-        reasonCode: 'VIC',
-        reasonDescription: 'Victim',
-        typeCode: 'WING',
-        typeDescription: 'Do Not Locate on Same Wing',
-        effectiveDate: '2018-12-01T13:34:00',
-        expiryDate: '2019-12-01T13:34:00',
-        authorisedBy: 'string',
-        comments: 'This one has expired',
-        offenderNonAssociation: {
-          offenderNo: 'ABC127',
-          firstName: 'Dave',
-          lastName: 'Digby',
-          reasonCode: 'PER',
-          reasonDescription: 'Perpetrator',
-          agencyDescription: 'Moorland (HMP & YOI)',
-          assignedLivingUnitDescription: 'MDI-2-1-3',
-          assignedLivingUnitId: 123,
-        },
-      },
-      {
-        reasonCode: 'VIC',
-        reasonDescription: 'Victim',
-        typeCode: 'WING',
-        typeDescription: 'Do Not Locate on Same Wing',
-        effectiveDate: '2018-12-01T13:34:00',
-        expiryDate: null,
-        authorisedBy: 'string',
-        comments: 'From an old booking',
-        offenderNonAssociation: {
-          offenderNo: 'ABC128',
-          firstName: 'Emily',
-          lastName: 'Egerton',
-          reasonCode: 'PER',
-          reasonDescription: 'Perpetrator',
-          agencyDescription: 'OUTSIDE',
-          assignedLivingUnitDescription: 'MDI-2-1-3',
-          assignedLivingUnitId: 123,
-        },
-      },
-      {
-        reasonCode: 'VIC',
-        reasonDescription: 'Victim',
-        typeCode: 'WING',
-        typeDescription: 'Do Not Locate on Same Wing',
-        effectiveDate: '2018-12-01T13:34:00',
-        expiryDate: null,
-        authorisedBy: 'string',
-        comments: 'From an old booking',
-        offenderNonAssociation: {
-          offenderNo: 'ABC129',
-          firstName: 'Frank',
-          lastName: 'Fibonacci',
-          reasonCode: 'PER',
-          reasonDescription: 'Perpetrator',
-          agencyDescription: 'Moorland (HMP & YOI)',
-          assignedLivingUnitDescription: 'MDI-2-1-3',
-          assignedLivingUnitId: 123,
-        },
-      },
-      {
-        reasonCode: 'VIC',
-        reasonDescription: 'Victim',
-        typeCode: 'WING',
-        typeDescription: 'Do Not Locate on Same Wing',
-        effectiveDate: '2018-12-01T13:34:00',
-        expiryDate: null,
-        authorisedBy: 'string',
-        comments: 'Is in an establisment which the user does not have as a caseload',
-        offenderNonAssociation: {
-          offenderNo: 'ABC130',
-          firstName: 'George',
-          lastName: 'Gauss',
-          reasonCode: 'PER',
-          reasonDescription: 'Perpetrator',
-          agencyDescription: 'Brixton (HMP)',
-          assignedLivingUnitDescription: 'BXI-1-1-1',
-          assignedLivingUnitId: 123,
+          role: 'RIV',
+          roleDescription: 'Rival gang',
+          prisonId: 'MDI',
+          prisonName: 'Moorland (HMP & YOI)',
+          cellLocation: 'MDI-2-1-3',
         },
       },
     ],
   }
 
-  const prisonerDetailsService = new PrisonerDetailsService(undefined) as jest.Mocked<PrisonerDetailsService>
-  prisonerDetailsService.getDetails.mockImplementation((_, offenderNo): Promise<OffenderDetails> => {
-    const agencyId = offenderNo === 'ABC129' ? 'BXI' : 'MDI'
-
-    return Promise.resolve({
-      agencyId,
-      offenderNo,
-      assignedLivingUnit: {
-        agencyId,
-        locationId: 12345,
-        description: '1-2-012',
-        agencyName: 'Ye olde prisone',
-      },
-      bookingId: 1234,
-      firstName: 'Test',
-      lastName: 'User',
-      csraClassificationCode: 'HI',
-      alerts: [],
-      dateOfBirth: '1990-10-12',
-      age: 29,
-      assignedLivingUnitId: 5432,
-      assignedLivingUnitDesc: '1-1-001',
-      categoryCode: 'C',
-      alertsDetails: ['XA', 'XVL'],
-      alertsCodes: ['XA', 'XVL'],
-      assessments: [],
-    })
-  })
-
   describe('getNonAssociationsInEstablishment', () => {
     let result
 
     beforeAll(async () => {
-      result = await getNonAssociationsInEstablishment(nonAssociations, 'token', prisonerDetailsService)
+      result = await getNonAssociationsInEstablishment(nonAssociations)
     })
 
     it('returns valid non-associations', async () => {
       expect(result).toContainEqual(
         expect.objectContaining({
-          offenderNonAssociation: expect.objectContaining({
+          otherPrisonerDetails: expect.objectContaining({
             firstName: 'Brian',
             lastName: 'Blessed',
           }),
@@ -204,53 +84,9 @@ describe('Cell move utils', () => {
       )
       expect(result).toContainEqual(
         expect.objectContaining({
-          offenderNonAssociation: expect.objectContaining({
+          otherPrisonerDetails: expect.objectContaining({
             firstName: 'Clarence',
             lastName: 'Cook',
-          }),
-        }),
-      )
-    })
-
-    it('filters out expired non-associations', async () => {
-      expect(result).not.toContainEqual(
-        expect.objectContaining({
-          offenderNonAssociation: expect.objectContaining({
-            firstName: 'Dave',
-            lastName: 'Digby',
-          }),
-        }),
-      )
-    })
-
-    it('filters out not yet effective non-associations', async () => {
-      expect(result).not.toContainEqual(
-        expect.objectContaining({
-          offenderNonAssociation: expect.objectContaining({
-            firstName: 'Andy',
-            lastName: 'Adams',
-          }),
-        }),
-      )
-    })
-
-    it('includes non-associations from old bookings', async () => {
-      expect(result).toContainEqual(
-        expect.objectContaining({
-          offenderNonAssociation: expect.objectContaining({
-            firstName: 'Emily',
-            lastName: 'Egerton',
-          }),
-        }),
-      )
-    })
-
-    it('filters out non-associations with a different current location', async () => {
-      expect(result).not.toContainEqual(
-        expect.objectContaining({
-          offenderNonAssociation: expect.objectContaining({
-            firstName: 'Frank',
-            lastName: 'Fibonacci',
           }),
         }),
       )

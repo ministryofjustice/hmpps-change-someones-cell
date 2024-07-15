@@ -1,11 +1,10 @@
-import { PrisonApiClient, WhereaboutsApiClient, LocationsInsidePrisonApiClient } from '../data'
+import { PrisonApiClient, LocationsInsidePrisonApiClient } from '../data'
 import { Agency } from '../data/prisonApiClient'
 import { Location, LocationGroup, LocationPrefix } from '../data/locationsInsidePrisonApiClient'
 
 export default class LocationService {
   constructor(
     private readonly prisonApiClient: PrisonApiClient,
-    private readonly whereaboutsApiClient: WhereaboutsApiClient,
     private readonly locationsInsidePrisonApiClient: LocationsInsidePrisonApiClient,
   ) {}
 

@@ -13,11 +13,9 @@ jest.mock('../../services/prisonerDetailsService')
 
 describe('Change cell play back details', () => {
   const analyticsService = jest.mocked(new AnalyticsService(undefined))
-  const locationService = jest.mocked(new LocationService(undefined, undefined, undefined))
-  const prisonerCellAllocationService = jest.mocked(
-    new PrisonerCellAllocationService(undefined, undefined, undefined, undefined),
-  )
-  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined))
+  const locationService = jest.mocked(new LocationService(undefined, undefined))
+  const prisonerCellAllocationService = jest.mocked(new PrisonerCellAllocationService(undefined, undefined, undefined))
+  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
 
   let controller
 
@@ -55,11 +53,11 @@ describe('Change cell play back details', () => {
     jest.clearAllMocks()
     req.query = { cellId }
 
-    prisonerDetailsService.getDetails = jest.fn().mockResolvedValue({
+    prisonerDetailsService.getPrisoner = jest.fn().mockResolvedValue({
       bookingId: 1,
       firstName: 'Bob',
       lastName: 'Doe',
-      agencyId: 'MDI',
+      prisonId: 'MDI',
     })
     prisonerCellAllocationService.moveToCell = jest.fn()
     prisonerCellAllocationService.moveToCellSwap = jest.fn()
@@ -106,7 +104,7 @@ describe('Change cell play back details', () => {
       await controller.index(req, res)
 
       expect(locationService.getLocation).toHaveBeenCalledWith(systemClientToken, cellId)
-      expect(prisonerDetailsService.getDetails).toHaveBeenCalledWith(systemClientToken, 'A12345')
+      expect(prisonerDetailsService.getPrisoner).toHaveBeenCalledWith(systemClientToken, 'A12345')
     })
 
     it('should render play back details page', async () => {
@@ -415,7 +413,7 @@ describe('Change cell play back details', () => {
 
       await controller.post(req, res)
 
-      expect(prisonerDetailsService.getDetails).toHaveBeenCalledWith(systemClientToken, 'A12345')
+      expect(prisonerDetailsService.getPrisoner).toHaveBeenCalledWith(systemClientToken, 'A12345')
       expect(prisonerCellAllocationService.moveToCell).toHaveBeenCalledWith(
         systemClientToken,
         1,
@@ -432,7 +430,7 @@ describe('Change cell play back details', () => {
       const offenderNo = 'A12345'
       const error = new Error('network error')
 
-      prisonerDetailsService.getDetails = jest.fn().mockRejectedValue(error)
+      prisonerDetailsService.getPrisoner = jest.fn().mockRejectedValue(error)
 
       await expect(controller.post(req, res)).rejects.toThrowError(error)
 
@@ -494,7 +492,7 @@ describe('Change cell play back details', () => {
 
       await controller.post(req, res)
 
-      expect(prisonerDetailsService.getDetails).toHaveBeenCalledWith(systemClientToken, 'A12345')
+      expect(prisonerDetailsService.getPrisoner).toHaveBeenCalledWith(systemClientToken, 'A12345')
       expect(prisonerCellAllocationService.moveToCellSwap).toHaveBeenCalledWith(systemClientToken, 1)
       expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/cell-move/space-created')
     })

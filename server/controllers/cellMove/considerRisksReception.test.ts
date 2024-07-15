@@ -79,15 +79,29 @@ const prisonerDetails = {
   profileInformation: [],
 }
 
+const prisoner = {
+  prisonerNumber: someOffenderNumber,
+  bookingId: someBookingId,
+  firstName: 'John',
+  lastName: 'Doe',
+  csra: 'High',
+  agencyId: 'MDI',
+  categoryCode: 'A',
+  prisonId: 'BXI',
+  cellLocation: '1-1-001',
+  prisonName: 'Brixton (HMP)',
+  alerts: [],
+  gender: 'Male',
+}
+
 describe('Consider risks reception', () => {
   const nonAssociationsService = jest.mocked(new NonAssociationsService(undefined))
-  const prisonerCellAllocationService = jest.mocked(
-    new PrisonerCellAllocationService(undefined, undefined, undefined, undefined),
-  )
-  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined))
+  const prisonerCellAllocationService = jest.mocked(new PrisonerCellAllocationService(undefined, undefined, undefined))
+  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
 
   beforeEach(() => {
     prisonerDetailsService.getDetails.mockResolvedValue(prisonerDetails)
+    prisonerDetailsService.getPrisoner.mockResolvedValue(prisoner)
     prisonerDetailsService.getCsraAssessments.mockResolvedValue([assessment])
     prisonerCellAllocationService.getReceptionsWithCapacity.mockResolvedValue([
       {

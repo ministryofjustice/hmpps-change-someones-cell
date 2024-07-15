@@ -1,19 +1,23 @@
 import { Readable } from 'stream'
 import { PrisonApiClient } from '../data'
 import PrisonerDetailsService from './prisonerDetailsService'
-import { Alert, Assessment, OffenceDetail, OffenderDetails, PrisonerDetail } from '../data/prisonApiClient'
+import { Alert, Assessment, OffenceDetail, OffenderDetails } from '../data/prisonApiClient'
+import PrisonerSearchApiClient, { Prisoner } from '../data/prisonerSearchApiClient'
 
 jest.mock('../data/prisonApiClient')
+jest.mock('../data/prisonerSearchApiClient')
 
 const token = 'some token'
 
 describe('Prisoner details service', () => {
   let prisonApiClient: jest.Mocked<PrisonApiClient>
+  let prisonerSearchApiClient: jest.Mocked<PrisonerSearchApiClient>
   let prisonerDetailsService: PrisonerDetailsService
 
   beforeEach(() => {
     prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
-    prisonerDetailsService = new PrisonerDetailsService(prisonApiClient)
+    prisonerSearchApiClient = new PrisonerSearchApiClient() as jest.Mocked<PrisonerSearchApiClient>
+    prisonerDetailsService = new PrisonerDetailsService(prisonApiClient, prisonerSearchApiClient)
   })
 
   describe('getImage', () => {
@@ -63,6 +67,26 @@ describe('Prisoner details service', () => {
       assessments: [],
     }
 
+    const prisoner: Prisoner = {
+      bookingId: 1,
+      prisonerNumber: 'A1234',
+      firstName: 'JOHN',
+      lastName: 'SMITH',
+      prisonId: 'MDI',
+      prisonName: 'Moorland',
+      category: 'C',
+      gender: 'Male',
+      mostSeriousOffence: 'Robbery',
+      alerts: [
+        {
+          active: true,
+          alertCode: 'HA',
+          alertType: 'H',
+          expired: false,
+        },
+      ],
+    }
+
     it('retrieves prisoner details', async () => {
       prisonApiClient.getDetails.mockResolvedValue(details)
 
@@ -70,6 +94,15 @@ describe('Prisoner details service', () => {
 
       expect(prisonApiClient.getDetails).toHaveBeenCalledWith(token, 'A1234', true)
       expect(results).toEqual(details)
+    })
+
+    it('retrieves prisoner details from search', async () => {
+      prisonerSearchApiClient.getPrisoner.mockResolvedValue(prisoner)
+
+      const results = await prisonerDetailsService.getPrisoner(token, 'A1234')
+
+      expect(prisonerSearchApiClient.getPrisoner).toHaveBeenCalledWith(token, 'A1234')
+      expect(results).toEqual(prisoner)
     })
 
     it('propagates error', async () => {
@@ -185,53 +218,32 @@ describe('Prisoner details service', () => {
   describe('getPrisoners', () => {
     const offenderNos = ['A1234BC', 'B1234CD']
 
-    const prisoners: PrisonerDetail[] = [
+    const prisoners: Prisoner[] = [
       {
-        offenderNo: 'A0000AA',
-        title: 'Earl',
-        suffix: 'Mac',
+        prisonerNumber: 'A0000AA',
         firstName: 'Thorfinn',
-        middleNames: 'Skull-splitter',
+        middleName: 'Skull-splitter',
         lastName: 'Torf-Einarsson',
-        dateOfBirth: '1960-02-29',
         gender: 'Female',
-        sexCode: 'F',
-        nationalities: 'Scottish',
-        currentlyInPrison: 'N',
-        latestBookingId: 1,
-        latestLocationId: 'WRI',
-        latestLocation: 'Whitemoor (HMP)',
-        internalLocation: 'WRI-B-3-018',
-        pncNumber: '01/000000A',
-        croNumber: '01/0001/01A',
-        ethnicity: 'White: British',
-        ethnicityCode: 'W1',
-        birthCountry: 'Norway',
-        religion: 'Pagan',
-        religionCode: 'PAG',
-        convictedStatus: 'Convicted',
-        legalStatus: 'REMAND',
-        imprisonmentStatus: 'LIFE',
-        imprisonmentStatusDesc: 'Service Life Imprisonment',
-        receptionDate: '1980-01-01',
-        maritalStatus: 'Single',
-        currentWorkingFirstName: 'Thorfinn',
-        currentWorkingLastName: 'Torf-Einarsson',
-        currentWorkingBirthDate: '1960-02-29',
+        bookingId: 1,
+        prisonId: 'WRI',
+        prisonName: 'Whitemoor (HMP)',
+        cellLocation: 'B-3-018',
+        alerts: [],
       },
     ]
 
     it('retrieves prisoners', async () => {
-      prisonApiClient.getPrisoners.mockResolvedValue(prisoners)
+      prisonerSearchApiClient.getPrisoners.mockResolvedValue(prisoners)
 
       const results = await prisonerDetailsService.getPrisoners(token, offenderNos)
 
-      expect(prisonApiClient.getPrisoners).toHaveBeenCalledWith(token, offenderNos)
+      expect(prisonerSearchApiClient.getPrisoners).toHaveBeenCalledWith(token, offenderNos)
       expect(results).toEqual(prisoners)
     })
 
     it('propagates error', async () => {
-      prisonApiClient.getPrisoners.mockRejectedValue(new Error('some error'))
+      prisonerSearchApiClient.getPrisoners.mockRejectedValue(new Error('some error'))
 
       await expect(prisonerDetailsService.getPrisoners(token, offenderNos)).rejects.toEqual(new Error('some error'))
     })
