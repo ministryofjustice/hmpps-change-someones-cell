@@ -15,21 +15,6 @@ export const stubHealth = (status = 200) =>
     },
   })
 
-export const stubOffenderNonAssociationsLegacy = response =>
-  stubFor({
-    request: {
-      method: 'GET',
-      urlPattern: '/non-associations/legacy/api/offenders/[0-9A-Z].+?/non-association-details',
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: response,
-    },
-  })
-
 export const stubGetPrisonerNonAssociations = response =>
   stubFor({
     request: {
@@ -47,6 +32,5 @@ export const stubGetPrisonerNonAssociations = response =>
 
 export default {
   stubHealth,
-  stubOffenderNonAssociationsLegacy,
   stubGetPrisonerNonAssociations,
 }

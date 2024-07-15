@@ -107,7 +107,7 @@ export default ({ nonAssociationsService, prisonerCellAllocationService, prisone
           offenderNumbersOfAllInReception.includes(nonAssociationPrisoner.otherPrisonerDetails.prisonerNumber),
       )
 
-      const { firstName, lastName } = await prisonerDetailsService.getDetails(systemClientToken, offenderNo)
+      const { firstName, lastName } = await prisonerDetailsService.getPrisoner(systemClientToken, offenderNo)
 
       const nonAssociationsRows = sortedNonAssociationsInReceptionWithinCurrentEstablishment?.map(nonAssociation => ({
         name: putLastNameFirst(

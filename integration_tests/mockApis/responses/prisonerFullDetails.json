@@ -1,0 +1,31 @@
+{
+  "prisonerNumber": "G3878UK",
+  "bookingId": 14,
+  "firstName": "John",
+  "lastName": "Smith",
+  "alerts": [
+    {
+      "active": true,
+      "alertCode": "XC",
+      "alertType": "X",
+      "expired": false
+    },
+    {
+      "active": false,
+      "alertCode": "XC",
+      "alertType": "X",
+      "expired": true
+    },
+    {
+      "active": false,
+      "alertCode": "XC",
+      "alertType": "X",
+      "expired": true
+    }
+  ],
+  "prisonId": "MDI",
+  "prisonName": "HMP Moorland",
+  "cellLocation": "1-1-001",
+  "category": "C",
+  "csra": "High"
+}

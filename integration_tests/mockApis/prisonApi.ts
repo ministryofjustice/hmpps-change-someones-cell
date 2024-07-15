@@ -168,21 +168,6 @@ export const stubOffenderBasicDetails = offender =>
     },
   })
 
-export const stubCellAttributes = cellAttributes =>
-  stubFor({
-    request: {
-      method: 'GET',
-      urlPattern: '/api/reference-domains/domains/HOU_UNIT_ATT',
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: cellAttributes,
-    },
-  })
-
 export const stubOffenderCellHistory = history =>
   stubFor({
     request: {
@@ -225,21 +210,6 @@ export const stubCsraAssessments = (offenderNumbers, assessments = []) =>
         'Content-Type': 'application/json;charset=UTF-8',
       },
       jsonBody: assessments,
-    },
-  })
-
-export const stubCellsWithCapacity = cells =>
-  stubFor({
-    request: {
-      method: 'GET',
-      urlPathPattern: '/api/agencies/.+?/cellsWithCapacity',
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: cells,
     },
   })
 
@@ -350,21 +320,6 @@ export const stubCellMoveHistory = ({ assignmentDate, agencyId, cellMoves }) =>
     },
   })
 
-export const stubGetPrisoners = body =>
-  stubFor({
-    request: {
-      method: 'POST',
-      urlPattern: '/api/prisoners',
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: body,
-    },
-  })
-
 export const stubStaff = (staffId, details) =>
   stubFor({
     request: {
@@ -439,11 +394,9 @@ export default {
   stubOffenderFullDetails,
   stubMainOffence,
   stubOffenderBasicDetails,
-  stubCellAttributes,
   stubOffenderCellHistory,
   stubGetAlerts,
   stubCsraAssessments,
-  stubCellsWithCapacity,
   stubSpecificOffenderFullDetails,
   stubPrisonerFullDetail,
   stubBookingDetails,
@@ -452,7 +405,6 @@ export default {
   verifyMoveToCellSwap,
   stubAgencyDetails,
   stubCellMoveHistory,
-  stubGetPrisoners,
   stubStaff,
   stubGlobalAlerts,
   stubReceptionWithCapacity,

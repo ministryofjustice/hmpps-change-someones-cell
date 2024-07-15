@@ -8,7 +8,6 @@ context('Common component functionality', () => {
   beforeEach(() => {
     cy.task('reset')
     cy.task('stubUserLocations')
-    cy.task('stubLocationConfig', { agencyId: 'MDI', response: { enabled: false } })
     cy.task('stubComponents')
   })
 

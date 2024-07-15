@@ -1,7 +1,8 @@
-import moment from 'moment'
 import SelectCellPage from '../pages/selectCellPage'
 import ConsiderRisksPage from '../pages/considerRisksPage'
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const prisonerFullDetails = require('../mockApis/responses/prisonerFullDetails.json')
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const offenderFullDetails = require('../mockApis/responses/offenderFullDetails.json')
 
@@ -33,115 +34,102 @@ context('A user can select a cell', () => {
   })
   beforeEach(() => {
     ;['A12345', 'G6123VU'].forEach(anotherOffenderNo => {
-      cy.task('stubSpecificOffenderFullDetails', {
-        ...offenderFullDetails,
-        offenderNo: anotherOffenderNo,
+      cy.task('stubGetPrisoner', {
+        ...prisonerFullDetails,
+        cellLocation: '1-2',
+        prisonerNumber: anotherOffenderNo,
       })
     })
     cy.task('stubGroups', { id: 'MDI' })
-    cy.task('stubCellAttributes')
-    cy.task('stubPrisonersAtLocations', {
-      prisoners: [
-        {
-          prisonerNumber: 'A12345',
-          firstName: 'Horatio',
-          lastName: 'McBubblesworth',
-          cellLocation: '1-1',
-          alerts: [],
-        },
-        {
-          prisonerNumber: 'G6123VU',
-          firstName: 'Bob',
-          lastName: 'Doe',
-          cellLocation: '1-2',
-          alerts: [],
-        },
-      ],
-    })
-    cy.task('stubOffenderNonAssociationsLegacy', {
-      offenderNo: 'G6123VU',
-      firstName: 'JOHN',
-      lastName: 'SAUNDERS',
-      agencyDescription: 'MOORLAND (HMP & YOI)',
-      assignedLivingUnitDescription: 'MDI-1-1-015',
+    cy.task('stubGetPrisonerNonAssociations', {
+      prisonerNumber: 'A12345',
+      firstName: 'John',
+      lastName: 'Smith',
+      prisonId: 'MDI',
+      prisonName: 'Moorland (HMP & YOI)',
+      cellLocation: '1-2',
+      openCount: 1,
+      closedCount: 0,
       nonAssociations: [
         {
-          reasonCode: 'RIV',
-          reasonDescription: 'Rival Gang',
-          typeCode: 'LAND',
-          typeDescription: 'Do Not Locate on Same Landing',
-          effectiveDate: '2020-06-17T00:00:00',
-          expiryDate: moment().add(1, 'day'),
-          comments: 'Gang violence',
-          offenderNonAssociation: {
-            offenderNo: 'A12345',
+          reason: 'RIV',
+          reasonDescription: 'Rival gang',
+          role: 'VIC',
+          roleDescription: 'Victim',
+          restrictionType: 'LANDING',
+          restrictionTypeDescription: 'Do Not Locate on Same Landing',
+          whenCreated: '2020-06-17T00:00:00',
+          comment: 'Gang violence',
+          otherPrisonerDetails: {
+            prisonerNumber: 'G6123VU',
             firstName: 'bob1',
             lastName: 'doe1',
-            reasonCode: 'RIV',
-            reasonDescription: 'Rival Gang',
-            agencyDescription: 'MOORLAND (HMP & YOI)',
-            assignedLivingUnitDescription: 'MDI-1-3-026',
+            role: 'PER',
+            roleDescription: 'Perpetrator',
+            prisonId: 'MDI',
+            prisonName: 'Moorland (HMP & YOI)',
+            cellLocation: '1-1',
           },
         },
       ],
     })
-
-    cy.task('stubUserCaseLoads')
   })
 
   context('with cell data', () => {
     const response = [
       {
-        attributes: [
-          { description: 'Special Cell', code: 'SPC' },
-          { description: 'Gated Cell', code: 'GC' },
+        legacyAttributes: [
+          { typeDescription: 'Gated Cell', type: 'GC' },
+          { type: 'LC', typeDescription: 'Listener Cell' },
         ],
-        capacity: 2,
-        description: 'MDI-1-2',
-        id: 1,
+        maxCapacity: 3,
+        pathHierarchy: '1-1',
         noOfOccupants: 2,
-        userDescription: 'MDI-1-1',
-      },
-      {
-        attributes: [
-          { code: 'LC', description: 'Listener Cell' },
-          { description: 'Gated Cell', code: 'GC' },
-        ],
-        capacity: 3,
-        description: 'MDI-1-1',
-        id: 1,
-        noOfOccupants: 2,
-        userDescription: 'MDI-1-1',
-      },
-    ]
-
-    beforeEach(() => {
-      cy.task('stubCellsWithCapacity', { cells: response })
-      cy.task('stubCellsWithCapacityByGroupName', { agencyId: 'MDI', groupName: 1, response })
-      cy.task('stubPrisonersAtLocations', {
-        prisoners: [
-          {
-            prisonerNumber: 'A12345',
-            firstName: 'Horatio',
-            lastName: 'McBubblesworth',
-            cellLocation: '1-1',
-            alerts: [],
-          },
+        key: 'MDI-1-1',
+        prisonId: 'MDI',
+        prisonersInCell: [
           {
             prisonerNumber: 'G6123VU',
             firstName: 'Bob',
             lastName: 'Doe',
-            cellLocation: '1-2',
+            cellLocation: '1-1',
             alerts: [
               {
+                alertType: 'P',
                 alertCode: 'PEEP',
-                alertCodeDescription: 'PEEP',
+                active: true,
+                expired: false,
               },
             ],
             csra: 'Standard',
           },
         ],
-      })
+      },
+      {
+        legacyAttributes: [
+          { typeDescription: 'Special Cell', type: 'SPC' },
+          { typeDescription: 'Gated Cell', type: 'GC' },
+        ],
+        maxCapacity: 2,
+        pathHierarchy: '1-2',
+        noOfOccupants: 1,
+        prisonId: 'MDI',
+        key: 'MDI-1-2',
+        prisonersInCell: [
+          {
+            prisonerNumber: 'G6123VU',
+            firstName: 'Horatio',
+            lastName: 'McBubblesworth',
+            cellLocation: '1-2',
+            alerts: [],
+          },
+        ],
+      },
+    ]
+
+    beforeEach(() => {
+      cy.task('stubCellsWithCapacity', { prisonId: 'MDI', response })
+      cy.task('stubCellsWithCapacityByGroupName', { prisonId: 'MDI', groupName: 1, response })
     })
 
     it('should load without error', () => {
@@ -154,7 +142,7 @@ context('A user can select a cell', () => {
       const page = SelectCellPage.goTo(offenderNo)
 
       page.cellResults().then($table => {
-        cy.get($table).find('tr').its('length').should('eq', 5)
+        cy.get($table).find('tr').its('length').should('eq', 3)
         cy.get($table)
           .find('tr')
           .then($tableRows => {
@@ -192,7 +180,7 @@ context('A user can select a cell', () => {
     })
 
     it('should NOT show the non association warning', () => {
-      cy.task('stubOffenderNonAssociationsLegacy', null)
+      cy.task('stubGetPrisonerNonAssociations', null)
       const page = SelectCellPage.goTo(offenderNo)
       page.nonAssociationWarning().should('not.exist')
     })
@@ -219,8 +207,8 @@ context('A user can select a cell', () => {
     const response = []
 
     beforeEach(() => {
-      cy.task('stubCellsWithCapacity', { cells: response })
-      cy.task('stubCellsWithCapacityByGroupName', { agencyId: 'MDI', groupName: 1, response })
+      cy.task('stubCellsWithCapacity', { prisonId: 'MDI', response })
+      cy.task('stubCellsWithCapacityByGroupName', { prisonId: 'MDI', groupName: 1, response })
     })
 
     it('should load without error and display no results message', () => {
@@ -233,10 +221,12 @@ context('A user can select a cell', () => {
     describe('back button', () => {
       context('When referred from the search for a cell page', () => {
         beforeEach(() => {
-          cy.task('stubOffenderFullDetails', offenderFullDetails)
-          cy.task('stubOffenderNonAssociationsLegacy', {})
+          cy.task('stubGetPrisoner', {
+            prisonerFullDetails,
+            cellLocation: '1-1-1',
+          })
+          cy.task('stubGetPrisonerNonAssociations', {})
           cy.task('stubGroups', { id: 'MDI' })
-          cy.task('stubUserCaseLoads')
           cy.visit('/prisoner/A12345/cell-move/search-for-cell')
         })
 
@@ -250,10 +240,15 @@ context('A user can select a cell', () => {
 
       context('When the user clicked back from the consider risks page', () => {
         beforeEach(() => {
+          cy.task('stubCellsWithCapacity', { prisonId: 'MDI', response })
+          cy.task('stubCellsWithCapacityByGroupName', { prisonId: 'MDI', groupName: 1, response })
           cy.task('stubOffenderFullDetails', offenderFullDetails)
-          cy.task('stubOffenderNonAssociationsLegacy', {})
+          cy.task('stubGetPrisoner', {
+            prisonerFullDetails,
+            cellLocation: '1-1-1',
+          })
+          cy.task('stubGetPrisonerNonAssociations', {})
           cy.task('stubGroups', { id: 'MDI' })
-          cy.task('stubUserCaseLoads')
           cy.task('stubLocation', {})
           cy.task('stubInmatesAtLocation', [
             {
@@ -270,24 +265,12 @@ context('A user can select a cell', () => {
               ],
             },
           ])
-
-          cy.task('stubPrisonersAtLocations', {
-            prisoners: [
-              {
-                prisonerNumber: 'A12345',
-                firstName: 'Bob',
-                lastName: 'Doe',
-                cellLocation: '1-1',
-                alerts: [],
-              },
-            ],
-          })
-          cy.task('stubOffenderNonAssociationsLegacy', {
-            offenderNo,
+          cy.task('stubGetPrisonerNonAssociations', {
+            prisonerNumber: offenderNo,
             firstName: 'JOHN',
             lastName: 'SAUNDERS',
-            agencyDescription: 'MOORLAND (HMP & YOI)',
-            assignedLivingUnitDescription: 'MDI-1-1-015',
+            prisonName: 'MOORLAND (HMP & YOI)',
+            cellLocation: '1-1-015',
             nonAssociations: [],
           })
 

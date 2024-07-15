@@ -2,7 +2,7 @@ import ConfirmCellMovePage from '../pages/confirmCellMovePage'
 
 import { assertHasRequestCount } from '../assertions'
 
-const offenderNo = 'A1234A'
+const offenderNo = 'A12345'
 const bookingId = 1234
 
 context('A user can confirm the cell move', () => {
@@ -14,11 +14,13 @@ context('A user can confirm the cell move', () => {
     cy.signIn()
   })
   beforeEach(() => {
-    cy.task('stubBookingDetails', {
+    cy.task('stubGetPrisoner', {
       firstName: 'Bob',
       lastName: 'Doe',
-      offenderNo,
+      prisonerNumber: offenderNo,
       bookingId,
+      prisonId: 'MDI',
+      cellLocation: '1-1-1',
     })
     cy.task('stubLocation', {
       prisonId: 'MDI',

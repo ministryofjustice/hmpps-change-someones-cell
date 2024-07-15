@@ -45,27 +45,22 @@ export default defineConfig({
             whereabouts.stubHealth(),
             locationsInsidePrisonApi.stubHealth(),
             tokenVerification.stubHealth(),
+            prisonerSearchApi.stubHealth(),
           ]),
-        stubLocationConfig: ({ agencyId, response }) => whereabouts.stubLocationConfig({ agencyId, response }),
         stubSignInPage: auth.redirect,
         stubUserMe: ({ username, staffId, name }) => users.stubUserMe(username, staffId, name),
         stubInmates: prisonApi.stubInmates,
         stubOffenderFullDetails: fullDetails => Promise.all([prisonApi.stubOffenderFullDetails(fullDetails)]),
-        stubOffenderNonAssociationsLegacy: response => nonAssociationsApi.stubOffenderNonAssociationsLegacy(response),
+        stubGetPrisonerNonAssociations: response => nonAssociationsApi.stubGetPrisonerNonAssociations(response),
         stubGroups: caseload => locationsInsidePrisonApi.stubGroups(caseload),
-        stubUserCaseLoads: caseloads => prisonApi.stubUserCaseloads(caseloads),
         stubMainOffence: offence => prisonApi.stubMainOffence(offence),
         stubOffenderBasicDetails: basicDetails => Promise.all([prisonApi.stubOffenderBasicDetails(basicDetails)]),
-        stubCellAttributes: prisonApi.stubCellAttributes,
         stubInmatesAtLocation: inmates => locationsInsidePrisonApi.stubInmatesAtLocation(inmates),
         stubOffenderCellHistory: ({ history }) => prisonApi.stubOffenderCellHistory(history),
         stubGetAlerts: ({ agencyId, alerts }) => prisonApi.stubGetAlerts({ agencyId, alerts }),
         stubCsraAssessments: ({ offenderNumbers, assessments }) =>
           prisonApi.stubCsraAssessments(offenderNumbers, assessments),
         stubLocation: location => locationsInsidePrisonApi.stubLocation(location),
-        stubCellsWithCapacity: ({ cells }) => prisonApi.stubCellsWithCapacity(cells),
-        stubCellsWithCapacityByGroupName: ({ agencyId, groupName, response }) =>
-          whereabouts.stubCellsWithCapacityByGroupName({ agencyId, groupName, response }),
         stubSpecificOffenderFullDetails: prisonApi.stubSpecificOffenderFullDetails,
         stubPrisonerFullDetail: ({ prisonerDetail, offenderNo, fullInfo }) =>
           prisonApi.stubPrisonerFullDetail(prisonerDetail, offenderNo, fullInfo),
@@ -78,14 +73,18 @@ export default defineConfig({
         stubAgencyDetails: ({ agencyId, details }) => Promise.all([prisonApi.stubAgencyDetails(agencyId, details)]),
         stubCellMoveHistory: ({ assignmentDate, agencyId, cellMoves }) =>
           prisonApi.stubCellMoveHistory({ assignmentDate, agencyId, cellMoves }),
-        stubGetPrisoners: response => prisonApi.stubGetPrisoners(response),
+        stubGetPrisoners: prisoners => Promise.all([prisonerSearchApi.stubGetPrisoners(prisoners)]),
+        stubGetPrisoner: prisoner => Promise.all([prisonerSearchApi.stubGetPrisoner(prisoner)]),
+        stubCellsWithCapacity: ({ prisonId, response }) =>
+          locationsInsidePrisonApi.stubCellsWithCapacity({ prisonId, response }),
+        stubCellsWithCapacityByGroupName: ({ prisonId, groupName, response }) =>
+          locationsInsidePrisonApi.stubCellsWithCapacityByGroupName({ prisonId, groupName, response }),
         stubStaff: ({ staffId, details }) => Promise.all([prisonApi.stubStaff(staffId, details)]),
         stubGlobalAlerts: prisonApi.stubGlobalAlerts,
         stubReceptionWithCapacity: ({ agencyId, reception }) =>
           prisonApi.stubReceptionWithCapacity(agencyId, reception),
         stubOffendersInReception: ({ agencyId, inReception }) =>
           prisonApi.stubOffendersInReception(agencyId, inReception),
-        stubPrisonersAtLocations: ({ prisoners }) => prisonerSearchApi.stubPrisonersAtLocations(prisoners),
       })
     },
     baseUrl: 'http://localhost:3007',

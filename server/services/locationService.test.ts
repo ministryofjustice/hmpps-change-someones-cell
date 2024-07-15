@@ -22,7 +22,7 @@ describe('Location service', () => {
   beforeEach(() => {
     jest.resetAllMocks()
 
-    locationService = new LocationService(prisonApiClient, whereaboutsApiClient, locationsInsidePrisonApiClient)
+    locationService = new LocationService(prisonApiClient, locationsInsidePrisonApiClient)
   })
 
   describe('searchGroups', () => {
