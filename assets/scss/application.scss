@@ -5,7 +5,7 @@ $moj-page-width: 1170px;
 $govuk-page-width: $moj-page-width;
 $govuk-font-family-print: 'GDS Transport';
 
-@import 'govuk/all';
+@import 'node_modules/govuk-frontend/dist/govuk/all';
 @import 'moj/all';
 
 @import 'govuk-elements';
