@@ -178,4 +178,35 @@ describe('Reception full journey', () => {
         expect(href).to.equal('http://localhost:3101/prisoner/G3878UK/location-details')
       })
   })
+
+  it('A user is presented with locked message when 423 error', () => {
+    cy.task('stubReceptionWithCapacity', {
+      agencyId: 'MDI',
+      reception: [
+        {
+          id: 4007,
+          description: 'MDI-RECP',
+          capacity: 100,
+          noOfOccupants: 100,
+          attributes: [],
+        },
+      ],
+    })
+    cy.task('stubMoveToCell', 423)
+
+    const page = receptionConfirmMovePage.goTo(offenderNo)
+    page.form().selectReceptionReason().click()
+    page.form().moveReason().type('Urgent medical appointment')
+    page.form().submitButton().click()
+
+    receptionConfirmMovePage
+      .verifyOnPage()
+      .errorSummaryList()
+      .find('li')
+      .then($errors => {
+        expect($errors.get(0).innerText).to.contain(
+          'This reception move cannot be carried out because a user currently has this prisoner open in P-Nomis, please try later',
+        )
+      })
+  })
 })

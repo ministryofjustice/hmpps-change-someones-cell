@@ -117,6 +117,18 @@ export default ({
     } catch (error) {
       if (error.status === 400)
         return res.redirect(`/prisoner/${offenderNo}/cell-move/cell-not-available?cellDescription=${pathHierarchy}`)
+
+      if (error.status === 423) {
+        const error423: any[] = [
+          {
+            text: 'This cell move cannot be carried out because a user currently has this prisoner open in P-Nomis, please try later',
+          },
+        ]
+        const { reason, comment } = req.body
+        req.flash('errors', error423)
+        req.flash('formValues', { comment, reason })
+        return res.redirect(`/prisoner/${offenderNo}/cell-move/confirm-cell-move?cellId=${cellId}`)
+      }
       throw error
     }
 

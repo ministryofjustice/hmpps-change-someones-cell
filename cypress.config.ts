@@ -67,7 +67,7 @@ export default defineConfig({
           prisonApi.stubPrisonerFullDetail(prisonerDetail, offenderNo, fullInfo),
         stubBookingDetails: details => prisonApi.stubBookingDetails(details),
         stubCellMoveTypes: type => prisonApi.stubCellMoveTypes(type),
-        stubMoveToCell: () => whereabouts.stubMoveToCell(),
+        stubMoveToCell: (status: number) => whereabouts.stubMoveToCell(status),
         stubMoveToCellSwap: () => prisonApi.stubMoveToCellSwap(),
         verifyMoveToCell: body => whereabouts.verifyMoveToCell(body),
         verifyMoveToCellSwap: ({ bookingId }) => prisonApi.verifyMoveToCellSwap({ bookingId }),

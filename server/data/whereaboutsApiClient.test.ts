@@ -34,7 +34,7 @@ describe('whereaboutsApiClient', () => {
       const response = { data: 'data' }
 
       fakeWhereaboutsApiClient
-        .post('/cell/make-cell-move', requestData)
+        .post('/cell/make-cell-move?lockTimeout=true', requestData)
         .matchHeader('authorization', `Bearer ${accessToken}`)
         .reply(200, response)
 

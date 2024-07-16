@@ -119,6 +119,17 @@ export default ({ prisonerCellAllocationService, prisonerDetailsService }: Param
     } catch (error) {
       logger.error(`Error moving ${offenderNo} to reception`)
       res.locals.redirectUrl = `/prisoner/${offenderNo}/reception-move/consider-risks-reception`
+
+      if (error.status === 423) {
+        const error423: any[] = [
+          {
+            text: 'This reception move cannot be carried out because a user currently has this prisoner open in P-Nomis, please try later',
+          },
+        ]
+        req.flash('errors', error423)
+        return res.redirect(`/prisoner/${offenderNo}/reception-move/confirm-reception-move`)
+      }
+
       throw error
     }
   }
