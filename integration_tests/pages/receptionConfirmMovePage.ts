@@ -29,6 +29,7 @@ const receptionConfirmMovePage: () => any = () =>
         .then(href => {
           expect(href).to.equal('http://localhost:3101/prisoner/G3878UK/location-details')
         }),
+    errorSummaryList: () => cy.get('.govuk-error-summary__list'),
   })
 
 export default {

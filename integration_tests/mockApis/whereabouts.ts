@@ -14,14 +14,14 @@ export const stubHealth = (status = 200) =>
     },
   })
 
-export const stubMoveToCell = () =>
+export const stubMoveToCell = (status: number) =>
   stubFor({
     request: {
       method: 'POST',
-      urlPath: '/whereabouts/cell/make-cell-move',
+      url: '/whereabouts/cell/make-cell-move?lockTimeout=true',
     },
     response: {
-      status: 201,
+      status,
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
       },
@@ -29,7 +29,7 @@ export const stubMoveToCell = () =>
     },
   })
 
-export const verifyMoveToCell = body => verifyPosts('/whereabouts/cell/make-cell-move', body)
+export const verifyMoveToCell = body => verifyPosts('/whereabouts/cell/make-cell-move?lockTimeout=true', body)
 
 export default {
   stubHealth,

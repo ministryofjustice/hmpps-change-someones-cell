@@ -39,6 +39,7 @@ export default class WhereaboutsApiClient {
   ) {
     return WhereaboutsApiClient.restClient(token).post<CellMoveResponse>({
       path: '/cell/make-cell-move',
+      query: { lockTimeout: 'true' },
       data: {
         bookingId,
         offenderNo,

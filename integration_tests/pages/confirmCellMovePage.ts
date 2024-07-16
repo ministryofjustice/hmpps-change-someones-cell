@@ -9,6 +9,7 @@ const confirmCellMovePage = (name: string, cell: string): any =>
       reason: () => cy.get('#reason'),
       comment: () => cy.get('#comment'),
     }),
+    errorSummaryList: () => cy.get('.govuk-error-summary__list'),
   })
 
 export default {
