@@ -117,10 +117,10 @@ export default {
     whereaboutsApi: {
       url: get('WHEREABOUTS_API_URL', 'http://localhost:8082', requiredInProduction),
       timeout: {
-        response: Number(get('WHEREABOUTS_API_TIMEOUT_RESPONSE', 10000)),
-        deadline: Number(get('WHEREABOUTS_API_TIMEOUT_DEADLINE', 10000)),
+        response: Number(get('WHEREABOUTS_API_TIMEOUT_RESPONSE', 12000)),
+        deadline: Number(get('WHEREABOUTS_API_TIMEOUT_DEADLINE', 12000)),
       },
-      agent: new AgentConfig(Number(get('WHEREABOUTS_API_TIMEOUT_RESPONSE', 10000))),
+      agent: new AgentConfig(Number(get('WHEREABOUTS_API_TIMEOUT_RESPONSE', 12000))),
     },
     locationsInsidePrisonApi: {
       url: get('LOCATIONS_INSIDE_PRISON_API_URL', 'http://localhost:8083', requiredInProduction),
