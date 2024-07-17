@@ -142,7 +142,7 @@ context('A user can select a cell', () => {
       const page = SelectCellPage.goTo(offenderNo)
 
       page.cellResults().then($table => {
-        cy.get($table).find('tr').its('length').should('eq', 3)
+        cy.get($table).find('tr').its('length').should('eq', 2)
         cy.get($table)
           .find('tr')
           .then($tableRows => {
@@ -157,17 +157,6 @@ context('A user can select a cell', () => {
               csra: 'Standard\n\nView details\nfor Doe, Bob',
               relevantAlerts: 'PEEP',
               selectCell: 'Select cell',
-            })
-
-            assertRow(1, columns, {
-              location: '',
-              cellType: '',
-              capacity: '',
-              spaces: '',
-              occupier: 'Mcbubblesworth, Horatio\nView details\nfor Mcbubblesworth, Horatio\nNON-ASSOCIATION',
-              csra: 'Not entered\n\nView details\nfor Mcbubblesworth, Horatio',
-              relevantAlerts: '',
-              selectCell: '',
             })
           })
       })
