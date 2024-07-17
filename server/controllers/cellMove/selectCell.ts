@@ -15,6 +15,7 @@ import LocationService from '../../services/locationService'
 import { PrisonerNonAssociation } from '../../data/nonAssociationsApiClient'
 import config from '../../config'
 import { Prisoner } from '../../data/prisonerSearchApiClient'
+import { getActualCapacity } from '../../data/locationsInsidePrisonApiClient'
 
 const defaultSubLocationsValue = { text: 'Select area in residential unit', value: '' }
 const noAreasSelectedDropDownValue = { text: 'No areas to select', value: '' }
@@ -156,8 +157,9 @@ export default ({
       })
 
       const selectedCells = cells.filter(cell => {
-        if (cellType === 'SO') return cell.maxCapacity === 1
-        if (cellType === 'MO') return cell.maxCapacity > 1
+        const actualCapacity = getActualCapacity(cell)
+        if (cellType === 'SO') return actualCapacity === 1
+        if (cellType === 'MO') return actualCapacity > 1
         return cell
       })
 
@@ -182,13 +184,18 @@ export default ({
         showNonAssociationsLink: numberOfNonAssociations > 0,
         alerts: alertsToShow,
         showNonAssociationWarning: Boolean(residentialLevelNonAssociations.length),
-        cells: selectedCells?.map(cell => ({
-          key: cell.key,
-          type: hasLength(cell.legacyAttributes) && cell.legacyAttributes.sort(),
-          maxCapacity: cell.maxCapacity,
-          spaces: cell.maxCapacity - cell.noOfOccupants,
-          occupants: getCellOccupants({ prisonersInCell: cell.prisonersInCell, nonAssociations }),
-        })),
+        cells: selectedCells
+          ?.filter(cell => cell.pathHierarchy !== prisonerDetails.cellLocation)
+          .map(cell => {
+            const actualCapacity = getActualCapacity(cell)
+            return {
+              key: cell.key,
+              type: hasLength(cell.legacyAttributes) && cell.legacyAttributes.sort(),
+              actualCapacity,
+              spaces: actualCapacity - cell.noOfOccupants,
+              occupants: getCellOccupants({ prisonersInCell: cell.prisonersInCell, nonAssociations }),
+            }
+          }),
         locations: renderLocationOptions(locationsData),
         subLocations,
         cellAttributes,

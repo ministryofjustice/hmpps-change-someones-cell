@@ -15,7 +15,7 @@
   {% if index === 1 %}
     <td class="{{ cellClass }}">{{ cell.key }}</th>
     <td class="{{ cellClass }}">{{ cell.type | join(',<br>', 'typeDescription') | safe if cell.type.length else 'Nothing entered' }}</td>
-    <td class="{{ cellClass }}">{{ cell.maxCapacity }}</td>
+    <td class="{{ cellClass }}">{{ cell.actualCapacity }}</td>
     <td class="{{ cellClass }}">{{ cell.spaces }}</td>
   {% else %}
     <td class="{{ cellClass }}">

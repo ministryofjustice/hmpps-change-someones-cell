@@ -7,6 +7,7 @@ import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import { properCaseName, putLastNameFirst } from '../../utils'
 import { getConfirmBackLinkData } from './cellMoveUtils'
 import { ReferenceCode } from '../../data/prisonApiClient'
+import { getActualCapacity } from '../../data/locationsInsidePrisonApiClient'
 
 const CSWAP = 'C-SWAP'
 
@@ -104,7 +105,7 @@ export default ({
   const makeCellMove = async (req, res, { cellId, bookingId, agencyId, offenderNo, reasonCode, commentText }) => {
     const { systemClientToken } = res.locals
     const { capacity, key, pathHierarchy } = await locationService.getLocation(systemClientToken, cellId)
-    const actualCapacity = capacity.workingCapacity || capacity.maxCapacity
+    const actualCapacity = getActualCapacity(capacity)
     try {
       await prisonerCellAllocationService.moveToCell(
         systemClientToken,

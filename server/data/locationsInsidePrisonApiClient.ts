@@ -2,12 +2,19 @@ import config from '../config'
 import RestClient from './restClient'
 import { Prisoner } from './prisonerSearchApiClient'
 
+export interface Capacity {
+  workingCapacity?: number
+  maxCapacity: number
+}
+
+export const getActualCapacity = (capacity: Capacity) => capacity.workingCapacity || capacity.maxCapacity
+
 export interface Location {
   prisonId: string
   parentId: string
   key: string
   pathHierarchy: string
-  capacity: { maxCapacity: number; workingCapacity?: number }
+  capacity: Capacity
 }
 
 export interface CellLocation {

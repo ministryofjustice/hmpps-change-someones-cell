@@ -494,7 +494,7 @@ describe('Select a cell', () => {
                     typeDescription: 'Listener Cell',
                   },
                 ],
-                maxCapacity: 1,
+                actualCapacity: 1,
                 occupants: [],
                 spaces: 1,
               },
@@ -516,7 +516,7 @@ describe('Select a cell', () => {
             cells: [
               {
                 key: 'MDI-1-2',
-                maxCapacity: 2,
+                actualCapacity: 2,
                 occupants: [],
                 spaces: 2,
                 type: [
@@ -660,7 +660,7 @@ describe('Select a cell', () => {
           cells: [
             {
               key: 'MDI-1-1-3',
-              maxCapacity: 2,
+              actualCapacity: 2,
               occupants: [
                 {
                   alerts: [
@@ -698,7 +698,7 @@ describe('Select a cell', () => {
             },
             {
               key: 'MDI-1-1-2',
-              maxCapacity: 2,
+              actualCapacity: 2,
               occupants: [
                 {
                   alerts: [
@@ -736,7 +736,7 @@ describe('Select a cell', () => {
             },
             {
               key: 'MDI-1-1-1',
-              maxCapacity: 2,
+              actualCapacity: 2,
               occupants: [
                 {
                   alerts: [
@@ -868,7 +868,7 @@ describe('Select a cell', () => {
           cells: [
             {
               key: 'LEI-1-1-1',
-              maxCapacity: 4,
+              actualCapacity: 4,
               occupants: [
                 {
                   alerts: [],
