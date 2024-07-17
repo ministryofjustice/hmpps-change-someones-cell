@@ -184,16 +184,18 @@ export default ({
         showNonAssociationsLink: numberOfNonAssociations > 0,
         alerts: alertsToShow,
         showNonAssociationWarning: Boolean(residentialLevelNonAssociations.length),
-        cells: selectedCells?.map(cell => {
-          const actualCapacity = getActualCapacity(cell)
-          return {
-            key: cell.key,
-            type: hasLength(cell.legacyAttributes) && cell.legacyAttributes.sort(),
-            actualCapacity,
-            spaces: actualCapacity - cell.noOfOccupants,
-            occupants: getCellOccupants({ prisonersInCell: cell.prisonersInCell, nonAssociations }),
-          }
-        }),
+        cells: selectedCells
+          ?.filter(cell => cell.pathHierarchy !== prisonerDetails.cellLocation)
+          .map(cell => {
+            const actualCapacity = getActualCapacity(cell)
+            return {
+              key: cell.key,
+              type: hasLength(cell.legacyAttributes) && cell.legacyAttributes.sort(),
+              actualCapacity,
+              spaces: actualCapacity - cell.noOfOccupants,
+              occupants: getCellOccupants({ prisonersInCell: cell.prisonersInCell, nonAssociations }),
+            }
+          }),
         locations: renderLocationOptions(locationsData),
         subLocations,
         cellAttributes,
