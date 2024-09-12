@@ -1,4 +1,5 @@
 import { stubFor } from './wiremock'
+import { LocationInfo } from '../../server/data/locationsInsidePrisonApiClient'
 
 export const stubHealth = (status = 200) =>
   stubFor({
@@ -122,11 +123,11 @@ export const stubGroups = (caseload, status = 200) => {
   })
 }
 
-export const stubActivePrisons = activeAgencies => {
+export const stubActivePrisons = (activeAgencies: LocationInfo) => {
   return stubFor({
     request: {
       method: 'GET',
-      urlPathPattern: '/info',
+      url: '/info',
     },
     response: {
       status: 200,
@@ -207,4 +208,5 @@ export default {
   stubInmatesAtLocation,
   stubCellsWithCapacity,
   stubCellsWithCapacityByGroupName,
+  stubActivePrisons,
 }

@@ -515,7 +515,6 @@ context('A user can see conflicts in cell', () => {
     })
 
     beforeEach(() => {
-      cy.task('stubActivePrisons')
       cy.task('stubOffenderBasicDetails', offenderBasicDetails)
       cy.task('stubOffenderFullDetails', offenderFullDetails)
       cy.task('stubGroups', { id: 'MDI' })
@@ -580,6 +579,7 @@ context('A user can see conflicts in cell', () => {
       cy.task('stubLocation', { prisonId: 'MDI', key: 'MDI-1-2', pathHierarchy: '1-2', parentId: 'uuid1' })
       cy.task('stubLocation', { prisonId: 'MDI', key: 'MDI-1-1', pathHierarchy: '1-1', parentId: 'uuid1' })
       cy.task('stubLocation', { prisonId: 'MDI', key: 'MDI-1', pathHierarchy: '1', parentId: null })
+      cy.task('stubActivePrisons')
     })
 
     context('When referred from the select cell page', () => {

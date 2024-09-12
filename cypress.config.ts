@@ -57,6 +57,7 @@ export default defineConfig({
         stubMainOffence: offence => prisonApi.stubMainOffence(offence),
         stubOffenderBasicDetails: basicDetails => Promise.all([prisonApi.stubOffenderBasicDetails(basicDetails)]),
         stubInmatesAtLocation: inmates => locationsInsidePrisonApi.stubInmatesAtLocation(inmates),
+        stubActivePrisons: activeAgencies => locationsInsidePrisonApi.stubActivePrisons(activeAgencies),
         stubOffenderCellHistory: ({ history }) => prisonApi.stubOffenderCellHistory(history),
         stubGetAlerts: ({ agencyId, alerts }) => prisonApi.stubGetAlerts({ agencyId, alerts }),
         stubCsraAssessments: ({ offenderNumbers, assessments }) =>
