@@ -1,7 +1,7 @@
 import { PrisonApiClient, LocationsInsidePrisonApiClient } from '../data'
 import { Agency } from '../data/prisonApiClient'
 import { LocationGroup, LocationPrefix } from '../data/whereaboutsApiClient'
-import { Location } from '../data/locationsInsidePrisonApiClient'
+import { Location, LocationInfo } from '../data/locationsInsidePrisonApiClient'
 import LocationService from './locationService'
 import { SanitisedError } from '../sanitisedError'
 
@@ -60,6 +60,28 @@ describe('Location service', () => {
     it('Propagates error', async () => {
       locationsInsidePrisonApiClient.searchGroups.mockRejectedValue(new Error('some error'))
       await expect(locationService.searchGroups(token, 'BXI')).rejects.toEqual(new Error('some error'))
+    })
+  })
+
+  describe('Active Prison check', () => {
+    const info: LocationInfo = {
+      activeAgencies: ['MDI', 'BXI'],
+    }
+
+    it('returns true for Brixton', async () => {
+      locationsInsidePrisonApiClient.getActiveAgenciesInLocationService.mockResolvedValue(info)
+
+      const results = await locationService.getActiveAgenciesInLocationService(token, 'BXI')
+
+      expect(results).toEqual(true)
+    })
+
+    it('returns false for Leeds', async () => {
+      locationsInsidePrisonApiClient.getActiveAgenciesInLocationService.mockResolvedValue(info)
+
+      const results = await locationService.getActiveAgenciesInLocationService(token, 'LEI')
+
+      expect(results).toEqual(false)
     })
   })
 

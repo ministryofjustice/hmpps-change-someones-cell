@@ -151,6 +151,7 @@ describe('Select a cell', () => {
       expect(prisonerDetailsService.getPrisoner).toHaveBeenCalledWith(systemClientToken, someOffenderNumber)
       expect(nonAssociationsService.getNonAssociations).toHaveBeenCalledWith(systemClientToken, someOffenderNumber)
       expect(locationService.searchGroups).toHaveBeenCalledWith(systemClientToken, someAgency)
+      expect(locationService.getActiveAgenciesInLocationService).toHaveBeenCalledWith(systemClientToken, someAgency)
     })
 
     it('Redirects when offender not in user caseloads', async () => {
