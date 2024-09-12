@@ -240,8 +240,6 @@ context('A user can select a cell', () => {
           })
           cy.task('stubGetPrisonerNonAssociations', {})
           cy.task('stubGroups', { id: 'MDI' })
-          cy.task('stubActivePrisons')
-          cy.task('a')
           cy.task('stubLocation', {})
           cy.task('stubInmatesAtLocation', [
             {
