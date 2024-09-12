@@ -76,6 +76,7 @@ context('Cell move history', () => {
       ],
     })
     cy.task('stubGroups', { id: 'MDI' })
+    cy.task('stubActivePrisons')
     cy.task('stubCellMoveTypes', [
       {
         domain: 'CHG_HOUS_RSN',

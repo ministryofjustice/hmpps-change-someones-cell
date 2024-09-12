@@ -309,6 +309,7 @@ context('A user can see conflicts in cell', () => {
       },
     ])
     cy.task('stubGroups', { id: 'MDI' })
+    cy.task('stubActivePrisons')
     cy.task('stubGetAlerts', { agencyId: 'MDI', alerts: [{ offenderNo: 'A12345', alertCode: 'PEEP' }] })
     cy.task('stubCsraAssessments', {
       offenderNumbers: ['A12345'],
@@ -518,6 +519,7 @@ context('A user can see conflicts in cell', () => {
       cy.task('stubOffenderBasicDetails', offenderBasicDetails)
       cy.task('stubOffenderFullDetails', offenderFullDetails)
       cy.task('stubGroups', { id: 'MDI' })
+      cy.task('stubActivePrisons')
       cy.task('stubGetPrisoner', {
         firstName: 'Bob',
         lastName: 'Doe',
@@ -579,7 +581,6 @@ context('A user can see conflicts in cell', () => {
       cy.task('stubLocation', { prisonId: 'MDI', key: 'MDI-1-2', pathHierarchy: '1-2', parentId: 'uuid1' })
       cy.task('stubLocation', { prisonId: 'MDI', key: 'MDI-1-1', pathHierarchy: '1-1', parentId: 'uuid1' })
       cy.task('stubLocation', { prisonId: 'MDI', key: 'MDI-1', pathHierarchy: '1', parentId: null })
-      cy.task('stubActivePrisons')
     })
 
     context('When referred from the select cell page', () => {
@@ -593,6 +594,7 @@ context('A user can see conflicts in cell', () => {
       })
 
       it('should have a back button linking to the prisoner search page', () => {
+        cy.task('stubActivePrisons')
         cy.contains('Back').click()
         cy.contains('Select an available cell')
       })

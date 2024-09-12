@@ -127,7 +127,7 @@ export const stubActivePrisons = (activeAgencies: LocationInfo) => {
   return stubFor({
     request: {
       method: 'GET',
-      url: '/info',
+      url: '/locations-inside-prison-api/info',
     },
     response: {
       status: 200,
