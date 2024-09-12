@@ -122,6 +122,22 @@ export const stubGroups = (caseload, status = 200) => {
   })
 }
 
+export const stubActivePrisons = activeAgencies => {
+  return stubFor({
+    request: {
+      method: 'GET',
+      urlPathPattern: '/info',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: activeAgencies || { activeAgencies: '***' },
+    },
+  })
+}
+
 export const stubLocation = location => {
   return stubFor({
     request: {

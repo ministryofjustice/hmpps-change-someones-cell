@@ -515,6 +515,7 @@ context('A user can see conflicts in cell', () => {
     })
 
     beforeEach(() => {
+      cy.task('stubActivePrisons')
       cy.task('stubOffenderBasicDetails', offenderBasicDetails)
       cy.task('stubOffenderFullDetails', offenderFullDetails)
       cy.task('stubGroups', { id: 'MDI' })
