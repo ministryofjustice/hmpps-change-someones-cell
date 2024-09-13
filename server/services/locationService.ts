@@ -19,6 +19,11 @@ export default class LocationService {
     return await this.locationsInsidePrisonApiClient.getLocation(token, key)
   }
 
+  async getActiveAgenciesInLocationService(token: string, prisonId: string): Promise<boolean> {
+    const locationInfo = await this.locationsInsidePrisonApiClient.getActiveAgenciesInLocationService(token)
+    return locationInfo.activeAgencies.includes(prisonId) || locationInfo.activeAgencies.includes('***')
+  }
+
   async getAgencyGroupLocationPrefix(token: string, agencyId: string, groupName: string): Promise<LocationPrefix> {
     try {
       return await this.locationsInsidePrisonApiClient.getAgencyGroupLocationPrefix(token, agencyId, groupName)

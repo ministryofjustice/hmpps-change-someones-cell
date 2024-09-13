@@ -21,6 +21,17 @@ describe('LocationsInsidePrisonApiClient', () => {
     nock.cleanAll()
   })
 
+  describe('activeAgenciesInLocationService', () => {
+    it('should return data from info', async () => {
+      const response = { activeAgencies: ['MDI', 'BXI'] }
+
+      fakeLocationsInsidePrisonApiClient.get('/info').reply(200, response)
+
+      const output = await locationsInsidePrisonApiClient.getActiveAgenciesInLocationService(accessToken)
+      expect(output).toEqual(response)
+    })
+  })
+
   describe('searchGroups', () => {
     it('should return data from api', async () => {
       const response = { data: 'data' }

@@ -76,6 +76,7 @@ context('A user can search for a cell', () => {
       ],
     })
     cy.task('stubGroups', { id: 'MDI' })
+    cy.task('stubActivePrisons')
     cy.task('stubCellsWithCapacity', { prisonId: 'MDI', locationsResponse })
     cy.task('stubCellsWithCapacityByGroupName', { prisonId: 'MDI', groupName: 1, response: locationsResponse })
     cy.task('stubLocation', { locationId: 1, locationData: { parentLocationId: 2, description: 'MDI-1-1' } })
@@ -309,6 +310,7 @@ context('A user can search for a cell', () => {
           prisonerNumber: 'B4567CD',
         })
         cy.task('stubGroups', { id: 'MDI' })
+        cy.task('stubActivePrisons')
         cy.task('stubInmatesAtLocation', {
           inmates: [{ offenderNo: 'A12345', firstName: 'Bob', lastName: 'Doe', assignedLivingUnitId: 1 }],
         })

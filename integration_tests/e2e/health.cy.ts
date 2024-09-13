@@ -29,6 +29,10 @@ context('Health page reports health correctly', () => {
             status: 'UP',
             details: 'UP',
           },
+          locationsInsidePrisonApi: {
+            status: 'UP',
+            details: 'UP',
+          },
           tokenVerification: {
             status: 'UP',
             details: 'UP',
