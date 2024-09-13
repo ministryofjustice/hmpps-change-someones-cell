@@ -172,7 +172,11 @@ export default ({
         },
       }
 
+<<<<<<< MAP-1622
       const useSpecialistCellTypes = await locationService.getActiveAgenciesInLocationService(
+=======
+      const useSpecialistCellTypes = locationService.getActiveAgenciesInLocationService(
+>>>>>>> main
         systemClientToken,
         prisonerDetails.prisonId,
       )
