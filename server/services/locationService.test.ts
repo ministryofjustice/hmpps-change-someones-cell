@@ -68,6 +68,16 @@ describe('Location service', () => {
       activeAgencies: ['MDI', 'BXI'],
     }
 
+    it('returns true for all prisons', async () => {
+      locationsInsidePrisonApiClient.getActiveAgenciesInLocationService.mockResolvedValue({
+        activeAgencies: ['***'],
+      })
+
+      const results = await locationService.getActiveAgenciesInLocationService(token, 'PVI')
+
+      expect(results).toEqual(true)
+    })
+
     it('returns true for Brixton', async () => {
       locationsInsidePrisonApiClient.getActiveAgenciesInLocationService.mockResolvedValue(info)
 
