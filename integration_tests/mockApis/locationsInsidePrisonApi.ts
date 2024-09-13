@@ -134,7 +134,7 @@ export const stubActivePrisons = (activeAgencies: LocationInfo) => {
       headers: {
         'Content-Type': 'application/json;charset=UTF-8',
       },
-      jsonBody: activeAgencies || { activeAgencies: '***' },
+      jsonBody: activeAgencies || { activeAgencies: [] },
     },
   })
 }

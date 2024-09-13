@@ -41,7 +41,7 @@ context('A user can select a cell', () => {
       })
     })
     cy.task('stubGroups', { id: 'MDI' })
-    cy.task('stubActivePrisons')
+    cy.task('stubActivePrisons', { activeAgencies: ['MDI'] })
     cy.task('stubGetPrisonerNonAssociations', {
       prisonerNumber: 'A12345',
       firstName: 'John',
@@ -225,7 +225,6 @@ context('A user can select a cell', () => {
           })
           cy.task('stubGetPrisonerNonAssociations', {})
           cy.task('stubGroups', { id: 'MDI' })
-          cy.task('stubActivePrisons')
           cy.visit('/prisoner/A12345/cell-move/search-for-cell')
         })
 
