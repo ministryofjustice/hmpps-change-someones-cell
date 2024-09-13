@@ -172,7 +172,7 @@ export default ({
         },
       }
 
-      const useSpecialistCellTypes = locationService.getActiveAgenciesInLocationService(
+      const useSpecialistCellTypes = await locationService.getActiveAgenciesInLocationService(
         systemClientToken,
         prisonerDetails.prisonId,
       )
