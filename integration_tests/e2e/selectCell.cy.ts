@@ -83,6 +83,10 @@ context('A user can select a cell', () => {
           { typeDescription: 'Gated Cell', type: 'GC' },
           { type: 'LC', typeDescription: 'Listener Cell' },
         ],
+        specialistCellTypes: [
+          { typeDescription: 'Listener / crisis cell', type: 'LISTENER_CRISIS' },
+          { typeDescription: 'Locate flat', type: 'LOCATE_FLAT_CELL' },
+        ],
         maxCapacity: 3,
         pathHierarchy: '1-1',
         noOfOccupants: 2,
@@ -110,6 +114,10 @@ context('A user can select a cell', () => {
         legacyAttributes: [
           { typeDescription: 'Special Cell', type: 'SPC' },
           { typeDescription: 'Gated Cell', type: 'GC' },
+        ],
+        specialistCellTypes: [
+          { typeDescription: 'Biohazard / dirty protest cell', type: 'BIOHAZARD_DIRTY_PROTEST' },
+          { typeDescription: 'Accessible cell', type: 'ACCESSIBLE_CELL' },
         ],
         maxCapacity: 2,
         pathHierarchy: '1-2',
@@ -151,7 +159,7 @@ context('A user can select a cell', () => {
 
             assertRow(0, columns, {
               location: 'MDI-1-1',
-              cellType: 'Gated Cell,\nListener Cell',
+              cellType: 'Listener / crisis cell,\nLocate flat',
               capacity: 3,
               spaces: 1,
               occupier: 'Doe, Bob\nView details\nfor Doe, Bob',
