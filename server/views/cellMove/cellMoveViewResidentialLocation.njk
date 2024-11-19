@@ -41,6 +41,7 @@
   </h1>
 
   <form novalidate="novalidate" data-test="prisoner-search-form">
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
     <div class="horizontal-form govuk-!-margin-bottom-3">
       {{ govukSelect({
         id: "location",
