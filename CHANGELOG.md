@@ -1,4 +1,12 @@
 # Change log
+
+**November 21st 2024** - Move to node 22
+
+Node 22 is now LTS. Notes [here](https://nodejs.org/en/blog/announcements/v22-release-announce)
+
+See PR [#474](https://github.com/ministryofjustice/hmpps-template-typescript/pull/474)
+
+
 **November 18th 2024** - Moving away from csurf and to csrf-sync
 
 [csurf](https://www.npmjs.com/package/csurf) has been deprecated for some time and this removes that dependency and implements the [synchronizer token pattern](https://cheatsheetseries.owasp.org/cheatsheets/Cross-Site_Request_Forgery_Prevention_Cheat_Sheet.html#transmissing-csrf-tokens-in-synchronized-patterns) using [csrf-sync](https://www.npmjs.com/package/csrf-sync).
