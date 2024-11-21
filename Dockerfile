@@ -1,5 +1,5 @@
 # Stage: base image
-FROM node:22.10-bookworm-slim as base
+FROM node:20.8-bullseye-slim as base
 
 ARG BUILD_NUMBER
 ARG GIT_REF
@@ -39,7 +39,7 @@ ARG GIT_REF
 ARG GIT_BRANCH
 
 RUN apt-get update && \
-        apt-get install -y make python g++
+        apt-get install -y make python-is-python3 2to3
 
 COPY package*.json ./
 RUN CYPRESS_INSTALL_BINARY=0 npm ci --no-audit
