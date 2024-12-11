@@ -1,4 +1,4 @@
-import express, { Router } from 'express'
+import express, { Application, Router } from 'express'
 
 import healthcheck from '../services/healthCheck'
 import type { ApplicationInfo } from '../applicationInfo'
@@ -15,7 +15,7 @@ export default function setUpHealthChecks(applicationInfo: ApplicationInfo): Rou
     })
   })
 
-  router.get('/ping', (req, res) =>
+  router.get('/ping', (req: any, res: { send: (arg0: { status: string }) => any }) =>
     res.send({
       status: 'UP',
     }),
