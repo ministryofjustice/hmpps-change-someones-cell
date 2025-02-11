@@ -26,5 +26,5 @@ generic-service:
       - private_prisons
 
 generic-prometheus-alerts:
-  alertSeverity: hmpps-prisoner-cell-allocation-prod
+  alertSeverity: move-a-prisoner-alerts-prod
 
