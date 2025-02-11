@@ -60,3 +60,4 @@ generic-service:
 
 generic-prometheus-alerts:
   targetApplication: hmpps-change-someones-cell
+  alertSeverity: move-a-prisoner-alerts-nonprod
