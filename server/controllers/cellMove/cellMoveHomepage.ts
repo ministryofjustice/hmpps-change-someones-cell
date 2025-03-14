@@ -48,7 +48,7 @@ const whereaboutsTasks: (prisonName: string) => WhereaboutsTask[] = prisonName =
     id: 'no-cell-allocated',
     heading: 'No cell allocated',
     description: 'View people who do not currently have a cell allocated having been temporarily moved out of a cell.',
-    href: `${config.dpsUrl}/establishment-roll/no-cell-allocated`,
+    href: `${config.establishmentRollUrl}/no-cell-allocated`,
     roles: null,
     enabled: true,
   },

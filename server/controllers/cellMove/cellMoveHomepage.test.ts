@@ -45,7 +45,7 @@ describe('Homepage', () => {
             heading: 'No cell allocated',
             description:
               'View people who do not currently have a cell allocated having been temporarily moved out of a cell.',
-            href: 'http://localhost:3000/establishment-roll/no-cell-allocated',
+            href: 'http://localhost:3000/no-cell-allocated',
           },
         ],
       })
