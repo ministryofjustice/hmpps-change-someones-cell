@@ -134,6 +134,7 @@ export default {
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName: get('ENVIRONMENT_NAME', ''),
   dpsUrl: get('DPS_URL', 'http://localhost:3000', requiredInProduction),
+  establishmentRollUrl: get('ESTABLISHMENT_ROLL_URL', 'http://localhost:3000', requiredInProduction),
   prisonerProfileUrl: get('PRISONER_PROFILE_URL', 'http://localhost:3000', requiredInProduction),
   googleAnalytics: {
     measurementId: get('GOOGLE_ANALYTICS_MEASUREMENT_ID', ''),

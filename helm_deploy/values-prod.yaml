@@ -18,6 +18,7 @@ generic-service:
     WHEREABOUTS_API_URL: "https://whereabouts-api.service.justice.gov.uk"
     LOCATIONS_INSIDE_PRISON_API_URL: "https://locations-inside-prison-api.hmpps.service.justice.gov.uk"
     PRISONER_SEARCH_API_URL: "https://prisoner-search.prison.service.justice.gov.uk"
+    ESTABLISHMENT_ROLL_URL: "https://prison-roll-count.hmpps.service.justice.gov.uk"
 
   allowlist:
     groups:
