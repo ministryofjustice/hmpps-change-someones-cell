@@ -22,12 +22,12 @@ export default class MetricsEvent {
     })
   }
 
-  static CANCELLED_OR_CONSIDER_RISKS_EVENT(
+  static CANCELLED_ON_CONSIDER_RISKS_EVENT(
     agencyId: string,
     offenderAlertCodes: string,
     alertCodesAssociatedWithOccupants: string,
   ) {
-    const event = new MetricsEvent('Cancelled or consider risks event', agencyId)
+    const event = new MetricsEvent('Cancelled on consider risks event', agencyId)
     return event.addProperties({
       offenderAlertCodes,
       cellOccupantsAlertCodes: alertCodesAssociatedWithOccupants,

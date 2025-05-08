@@ -278,7 +278,7 @@ export default ({
           logger.warn('Failed to send Google Analytics event')
         })
 
-      const event = MetricsEvent.CANCELLED_OR_CONSIDER_RISKS_EVENT(
+      const event = MetricsEvent.CANCELLED_ON_CONSIDER_RISKS_EVENT(
         currentOffenderDetails.agencyId,
         offenderAlertCodes,
         alertCodesAssociatedWithOccupants,

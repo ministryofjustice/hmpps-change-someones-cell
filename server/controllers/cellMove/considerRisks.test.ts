@@ -776,7 +776,7 @@ describe('move validation', () => {
     ])
 
     expect(metricsService.trackEvent).toHaveBeenCalledWith(
-      MetricsEvent.CANCELLED_OR_CONSIDER_RISKS_EVENT('MDI', 'XEL,XGANG,VIP,HA,HA1,RTP,RLG,RLG', 'VIP,XGANG'),
+      MetricsEvent.CANCELLED_ON_CONSIDER_RISKS_EVENT('MDI', 'XEL,XGANG,VIP,HA,HA1,RTP,RLG,RLG', 'VIP,XGANG'),
     )
 
     expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${offenderNo}/cell-move/select-cell`)
