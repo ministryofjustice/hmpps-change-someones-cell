@@ -8,6 +8,8 @@ import { properCaseName, putLastNameFirst } from '../../utils'
 import { getConfirmBackLinkData } from './cellMoveUtils'
 import { ReferenceCode } from '../../data/prisonApiClient'
 import { getActualCapacity } from '../../data/locationsInsidePrisonApiClient'
+import MetricsEvent from '../../data/metricsEvent'
+import MetricsService from '../../services/metricsService'
 
 const CSWAP = 'C-SWAP'
 
@@ -34,6 +36,7 @@ type Params = {
   locationService: LocationService
   prisonerCellAllocationService: PrisonerCellAllocationService
   prisonerDetailsService: PrisonerDetailsService
+  metricsService: MetricsService
 }
 
 export default ({
@@ -41,6 +44,7 @@ export default ({
   locationService,
   prisonerCellAllocationService,
   prisonerDetailsService,
+  metricsService,
 }: Params) => {
   const index = async (req, res) => {
     const { offenderNo } = req.params
@@ -100,6 +104,9 @@ export default ({
       .catch(_reason => {
         logger.warn('Failed to send Google Analytics event')
       })
+
+    const event = MetricsEvent.CELL_MOVE_EVENT(agencyId, cellType)
+    metricsService.trackEvent(event)
   }
 
   const makeCellMove = async (req, res, { cellId, bookingId, agencyId, offenderNo, reasonCode, commentText }) => {

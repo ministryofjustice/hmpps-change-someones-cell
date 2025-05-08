@@ -8,7 +8,7 @@ import applicationInfoSupplier from '../applicationInfo'
 
 const applicationInfo = applicationInfoSupplier()
 initialiseAppInsights()
-buildAppInsightsClient(applicationInfo)
+const applicationInsightsClient = buildAppInsightsClient(applicationInfo)
 
 import HmppsAuthClient from './hmppsAuthClient'
 import ManageUsersApiClient from './manageUsersApiClient'
@@ -35,6 +35,7 @@ export const dataAccess = () => ({
   nonAssociationsApiClient: new NonAssociationsApiClient(),
   googleAnalyticsClient: new GoogleAnalyticsClient(),
   prisonerSearchApiClient: new PrisonerSearchApiClient(),
+  applicationInsightsClient,
 })
 
 export type DataAccess = ReturnType<typeof dataAccess>
@@ -49,4 +50,5 @@ export {
   NonAssociationsApiClient,
   GoogleAnalyticsClient,
   PrisonerSearchApiClient,
+  applicationInsightsClient,
 }

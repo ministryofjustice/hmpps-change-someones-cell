@@ -6,6 +6,7 @@ import PrisonerDetailsService from './prisonerDetailsService'
 import LocationService from './locationService'
 import NonAssociationsService from './nonAssociationsService'
 import AnalyticsService from './analyticsService'
+import MetricsService from './metricsService'
 
 export const services = () => {
   const {
@@ -18,6 +19,7 @@ export const services = () => {
     nonAssociationsApiClient,
     googleAnalyticsClient,
     prisonerSearchApiClient,
+    applicationInsightsClient,
   } = dataAccess()
 
   const userService = new UserService(manageUsersApiClient, prisonApiClient)
@@ -31,6 +33,7 @@ export const services = () => {
   const locationService = new LocationService(prisonApiClient, locationsInsidePrisonApiClient)
   const nonAssociationsService = new NonAssociationsService(nonAssociationsApiClient)
   const analyticsService = new AnalyticsService(googleAnalyticsClient)
+  const metricsService = new MetricsService(applicationInsightsClient)
 
   return {
     applicationInfo,
@@ -41,6 +44,7 @@ export const services = () => {
     locationService,
     nonAssociationsService,
     analyticsService,
+    metricsService,
   }
 }
 
