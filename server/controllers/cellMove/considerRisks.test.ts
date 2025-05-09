@@ -8,6 +8,8 @@ import PrisonerCellAllocationService from '../../services/prisonerCellAllocation
 
 import config from '../../config'
 import { PrisonerNonAssociation } from '../../data/nonAssociationsApiClient'
+import MetricsService from '../../services/metricsService'
+import MetricsEvent from '../../data/metricsEvent'
 
 Reflect.deleteProperty(process.env, 'APPINSIGHTS_INSTRUMENTATIONKEY')
 
@@ -23,6 +25,7 @@ describe('move validation', () => {
   const nonAssociationsService = jest.mocked(new NonAssociationsService(undefined))
   const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
   const prisonerCellAllocationService = jest.mocked(new PrisonerCellAllocationService(undefined, undefined, undefined))
+  const metricsService = jest.mocked(new MetricsService(undefined))
 
   let req
   let res
@@ -266,6 +269,7 @@ describe('move validation', () => {
     prisonerDetailsService.getDetails = jest.fn()
     locationService.getLocation = jest.fn().mockResolvedValueOnce(cellLocationData)
     analyticsService.sendEvents = jest.fn().mockResolvedValue(Promise.resolve({}))
+    metricsService.trackEvent = jest.fn().mockResolvedValue(Promise.resolve({}))
     nonAssociationsService.getNonAssociations = jest.fn().mockResolvedValue({
       prisonerNumber: 'ABC123',
       firstName: 'Fred',
@@ -377,6 +381,7 @@ describe('move validation', () => {
       nonAssociationsService,
       prisonerDetailsService,
       prisonerCellAllocationService,
+      metricsService,
     })
   })
 
@@ -747,7 +752,7 @@ describe('move validation', () => {
     expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${offenderNo}/cell-move/select-cell`)
   })
 
-  it('Raise ga event on cancel, containing the alert codes for all involed offenders', async () => {
+  it('Raise ga event and an app insights event on cancel, containing the alert codes for all involved offenders', async () => {
     prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue(occupants)
     prisonerDetailsService.getDetails
       .mockResolvedValueOnce(offenderDetails)
@@ -769,6 +774,10 @@ describe('move validation', () => {
         },
       },
     ])
+
+    expect(metricsService.trackEvent).toHaveBeenCalledWith(
+      MetricsEvent.CANCELLED_ON_CONSIDER_RISKS_EVENT('MDI', 'XEL,XGANG,VIP,HA,HA1,RTP,RLG,RLG', 'VIP,XGANG'),
+    )
 
     expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${offenderNo}/cell-move/select-cell`)
   })

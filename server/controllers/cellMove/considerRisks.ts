@@ -13,6 +13,8 @@ import PrisonerCellAllocationService from '../../services/prisonerCellAllocation
 import logger from '../../../logger'
 import config from '../../config'
 import { NonAssociation } from '../../data/nonAssociationsApiClient'
+import MetricsService from '../../services/metricsService'
+import MetricsEvent from '../../data/metricsEvent'
 
 const activeCellMoveAlertsExcludingDisabled = alert =>
   !alert.expired && cellMoveAlertCodes.includes(alert.alertCode) && alert.alertCode !== 'PEEP'
@@ -25,6 +27,7 @@ type Params = {
   prisonerDetailsService: PrisonerDetailsService
   nonAssociationsService: NonAssociationsService
   prisonerCellAllocationService: PrisonerCellAllocationService
+  metricsService: MetricsService
 }
 
 export default ({
@@ -33,6 +36,7 @@ export default ({
   nonAssociationsService,
   prisonerDetailsService,
   prisonerCellAllocationService,
+  metricsService,
 }: Params) => {
   const getOccupantsDetails = async (context, offenders: string[]) =>
     Promise.all(offenders.map(offender => prisonerDetailsService.getDetails(context, offender, true)))
@@ -273,6 +277,14 @@ export default ({
         .catch(_reason => {
           logger.warn('Failed to send Google Analytics event')
         })
+
+      const event = MetricsEvent.CANCELLED_ON_CONSIDER_RISKS_EVENT(
+        currentOffenderDetails.agencyId,
+        offenderAlertCodes,
+        alertCodesAssociatedWithOccupants,
+      )
+
+      metricsService.trackEvent(event)
 
       return res.redirect(redirectUrl)
     } catch (error) {

@@ -5,6 +5,8 @@ import LocationService from '../../services/locationService'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import config from '../../config'
+import MetricsService from '../../services/metricsService'
+import MetricsEvent from '../../data/metricsEvent'
 
 jest.mock('../../services/analyticsService')
 jest.mock('../../services/locationService')
@@ -16,6 +18,7 @@ describe('Change cell play back details', () => {
   const locationService = jest.mocked(new LocationService(undefined, undefined))
   const prisonerCellAllocationService = jest.mocked(new PrisonerCellAllocationService(undefined, undefined, undefined))
   const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
+  const metricsService = jest.mocked(new MetricsService(undefined))
 
   let controller
 
@@ -76,11 +79,14 @@ describe('Change cell play back details', () => {
 
     analyticsService.sendEvents = jest.fn().mockResolvedValue(Promise.resolve({}))
 
+    metricsService.trackEvent = jest.fn().mockResolvedValue(Promise.resolve({}))
+
     controller = confirmCellMove({
       analyticsService,
       locationService,
       prisonerCellAllocationService,
       prisonerDetailsService,
+      metricsService,
     })
 
     req.params = {
@@ -438,7 +444,7 @@ describe('Change cell play back details', () => {
       expect(res.locals.homeUrl).toBe(`${config.prisonerProfileUrl}/prisoner/${offenderNo}`)
     })
 
-    it('should raise an analytics event', async () => {
+    it('should raise both an analytics event and an app insights event', async () => {
       req.body = { ...req.body, cellId: 223 }
 
       await controller.post(req, res)
@@ -451,6 +457,8 @@ describe('Change cell play back details', () => {
           },
         },
       ])
+
+      expect(metricsService.trackEvent).toHaveBeenCalledWith(MetricsEvent.CELL_MOVE_EVENT('MDI', 'Single occupancy'))
     })
 
     it('should not raise an analytics event on api failures', async () => {
@@ -462,6 +470,8 @@ describe('Change cell play back details', () => {
       await expect(controller.post(req, res)).rejects.toThrowError(error)
 
       expect(analyticsService.sendEvents.mock.calls.length).toBe(0)
+
+      expect(metricsService.trackEvent.mock.calls.length).toBe(0)
     })
 
     it('should redirect to cell not available on a http 400 bad request when attempting a cell move', async () => {
@@ -473,6 +483,7 @@ describe('Change cell play back details', () => {
 
       expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/cell-move/cell-not-available?cellDescription=A-1-1')
       expect(analyticsService.sendEvents.mock.calls.length).toBe(0)
+      expect(metricsService.trackEvent.mock.calls.length).toBe(0)
     })
   })
 
@@ -522,6 +533,7 @@ describe('Change cell play back details', () => {
       await expect(controller.post(req, res)).rejects.toThrow(error)
 
       expect(analyticsService.sendEvents.mock.calls.length).toBe(0)
+      expect(metricsService.trackEvent.mock.calls.length).toBe(0)
     })
   })
 })
