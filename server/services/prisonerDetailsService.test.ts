@@ -1,21 +1,25 @@
 import { Readable } from 'stream'
 import { PrisonApiClient } from '../data'
 import PrisonerDetailsService from './prisonerDetailsService'
-import { Alert, Assessment, OffenceDetail, OffenderDetails } from '../data/prisonApiClient'
+import { Assessment, OffenceDetail, OffenderDetails } from '../data/prisonApiClient'
+import { Alert } from '../data/alertsApiClient'
 import PrisonerSearchApiClient, { Prisoner } from '../data/prisonerSearchApiClient'
 
 jest.mock('../data/prisonApiClient')
+jest.mock('../data/alertsApiClient')
 jest.mock('../data/prisonerSearchApiClient')
 
 const token = 'some token'
 
 describe('Prisoner details service', () => {
   let prisonApiClient: jest.Mocked<PrisonApiClient>
+  let alertsApiClient: jest.Mocked<AlertsApiClient>
   let prisonerSearchApiClient: jest.Mocked<PrisonerSearchApiClient>
   let prisonerDetailsService: PrisonerDetailsService
 
   beforeEach(() => {
     prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
+    alertsApiClient = new AlertsApiClient() as jest.Mocked<AlertsApiClient>
     prisonerSearchApiClient = new PrisonerSearchApiClient() as jest.Mocked<PrisonerSearchApiClient>
     prisonerDetailsService = new PrisonerDetailsService(prisonApiClient, prisonerSearchApiClient)
   })
@@ -114,40 +118,49 @@ describe('Prisoner details service', () => {
 
   describe('getAlerts', () => {
     const alerts: Alert[] = [
-      {
-        active: true,
-        addedByFirstName: 'John',
-        addedByLastName: 'Smith',
-        alertCode: 'XGANG',
-        alertCodeDescription: 'Gang member',
-        alertId: 1,
-        alertType: 'X',
-        alertTypeDescription: 'Security',
-        bookingId: 14,
-        comment: 'silly',
-        dateCreated: '2019-08-25',
-        dateExpires: '2019-09-20',
-        expired: false,
-        expiredByFirstName: 'Jane',
-        expiredByLastName: 'Smith',
-        modifiedDateTime: '2021-07-05T10:35:17',
-        offenderNo: 'G3878UK',
-      },
-    ]
+  {
+    alertUuid: '123e4567-e89b-12d3-a456-426614174000',
+    prisonNumber: 'G3878UK',
+    alertCode: {
+      alertTypeCode: 'X',
+      alertTypeDescription: 'Security',
+      code: 'XGANG',
+      description: 'Gang member',
+    },
+    description: 'silly',
+    authorisedBy: 'John Smith',
+    activeFrom: '2019-08-25',
+    activeTo: '2019-09-20',
+    isActive: true,
+    createdAt: '2019-08-25T10:00:00',
+    createdBy: 'USER1234',
+    createdByDisplayName: 'John Smith',
+    lastModifiedAt: '2021-07-05T10:35:17',
+    lastModifiedBy: 'USER5678',
+    lastModifiedByDisplayName: 'Jane Smith',
+    activeToLastSetAt: '2019-09-20T08:00:00',
+    activeToLastSetBy: 'USER5678',
+    activeToLastSetByDisplayName: 'Jane Smith',
+    madeInactiveAt: '2019-09-20T08:00:00',
+    madeInactiveBy: 'USER5678',
+    madeInactiveByDisplayName: 'Jane Smith',
+    prisonCodeWhenCreated: 'LEI',
+  },
+]
 
     it('retrieves alerts', async () => {
-      prisonApiClient.getAlerts.mockResolvedValue(alerts)
+      alertsApiClient.getAlerts.mockResolvedValue(alerts)
 
-      const results = await prisonerDetailsService.getAlerts(token, 'BXI', ['A1234'])
+      const results = await prisonerDetailsService.getAlerts(token, ['A1234'])
 
-      expect(prisonApiClient.getAlerts).toHaveBeenCalledWith(token, 'BXI', ['A1234'])
+      expect(alertsApiClient.getAlerts).toHaveBeenCalledWith(token, ['A1234'])
       expect(results).toEqual(alerts)
     })
 
     it('propagates error', async () => {
-      prisonApiClient.getAlerts.mockRejectedValue(new Error('some error'))
+      alertsApiClient.getAlerts.mockRejectedValue(new Error('some error'))
 
-      await expect(prisonerDetailsService.getAlerts(token, 'BXI', ['A1234'])).rejects.toEqual(new Error('some error'))
+      await expect(prisonerDetailsService.getAlerts(token, ['A1234'])).rejects.toEqual(new Error('some error'))
     })
   })
 

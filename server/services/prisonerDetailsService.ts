@@ -1,9 +1,11 @@
-import { PrisonApiClient } from '../data'
+import AlertsApiClient from '../data/alertsApiClient'
+import PrisonApiClient from '../data/prisonApiClient'
 import PrisonerSearchApiClient, { Prisoner } from '../data/prisonerSearchApiClient'
 
 export default class PrisonerDetailsService {
   constructor(
     private readonly prisonApiClient: PrisonApiClient,
+    private readonly alertsApiClient: AlertsApiClient,
     private readonly prisonerSearchApiClient: PrisonerSearchApiClient,
   ) {}
 
@@ -33,8 +35,8 @@ export default class PrisonerDetailsService {
     return this.prisonApiClient.getDetails(token, offenderNo, fullInfo)
   }
 
-  async getAlerts(token: string, agencyId: string, offenderNumbers: string[]) {
-    return this.prisonApiClient.getAlerts(token, agencyId, offenderNumbers)
+  async getAlerts(token: string, offenderNumbers: string[]) {
+    return this.alertsApiClient.getAlerts(token,offenderNumbers)
   }
 
   async getCsraAssessments(token: string, offenderNumbers: string[]) {
