@@ -1,4 +1,4 @@
-import { LocationsInsidePrisonApiClient, PrisonApiClient, WhereaboutsApiClient } from '../data'
+import { LocationsInsidePrisonApiClient, PrisonApiClient, WhereaboutsApiClient, AlertsApiClient } from '../data'
 import { Alert, Offender, OffenderInReception } from '../data/prisonApiClient'
 import logger from '../../logger'
 import { CellLocation, Occupant } from '../data/locationsInsidePrisonApiClient'
@@ -9,6 +9,7 @@ export interface OffenderWithAlerts extends OffenderInReception {
 
 export default class PrisonerCellAllocationService {
   constructor(
+    private readonly alertsApiClient: AlertsApiClient,
     private readonly prisonApiClient: PrisonApiClient,
     private readonly whereaboutsApiClient: WhereaboutsApiClient,
     private readonly locationsInsidePrisonApiClient: LocationsInsidePrisonApiClient,
@@ -89,8 +90,8 @@ export default class PrisonerCellAllocationService {
   }
 
   private async getActiveAlerts(token: string, offenderNumbers: string[]) {
-    const alerts = await this.prisonApiClient.getAlertsGlobal(token, offenderNumbers)
-    return alerts?.filter(alert => !alert.expired)
+    const alerts = await this.alertsApiClient.getAlertsGlobal(token, offenderNumbers)
+    return alerts?.content.filter(alert => alert.isActive)
   }
 
   private addAlerts(objects: OffenderInReception[], alerts: Alert[]) {

@@ -22,3 +22,5 @@ generic-service:
     LOCATIONS_INSIDE_PRISON_API_URL: "https://locations-inside-prison-api-preprod.hmpps.service.justice.gov.uk"
     PRISONER_SEARCH_API_URL: "https://prisoner-search-preprod.prison.service.justice.gov.uk"
     ESTABLISHMENT_ROLL_URL: "https://prison-roll-count-preprod.hmpps.service.justice.gov.uk"
+    ALERTS_API_URL: "https://alerts-api-preprod.hmpps.service.justice.gov.uk"
+
