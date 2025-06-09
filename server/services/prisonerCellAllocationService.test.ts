@@ -1,4 +1,4 @@
-import { LocationsInsidePrisonApiClient, PrisonApiClient, WhereaboutsApiClient } from '../data'
+import { LocationsInsidePrisonApiClient, PrisonApiClient, WhereaboutsApiClient, AlertsApiClient } from '../data'
 import {
   BedAssignment,
   Offender,
@@ -12,6 +12,7 @@ import { CellMoveResponse } from '../data/whereaboutsApiClient'
 import PrisonerCellAllocationService from './prisonerCellAllocationService'
 import { CellLocation, Occupant } from '../data/locationsInsidePrisonApiClient'
 
+jest.mock('../data/alertsApiClient')
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/prisonerSearchApiClient')
 jest.mock('../data/whereaboutsApiClient')
@@ -20,15 +21,18 @@ jest.mock('../data/locationsInsidePrisonApiClient')
 const token = 'some token'
 
 describe('Prisoner cell allocation service', () => {
+  let alertsApiClient: jest.Mocked<AlertsApiClient>
   let prisonApiClient: jest.Mocked<PrisonApiClient>
   let whereaboutsApiClient: jest.Mocked<WhereaboutsApiClient>
   let prisonerCellAllocationService: PrisonerCellAllocationService
   let locationsInsidePrisonApiClient: jest.Mocked<LocationsInsidePrisonApiClient>
   beforeEach(() => {
+    alertsApiClient = new AlertsApiClient() as jest.Mocked<AlertsApiClient>
     prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
     whereaboutsApiClient = new WhereaboutsApiClient() as jest.Mocked<WhereaboutsApiClient>
     locationsInsidePrisonApiClient = new LocationsInsidePrisonApiClient() as jest.Mocked<LocationsInsidePrisonApiClient>
     prisonerCellAllocationService = new PrisonerCellAllocationService(
+      alertsApiClient,
       prisonApiClient,
       whereaboutsApiClient,
       locationsInsidePrisonApiClient,
@@ -422,27 +426,17 @@ describe('Prisoner cell allocation service', () => {
 
     it('retrieves offenders in reception with alerts', async () => {
       prisonApiClient.getOffendersInReception.mockResolvedValue([offender])
-      prisonApiClient.getAlertsGlobal.mockResolvedValue([
-        {
-          active: true,
-          addedByFirstName: 'John',
-          addedByLastName: 'Smith',
-          alertCode: 'XGANG',
-          alertCodeDescription: 'Gang member',
-          alertId: 1,
-          alertType: 'X',
-          alertTypeDescription: 'Security',
-          bookingId: 14,
-          comment: 'silly',
-          dateCreated: '2019-08-25',
-          dateExpires: '2019-09-20',
-          expired: false,
-          expiredByFirstName: 'Jane',
-          expiredByLastName: 'Smith',
-          modifiedDateTime: '2021-07-05T10:35:17',
-          offenderNo: 'G3878UK',
-        },
-      ])
+      alertsApiClient.getAlertsGlobal.mockResolvedValue({
+        content: [
+          {
+            isActive: true,
+            prisonNumber: 'G3878UK',
+            alertCode: {
+              code: 'XGANG',
+            },
+          },
+        ],
+      })
 
       const result = await prisonerCellAllocationService.getOffendersInReception(token, 'LEI')
 
@@ -459,7 +453,7 @@ describe('Prisoner cell allocation service', () => {
     it('Does not call to get offender alerts if none in reception', async () => {
       prisonApiClient.getOffendersInReception.mockResolvedValue([])
       await prisonerCellAllocationService.getOffendersInReception(token, 'LEI')
-      expect(prisonApiClient.getAlertsGlobal).not.toHaveBeenCalled()
+      expect(alertsApiClient.getAlertsGlobal).not.toHaveBeenCalled()
     })
   })
 })

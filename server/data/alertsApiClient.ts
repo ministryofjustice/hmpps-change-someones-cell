@@ -1,13 +1,18 @@
 import config from '../config'
 import RestClient from './restClient'
-import { Alert } from './prisonApiClient'
 
-interface ActiveAlert {
+interface AlertCode {
+  code: string
+}
+
+export interface Alert {
+  prisonNumber: string
+  alertCode: AlertCode
   isActive: boolean
 }
 
-interface AlertsApiAlert extends Alert {
-  content: ActiveAlert[]
+interface Alerts {
+  content: Alert[]
 }
 
 export default class AlertsApiClient {
@@ -18,7 +23,7 @@ export default class AlertsApiClient {
   }
 
   getAlertsGlobal(token: string, offenderNos: string[]) {
-    return AlertsApiClient.restClient(token).post<AlertsApiAlert>({
+    return AlertsApiClient.restClient(token).post<Alerts>({
       path: '/search/alerts/prison-numbers',
       data: offenderNos,
     })

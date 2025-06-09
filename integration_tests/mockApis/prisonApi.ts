@@ -339,21 +339,6 @@ export const stubStaff = (staffId, details) =>
     },
   })
 
-export const stubGlobalAlerts = alerts =>
-  stubFor({
-    request: {
-      method: 'POST',
-      url: '/api/bookings/offenderNo/alerts',
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: alerts || [],
-    },
-  })
-
 export const stubReceptionWithCapacity = (agencyId, reception) =>
   stubFor({
     request: {
@@ -406,7 +391,6 @@ export default {
   stubAgencyDetails,
   stubCellMoveHistory,
   stubStaff,
-  stubGlobalAlerts,
   stubReceptionWithCapacity,
   stubOffendersInReception,
 }

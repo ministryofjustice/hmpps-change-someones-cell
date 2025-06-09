@@ -7,7 +7,9 @@ jest.mock('../../services/prisonerCellAllocationService')
 
 describe('View Residential Location', () => {
   const locationService = jest.mocked(new LocationService(undefined, undefined))
-  const prisonerCellAllocationService = jest.mocked(new PrisonerCellAllocationService(undefined, undefined, undefined))
+  const prisonerCellAllocationService = jest.mocked(
+    new PrisonerCellAllocationService(undefined, undefined, undefined, undefined),
+  )
 
   let req
   let res

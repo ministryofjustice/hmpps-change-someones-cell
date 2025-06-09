@@ -4,6 +4,7 @@ import auth from './integration_tests/mockApis/auth'
 import tokenVerification from './integration_tests/mockApis/tokenVerification'
 import components from './integration_tests/mockApis/components'
 import prisonApi from './integration_tests/mockApis/prisonApi'
+import alertsApi from './integration_tests/mockApis/alertsApi'
 import users from './integration_tests/mockApis/users'
 import whereabouts from './integration_tests/mockApis/whereabouts'
 import locationsInsidePrisonApi from './integration_tests/mockApis/locationsInsidePrisonApi'
@@ -82,7 +83,7 @@ export default defineConfig({
         stubCellsWithCapacityByGroupName: ({ prisonId, groupName, response }) =>
           locationsInsidePrisonApi.stubCellsWithCapacityByGroupName({ prisonId, groupName, response }),
         stubStaff: ({ staffId, details }) => Promise.all([prisonApi.stubStaff(staffId, details)]),
-        stubGlobalAlerts: prisonApi.stubGlobalAlerts,
+        stubGlobalAlerts: alertsApi.stubGlobalAlerts,
         stubReceptionWithCapacity: ({ agencyId, reception }) =>
           prisonApi.stubReceptionWithCapacity(agencyId, reception),
         stubOffendersInReception: ({ agencyId, inReception }) =>

@@ -287,19 +287,4 @@ describe('prisonApiClient', () => {
       expect(output).toEqual(response)
     })
   })
-
-  describe('getAlertsGlobal', () => {
-    it('should query the API for alerts', async () => {
-      const response = { data: 'data' }
-      const offenderNumbers = ['A1234', 'B4321']
-
-      fakePrisonApiClient
-        .post('/api/bookings/offenderNo/alerts', offenderNumbers)
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .reply(200, response)
-
-      const output = await prisonApiClient.getAlertsGlobal(accessToken, offenderNumbers)
-      expect(output).toEqual(response)
-    })
-  })
 })

@@ -1,5 +1,6 @@
 import { LocationsInsidePrisonApiClient, PrisonApiClient, WhereaboutsApiClient, AlertsApiClient } from '../data'
-import { Alert, Offender, OffenderInReception } from '../data/prisonApiClient'
+import { Offender, OffenderInReception } from '../data/prisonApiClient'
+import { Alert } from '../data/alertsApiClient'
 import logger from '../../logger'
 import { CellLocation, Occupant } from '../data/locationsInsidePrisonApiClient'
 
@@ -94,16 +95,16 @@ export default class PrisonerCellAllocationService {
     return alerts?.content.filter(alert => alert.isActive)
   }
 
-  private addAlerts(objects: OffenderInReception[], alerts: Alert[]) {
+  private addAlerts(offenders: OffenderInReception[], alerts: Alert[]) {
     return alerts
-      ? objects.map(obj => ({
-          ...obj,
-          alerts: this.alertCodesForOffenderNo(alerts, obj.offenderNo),
+      ? offenders.map(offender => ({
+          ...offender,
+          alerts: this.alertCodesForOffenderNo(alerts, offender.offenderNo),
         }))
-      : objects
+      : offenders
   }
 
   private alertCodesForOffenderNo(alerts: Alert[], offenderNo: string) {
-    return alerts.filter(alert => alert.offenderNo === offenderNo).map(alert => alert.alertCode)
+    return alerts.filter(alert => alert.prisonNumber === offenderNo).map(alert => alert.alertCode.code)
   }
 }

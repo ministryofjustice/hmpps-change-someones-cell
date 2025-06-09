@@ -16,28 +16,30 @@ before(() => {
   cy.task('stubComponentsFail')
   cy.task('stubSignIn', { username: 'ITAG_USER', caseload: 'MDI', roles: ['ROLE_CELL_MOVE'] })
   cy.signIn()
-  cy.task('stubGlobalAlerts', [
-    {
-      offenderNo: 'G0873UU',
-      expired: false,
-      alertCode: 'XR',
-    },
-    {
-      offenderNo: 'G2755UN',
-      expired: false,
-      alertCode: 'XR',
-    },
-    {
-      offenderNo: 'G2755UN',
-      expired: false,
-      alertCode: 'XGANG',
-    },
-    {
-      offenderNo: 'G2755UN',
-      expired: false,
-      alertCode: 'XRF',
-    },
-  ])
+  cy.task('stubGlobalAlerts', {
+    content: [
+      {
+        prisonNumber: 'G0873UU',
+        isActive: true,
+        alertCode: { code: 'XR' },
+      },
+      {
+        prisonNumber: 'G2755UN',
+        isActive: true,
+        alertCode: { code: 'XR' },
+      },
+      {
+        prisonNumber: 'G2755UN',
+        isActive: true,
+        alertCode: { code: 'XGANG' },
+      },
+      {
+        prisonNumber: 'G2755UN',
+        isActive: true,
+        alertCode: { code: 'XRF' },
+      },
+    ],
+  })
   cy.task('stubOffenderFullDetails', {
     ...offenderFullDetails,
     alerts: [
