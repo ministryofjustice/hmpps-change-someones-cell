@@ -10,6 +10,7 @@ import MetricsService from './metricsService'
 
 export const services = () => {
   const {
+    alertsApiClient,
     applicationInfo,
     manageUsersApiClient,
     feComponentsClient,
@@ -25,6 +26,7 @@ export const services = () => {
   const userService = new UserService(manageUsersApiClient, prisonApiClient)
   const feComponentsService = new FeComponentsService(feComponentsClient)
   const prisonerCellAllocationService = new PrisonerCellAllocationService(
+    alertsApiClient,
     prisonApiClient,
     whereaboutsApiClient,
     locationsInsidePrisonApiClient,

@@ -24,7 +24,9 @@ describe('move validation', () => {
   const locationService = jest.mocked(new LocationService(undefined, undefined))
   const nonAssociationsService = jest.mocked(new NonAssociationsService(undefined))
   const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
-  const prisonerCellAllocationService = jest.mocked(new PrisonerCellAllocationService(undefined, undefined, undefined))
+  const prisonerCellAllocationService = jest.mocked(
+    new PrisonerCellAllocationService(undefined, undefined, undefined, undefined),
+  )
   const metricsService = jest.mocked(new MetricsService(undefined))
 
   let req

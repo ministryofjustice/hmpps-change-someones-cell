@@ -461,11 +461,4 @@ export default class PrisonApiClient {
       path: `/api/movements/rollcount/${agencyId}/in-reception`,
     })
   }
-
-  getAlertsGlobal(token: string, offenderNos: string[]) {
-    return PrisonApiClient.restClient(token).post<Alert[]>({
-      path: '/api/bookings/offenderNo/alerts',
-      data: offenderNos,
-    })
-  }
 }

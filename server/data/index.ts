@@ -16,6 +16,7 @@ import { createRedisClient } from './redisClient'
 import TokenStore from './tokenStore'
 import FeComponentsClient from './feComponentsClient'
 import PrisonApiClient from './prisonApiClient'
+import AlertsApiClient from './alertsApiClient'
 import WhereaboutsApiClient from './whereaboutsApiClient'
 import LocationsInsidePrisonApiClient from './locationsInsidePrisonApiClient'
 import NonAssociationsApiClient from './nonAssociationsApiClient'
@@ -30,6 +31,7 @@ export const dataAccess = () => ({
   manageUsersApiClient: new ManageUsersApiClient(),
   feComponentsClient: new FeComponentsClient(),
   prisonApiClient: new PrisonApiClient(),
+  alertsApiClient: new AlertsApiClient(),
   whereaboutsApiClient: new WhereaboutsApiClient(),
   locationsInsidePrisonApiClient: new LocationsInsidePrisonApiClient(),
   nonAssociationsApiClient: new NonAssociationsApiClient(),
@@ -41,6 +43,7 @@ export const dataAccess = () => ({
 export type DataAccess = ReturnType<typeof dataAccess>
 
 export {
+  AlertsApiClient,
   HmppsAuthClient,
   RestClientBuilder,
   ManageUsersApiClient,
