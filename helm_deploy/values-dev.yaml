@@ -24,3 +24,8 @@ generic-service:
     ESTABLISHMENT_ROLL_URL: "https://prison-roll-count-dev.hmpps.service.justice.gov.uk"
     ALERTS_API_URL: "https://alerts-api-dev.hmpps.service.justice.gov.uk"
 
+  allowlist:
+    groups:
+      - digital_staff_and_mojo
+      - moj_cloud_platform
+      - kilco_uat
