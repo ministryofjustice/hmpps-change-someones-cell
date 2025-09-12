@@ -51,7 +51,7 @@ services:
       - AUTHORIZATION_SERVER_TOKEN_ENDPOINT_URL=http://hmpps-auth:8080/auth/oauth/token
 
   redis:
-    image: 'redis:7.2'
+    image: 'redis:7.4'
     networks:
       - hmpps
     container_name: redis
