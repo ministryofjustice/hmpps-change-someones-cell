@@ -21,11 +21,6 @@ permissions:
   contents: read
   packages: write
 
-concurrency:
-  # if branch is main, append commit sha to the group name, so that other jobs from main don't get cancelled
-  group: ${{ github.workflow }}-${{ github.ref }}${{ (github.ref == 'refs/heads/main') && format('-{0}', github.sha) || '' }}
-  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
-
 jobs:
   # main node build workflow
   node_build:
@@ -47,7 +42,7 @@ jobs:
   helm_lint:
     strategy:
       matrix:
-        environments: ['dev', 'train', 'preprod', 'prod']
+        environments: ['dev', 'preprod', 'prod']
     name: helm lint
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/test_helm_lint.yml@v2 # WORKFLOW_VERSION
     secrets: inherit
@@ -67,8 +62,7 @@ jobs:
       push: ${{ inputs.push || true }}
       docker_multiplatform: false
   deploy_dev:
-    name: Deploy to the dev environment
-    if: github.ref == 'refs/heads/main'
+    name: Deploy to the development environment
     needs:
       - build
       - helm_lint
@@ -76,16 +70,6 @@ jobs:
     secrets: inherit
     with:
       environment: 'dev'
-      app_version: '${{ needs.build.outputs.app_version }}'
-  deploy_train:
-    name: Deploy to the training environment
-    needs:
-      - build
-      - deploy_dev
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
-    secrets: inherit
-    with:
-      environment: 'train'
       app_version: '${{ needs.build.outputs.app_version }}'
   deploy_preprod:
     name: Deploy to pre-production environment
