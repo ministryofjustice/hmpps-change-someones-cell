@@ -60,7 +60,7 @@ jobs:
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/docker_build.yml@v2 # WORKFLOW_VERSION
     needs:
       - node_integration_tests
-      - node_unit_tests
+      - unit_tests
     with:
       docker_registry: 'ghcr.io'
       registry_org: 'ministryofjustice'
