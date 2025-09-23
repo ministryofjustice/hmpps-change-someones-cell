@@ -1,5 +1,6 @@
 name: Build and test node
-
+# this custom script can be removed when govuk_frontend_toolkit is replaced.
+# It generates a package-lock.json file which changes the hash key running hashFiles('**/package-lock.json')
 on:
   workflow_call:
     inputs:
