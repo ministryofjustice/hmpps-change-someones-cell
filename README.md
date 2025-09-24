@@ -1,6 +1,5 @@
 # hmpps-change-someones-cell
 [![repo standards badge](https://img.shields.io/badge/dynamic/json?color=blue&style=flat&logo=github&label=MoJ%20Compliant&query=%24.result&url=https%3A%2F%2Foperations-engineering-reports.cloud-platform.service.justice.gov.uk%2Fapi%2Fv1%2Fcompliant_public_repositories%2Fhmpps-change-someones-cell)](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/public-github-repositories.html#hmpps-change-someones-cell "Link to report")
-[![CircleCI](https://circleci.com/gh/ministryofjustice/hmpps-change-someones-cell/tree/main.svg?style=svg)](https://circleci.com/gh/ministryofjustice/hmpps-change-someones-cell)
 [![Known Vulnerabilities](https://snyk.io/test/github/ministryofjustice/hmpps-change-someones-cell/badge.svg)](https://snyk.io/test/github/ministryofjustice/hmpps-change-someones-cell)
 
 ## Running the app
