@@ -171,7 +171,7 @@
     "nock": "^14.0.10",
     "nodemon": "^3.1.10",
     "prettier": "^3.6.2",
-    "prettier-plugin-jinja-template": "^1.4.1",
+    "prettier-plugin-jinja-template": "^2.1.0",
     "sass": "^1.93.3",
     "supertest": "^6.3.4",
     "ts-jest": "^29.4.5",
