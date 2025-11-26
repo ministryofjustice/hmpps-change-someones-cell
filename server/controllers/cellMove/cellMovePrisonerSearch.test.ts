@@ -101,11 +101,8 @@ describe('Prisoner search', () => {
               age: 29,
               agencyId: 'MDI',
               alerts: [
-                {
-                  alertCodes: ['XA'],
-                  classes: 'alert-status alert-status--security',
-                  label: 'Arsonist',
-                },
+                { alertCodes: ['XA'], classes: 'alert-status alert-status--security', label: 'Arsonist' },
+                { alertCodes: ['HID'], classes: 'alert-status alert-status--medical', label: 'Hidden disability' },
               ],
               alertsCodes: ['XA', 'HID'],
               alertsDetails: ['XA', 'HID'],
@@ -125,7 +122,9 @@ describe('Prisoner search', () => {
             {
               age: 30,
               agencyId: 'MDI',
-              alerts: [],
+              alerts: [
+                { alertCodes: ['XSA', 'SA'], classes: 'alert-status alert-status--security', label: 'Staff assaulter' },
+              ],
               alertsCodes: ['XSA', 'SA'],
               alertsDetails: ['XSA', 'SA'],
               assignedLivingUnitDesc: 'No cell allocated',

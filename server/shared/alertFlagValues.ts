@@ -130,6 +130,19 @@ export const cellMoveAlertCodes = [
   'RTP',
   'PVN',
   'XCDO',
+  'HID',
+  'XRF',
+  'XTACT',
+  'XCO',
+  'XCA',
+  'XCI',
+  'XCU',
+  'XSA',
+  'SA',
+  'F1',
+  'LCE',
+  'RCDR',
+  'RNO121',
 ]
 
 export const profileAlertCodes = [

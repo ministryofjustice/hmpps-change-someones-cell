@@ -171,16 +171,8 @@ describe('View Residential Location', () => {
               age: 29,
               agencyId: 'MDI',
               alerts: [
-                {
-                  alertCodes: ['XA'],
-                  classes: 'alert-status alert-status--security',
-                  label: 'Arsonist',
-                },
-                {
-                  alertCodes: ['XGANG'],
-                  classes: 'alert-status alert-status--security',
-                  label: 'Gang member',
-                },
+                { alertCodes: ['XA'], classes: 'alert-status alert-status--security', label: 'Arsonist' },
+                { alertCodes: ['XGANG'], classes: 'alert-status alert-status--security', label: 'Gang member' },
               ],
               alertsDetails: ['XA', 'XGANG'],
               assignedLivingUnitDesc: 'UNIT-1',
@@ -201,7 +193,13 @@ describe('View Residential Location', () => {
             {
               age: 30,
               agencyId: 'MDI',
-              alerts: [],
+              alerts: [
+                {
+                  alertCodes: ['XCU'],
+                  classes: 'alert-status alert-status--security',
+                  label: 'Controlled unlock',
+                },
+              ],
               alertsDetails: ['XCU'],
               assignedLivingUnitDesc: 'No cell allocated',
               assignedLivingUnitId: 2,
