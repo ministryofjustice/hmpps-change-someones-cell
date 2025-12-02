@@ -149,26 +149,11 @@ describe('select location', () => {
           searchForCellRootUrl: '/prisoner/ABC123/cell-move/search-for-cell',
           showNonAssociationsLink: false,
           alerts: [
-            {
-              alertCodes: ['HA'],
-              classes: 'alert-status alert-status--self-harm',
-              label: 'ACCT open',
-            },
-            {
-              alertCodes: ['HA1'],
-              classes: 'alert-status alert-status--self-harm',
-              label: 'ACCT post closure',
-            },
-            {
-              alertCodes: ['XGANG'],
-              classes: 'alert-status alert-status--security',
-              label: 'Gang member',
-            },
-            {
-              alertCodes: ['VIP'],
-              classes: 'alert-status alert-status--isolated-prisoner',
-              label: 'Isolated',
-            },
+            { alertCodes: ['HA'], classes: 'alert-status alert-status--self-harm', label: 'ACCT open' },
+            { alertCodes: ['HA1'], classes: 'alert-status alert-status--self-harm', label: 'ACCT post closure' },
+            { alertCodes: ['XGANG'], classes: 'alert-status alert-status--security', label: 'Gang member' },
+            { alertCodes: ['VIP'], classes: 'alert-status alert-status--isolated-prisoner', label: 'Isolated' },
+            { alertCodes: ['XRF'], classes: 'alert-status alert-status--security', label: 'Risk to females' },
           ],
           offenderNo,
         }),
