@@ -46,7 +46,7 @@ jobs:
         if: steps.restore-cache.outputs.cache-hit != 'true'
         shell: bash
         run: |
-          "${{ inputs.install_command }}"
+          ${{ inputs.install_command }}
       - name: build npm
         shell: bash
         run: |
