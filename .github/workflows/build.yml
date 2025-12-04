@@ -9,6 +9,11 @@ on:
         required: false
         type: string
         default: ".nvmrc"
+      install_command:
+        description: "The command used to install npm dependencies"
+        required: false
+        type: string
+        default: "npm ci --no-audit"
 
 permissions:
   contents: read
