@@ -9,6 +9,11 @@ on:
         required: false
         type: string
         default: ".nvmrc"
+      install_command:
+        description: "The command used to install npm dependencies"
+        required: false
+        type: string
+        default: "npm ci --no-audit"
 
 permissions:
   contents: read
@@ -18,15 +23,15 @@ jobs:
     name: Run the node build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - name: Use Node.js ${{ inputs.node_version_file }}
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version-file: ${{ inputs.node_version_file }}
       - name: update npm
         shell: bash
         run: |
-          sudo npm install -g npm@latest
+          npm install -g npm@latest
       - name: restore cache
         id: restore-cache
         uses: actions/cache/restore@v4
@@ -41,7 +46,7 @@ jobs:
         if: steps.restore-cache.outputs.cache-hit != 'true'
         shell: bash
         run: |
-          npm ci --no-audit
+          ${{ inputs.install_command }}
       - name: build npm
         shell: bash
         run: |
@@ -51,7 +56,7 @@ jobs:
         run: |
           npm run lint
       - name: upload the artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: npm_build_artifacts
           path: |
