@@ -1,14 +1,18 @@
 import { Offender } from '../../data/prisonApiClient'
+import { Prisoner } from '../../data/prisonerSearchApiClient'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
+import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import prisonerSearchController from './cellMovePrisonerSearch'
 
 jest.mock('../../services/prisonerCellAllocationService')
+jest.mock('../../services/prisonerDetailsService')
 
 describe('Prisoner search', () => {
   const prisonerCellAllocationService = jest.mocked(
     new PrisonerCellAllocationService(undefined, undefined, undefined, undefined),
   )
-
+  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
+  prisonerDetailsService.getPrisoners = jest.fn()
   let req
   let res
   let controller
@@ -39,7 +43,7 @@ describe('Prisoner search', () => {
     const offenders: Promise<Offender[]> = Promise.resolve([])
     prisonerCellAllocationService.getInmates.mockReturnValue(offenders)
 
-    controller = prisonerSearchController({ prisonerCellAllocationService })
+    controller = prisonerSearchController({ prisonerCellAllocationService, prisonerDetailsService })
   })
 
   describe('index', () => {
@@ -84,13 +88,46 @@ describe('Prisoner search', () => {
           alertsCodes: ['XSA', 'SA'],
         },
       ]
+
       prisonerCellAllocationService.getInmates.mockReturnValue(Promise.resolve(inmates))
+
+      const prisonersDetailsFromPrisonerDetailsService = [
+        {
+          prisonerNumber: 'A1234BC',
+          alerts: [
+            {
+              alertCode: 'XA',
+              active: true,
+              expired: false,
+            },
+            {
+              alertCode: 'HID',
+              active: true,
+              expired: false,
+            },
+          ],
+        },
+        {
+          prisonerNumber: 'B4567CD',
+          alerts: [
+            {
+              alertCode: 'XSA',
+              active: true,
+              expired: false,
+            },
+          ],
+        },
+      ] as Prisoner[]
+
+      prisonerDetailsService.getPrisoners.mockResolvedValue(prisonersDetailsFromPrisonerDetailsService)
 
       req.query = {
         keywords: 'Smith',
       }
 
       await controller(req, res)
+
+      expect(prisonerDetailsService.getPrisoners).toHaveBeenCalledWith('system_client_token', ['A1234BC', 'B4567CD'])
 
       expect(res.render).toHaveBeenCalledWith(
         'cellMove/cellMovePrisonerSearch.njk',
@@ -101,18 +138,15 @@ describe('Prisoner search', () => {
               age: 29,
               agencyId: 'MDI',
               alerts: [
-                {
-                  alertCodes: ['XA'],
-                  classes: 'alert-status alert-status--security',
-                  label: 'Arsonist',
-                },
+                { alertCodes: ['XA'], classes: 'alert-status alert-status--security', label: 'Arsonist' },
+                { alertCodes: ['HID'], classes: 'alert-status alert-status--medical', label: 'Hidden disability' },
               ],
               alertsCodes: ['XA', 'HID'],
               alertsDetails: ['XA', 'HID'],
               assignedLivingUnitDesc: 'UNIT-1',
               assignedLivingUnitId: 1,
               bookingId: 1,
-              categoryCode: 'C',
+              categoryCode: '',
               dateOfBirth: '1990-10-12',
               firstName: 'JOHN',
               lastName: 'SMITH',
@@ -125,13 +159,15 @@ describe('Prisoner search', () => {
             {
               age: 30,
               agencyId: 'MDI',
-              alerts: [],
+              alerts: [
+                { alertCodes: ['XSA', 'SA'], classes: 'alert-status alert-status--security', label: 'Staff assaulter' },
+              ],
               alertsCodes: ['XSA', 'SA'],
               alertsDetails: ['XSA', 'SA'],
               assignedLivingUnitDesc: 'No cell allocated',
               assignedLivingUnitId: 2,
               bookingId: 2,
-              categoryCode: 'C',
+              categoryCode: '',
               dateOfBirth: '1989-11-12',
               firstName: 'STEVE',
               lastName: 'SMITH',

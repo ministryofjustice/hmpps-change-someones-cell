@@ -8,6 +8,7 @@ context('Cell move prisoner search', () => {
     changeCellText: $cell[6]?.textContent,
   })
 
+  // inmate1 and inmate2 are data returned by prisonerCellAllocationService.getInmates
   const inmate1 = {
     bookingId: 1,
     offenderNo: 'A1234BC',
@@ -33,6 +34,45 @@ context('Cell move prisoner search', () => {
     alertsDetails: ['RSS', 'XC'],
   }
 
+  // prisoner1 and prisoner2 are data redturned by prisonerDetailsService.getPrisoners
+  const prisoner1 = {
+    prisonerNumber: 'A1234BC',
+    alerts: [
+      {
+        alertType: 'X',
+        alertCode: 'XA',
+        active: true,
+        expired: false,
+      },
+      {
+        alertType: 'X',
+        alertCode: 'XVL',
+        active: true,
+        expired: false,
+      },
+    ],
+  }
+
+  const prisoner2 = {
+    prisonerNumber: 'B4567CD',
+    firstName: 'STEVE',
+    lastName: 'SMITH',
+    bookingId: 2,
+    alerts: [
+      {
+        alertType: 'R',
+        alertCode: 'RSS',
+        active: true,
+        expired: false,
+      },
+      {
+        alertType: 'X',
+        alertCode: 'XC',
+        active: true,
+        expired: false,
+      },
+    ],
+  }
   before(() => {
     cy.clearCookies()
     cy.task('reset')
@@ -56,6 +96,7 @@ context('Cell move prisoner search', () => {
   context('When there are search values', () => {
     beforeEach(() => {
       cy.task('stubUserLocations')
+      cy.task('stubGetPrisoners', [prisoner1, prisoner2])
     })
 
     it('should have correct data pre filled from search query', () => {

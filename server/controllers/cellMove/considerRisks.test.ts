@@ -454,6 +454,11 @@ describe('move validation', () => {
         {
           comment: 'test',
           date: 'Date added: 20 August 2019',
+          title: 'a Gang member alert',
+        },
+        {
+          comment: 'test',
+          date: 'Date added: 20 August 2019',
           title: 'an Isolated Prisoner alert',
         },
         {
@@ -772,13 +777,13 @@ describe('move validation', () => {
         name: 'cancelled_on_consider_risks_page',
         params: {
           cell_occupants_alert_codes: 'VIP,XGANG',
-          offender_alert_codes: 'XEL,XGANG,VIP,HA,HA1,RTP,RLG,RLG',
+          offender_alert_codes: 'XEL,XGANG,XTACT,VIP,HA,HA1,RTP,RLG,RLG',
         },
       },
     ])
 
     expect(metricsService.trackEvent).toHaveBeenCalledWith(
-      MetricsEvent.CANCELLED_ON_CONSIDER_RISKS_EVENT('MDI', 'XEL,XGANG,VIP,HA,HA1,RTP,RLG,RLG', 'VIP,XGANG'),
+      MetricsEvent.CANCELLED_ON_CONSIDER_RISKS_EVENT('MDI', 'XEL,XGANG,XTACT,VIP,HA,HA1,RTP,RLG,RLG', 'VIP,XGANG'),
     )
 
     expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${offenderNo}/cell-move/select-cell`)
