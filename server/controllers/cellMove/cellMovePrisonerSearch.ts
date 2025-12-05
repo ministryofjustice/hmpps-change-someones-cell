@@ -1,4 +1,4 @@
-import { alertFlagLabels } from '../../shared/alertFlagValues'
+import { alertFlagLabels, cellMoveAlertCodes } from '../../shared/alertFlagValues'
 import { putLastNameFirst, formatLocation, formatName } from '../../utils'
 import config from '../../config'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
@@ -61,7 +61,7 @@ export default ({ prisonerCellAllocationService, prisonerDetailsService }: Param
         alerts: alertFlagLabels.filter(alertFlag =>
           alertFlag.alertCodes.some(alert => {
             const alertsDetails = prisoner.alerts.map((a: { alertCode: string }) => a.alertCode)
-            return alertsDetails && alertsDetails.includes(alert)
+            return alertsDetails && alertsDetails.includes(alert) && cellMoveAlertCodes.includes(alert)
           }),
         ),
         cellHistoryUrl: `${config.prisonerProfileUrl}/prisoner/${prisoner.offenderNo}/location-details`,
