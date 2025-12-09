@@ -201,7 +201,13 @@ describe('View Residential Location', () => {
             {
               age: 30,
               agencyId: 'MDI',
-              alerts: [],
+              alerts: [
+                {
+                  alertCodes: ['XCU'],
+                  classes: 'alert-status alert-status--security',
+                  label: 'Controlled unlock',
+                },
+              ],
               alertsDetails: ['XCU'],
               assignedLivingUnitDesc: 'No cell allocated',
               assignedLivingUnitId: 2,

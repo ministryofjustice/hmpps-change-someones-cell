@@ -192,6 +192,7 @@ context('A user can search for a cell', () => {
   })
 
   describe('back button', () => {
+    // inmate1 and inmate2 are data returned by prisonerCellAllocationService.getInmates
     const inmate1 = {
       bookingId: 1,
       offenderNo: 'A1234BC',
@@ -217,6 +218,46 @@ context('A user can search for a cell', () => {
       alertsDetails: ['RSS', 'XC'],
     }
 
+    // prisoner1 and prisoner2 are data returned by prisonerDetailsService.getPrisoners
+    const prisoner1 = {
+      prisonerNumber: 'A1234BC',
+      alerts: [
+        {
+          alertType: 'X',
+          alertCode: 'XA',
+          active: true,
+          expired: false,
+        },
+        {
+          alertType: 'X',
+          alertCode: 'XVL',
+          active: true,
+          expired: false,
+        },
+      ],
+    }
+
+    const prisoner2 = {
+      prisonerNumber: 'B4567CD',
+      firstName: 'STEVE',
+      lastName: 'SMITH',
+      bookingId: 2,
+      alerts: [
+        {
+          alertType: 'R',
+          alertCode: 'RSS',
+          active: true,
+          expired: false,
+        },
+        {
+          alertType: 'X',
+          alertCode: 'XC',
+          active: true,
+          expired: false,
+        },
+      ],
+    }
+
     context('When referred from the prisoner search page', () => {
       beforeEach(() => {
         cy.task('stubInmates', {
@@ -224,6 +265,7 @@ context('A user can search for a cell', () => {
           count: 2,
           data: [inmate1, inmate2],
         })
+        cy.task('stubGetPrisoners', [prisoner1, prisoner2])
         cy.visit(`/prisoner-search?keywords=SMITH`)
         cy.task('stubGetPrisoner', {
           ...prisonerFullDetails,
