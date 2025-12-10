@@ -1,5 +1,5 @@
 {% macro categoryFlag(categoryText, categoryCode, default = true) %}
-  {% set classes = 'cat-a-status cat-a-status--' + categoryCode if categoryCode in ['A', 'E', 'H', 'P'] %}
+  {% set classes = 'govuk-!-margin-bottom-1 dps-cat-a-tag' if categoryCode in ['A', 'E', 'H', 'P'] %}
   {% set text %}
     {% if categoryCode in ['A', 'E'] %}
       CAT A

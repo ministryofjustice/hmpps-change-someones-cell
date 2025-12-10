@@ -1,15 +1,17 @@
 import config from '../../config'
 import LocationService from '../../services/locationService'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
+import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import { alertFlagLabels, cellMoveAlertCodes } from '../../shared/alertFlagValues'
 import { putLastNameFirst, formatLocation, formatName } from '../../utils'
 
 type Params = {
   locationService: LocationService
   prisonerCellAllocationService: PrisonerCellAllocationService
+  prisonerDetailsService: PrisonerDetailsService
 }
 
-export default ({ locationService, prisonerCellAllocationService }: Params) =>
+export default ({ locationService, prisonerCellAllocationService, prisonerDetailsService }: Params) =>
   async (req, res) => {
     const prisonApiLocationDescription = async (systemClientToken: string, locationKey, userCaseLoad) => {
       const fullLocationPrefix = await locationService.getAgencyGroupLocationPrefix(
@@ -63,7 +65,21 @@ export default ({ locationService, prisonerCellAllocationService }: Params) =>
 
     const prisoners = await prisonerCellAllocationService.getInmates(systemClientToken, locationDesc, null, true)
 
-    const results = prisoners?.map(prisoner => ({
+    const prisonersAlerts = await prisonerDetailsService.getPrisoners(
+      res.locals.systemClientToken,
+      prisoners.map(p => p.offenderNo),
+    )
+
+    const prisonersWithEnhancedAlertData = prisoners.map(prisoner => {
+      const offender = prisonersAlerts.find(p => p.prisonerNumber === prisoner.offenderNo)
+      return {
+        ...prisoner,
+        alerts: offender?.alerts || [],
+        categoryCode: offender?.category || '',
+      }
+    })
+
+    const results = prisonersWithEnhancedAlertData?.map(prisoner => ({
       ...prisoner,
       assignedLivingUnitDesc: formatLocation(prisoner.assignedLivingUnitDesc),
       name: putLastNameFirst(prisoner.firstName, prisoner.lastName),

@@ -1,6 +1,8 @@
 import viewResidentialLocationController from './cellMoveViewResidentialLocation'
 import LocationService from '../../services/locationService'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
+import PrisonerDetailsService from '../../services/prisonerDetailsService'
+import { Prisoner } from '../../data/prisonerSearchApiClient'
 
 jest.mock('../../services/locationService')
 jest.mock('../../services/prisonerCellAllocationService')
@@ -10,6 +12,8 @@ describe('View Residential Location', () => {
   const prisonerCellAllocationService = jest.mocked(
     new PrisonerCellAllocationService(undefined, undefined, undefined, undefined),
   )
+  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
+  prisonerDetailsService.getPrisoners = jest.fn()
 
   let req
   let res
@@ -60,7 +64,11 @@ describe('View Residential Location', () => {
 
     prisonerCellAllocationService.getInmates = jest.fn().mockReturnValue([])
 
-    controller = viewResidentialLocationController({ locationService, prisonerCellAllocationService })
+    controller = viewResidentialLocationController({
+      locationService,
+      prisonerCellAllocationService,
+      prisonerDetailsService,
+    })
   })
 
   describe('index', () => {
@@ -122,7 +130,7 @@ describe('View Residential Location', () => {
           assignedLivingUnitId: 1,
           assignedLivingUnitDesc: 'UNIT-1',
           iepLevel: 'Standard',
-          categoryCode: 'C',
+          categoryCode: 'A',
           alertsDetails: ['XA', 'XGANG'],
         },
         {
@@ -142,6 +150,37 @@ describe('View Residential Location', () => {
       ]
       prisonerCellAllocationService.getInmates = jest.fn().mockReturnValue(inmates)
 
+      const prisonersDetailsFromPrisonerDetailsService = [
+        {
+          prisonerNumber: 'A1234BC',
+          category: 'A',
+          alerts: [
+            {
+              alertCode: 'XA',
+              active: true,
+              expired: false,
+            },
+            {
+              alertCode: 'XGANG',
+              active: true,
+              expired: false,
+            },
+          ],
+        },
+        {
+          prisonerNumber: 'B4567CD',
+          category: 'C',
+          alerts: [
+            {
+              alertCode: 'XCU',
+              active: true,
+              expired: false,
+            },
+          ],
+        },
+      ] as Prisoner[]
+
+      prisonerDetailsService.getPrisoners.mockResolvedValue(prisonersDetailsFromPrisonerDetailsService)
       req.query = {
         location: 'H 1',
       }
@@ -186,7 +225,7 @@ describe('View Residential Location', () => {
               assignedLivingUnitDesc: 'UNIT-1',
               assignedLivingUnitId: 1,
               bookingId: 1,
-              categoryCode: 'C',
+              categoryCode: 'A',
               dateOfBirth: '1990-10-12',
               firstName: 'JOHN',
               iepLevel: 'Standard',
