@@ -33,6 +33,41 @@ context('Cell move view residential location', () => {
     alertsDetails: ['RSS', 'XC'],
   }
 
+  // prisoner1 and prisoner2 are data returned by prisonerDetailsService.getPrisoners
+  const prisoner1 = {
+    prisonerNumber: 'A1234BC',
+    alerts: [
+      {
+        alertType: 'X',
+        alertCode: 'XA',
+        active: true,
+        expired: false,
+      },
+      {
+        alertType: 'X',
+        alertCode: 'XVL',
+        active: true,
+        expired: false,
+      },
+    ],
+  }
+  const prisoner2 = {
+    prisonerNumber: 'B4567CD',
+    alerts: [
+      {
+        alertType: 'X',
+        alertCode: 'RSS',
+        active: true,
+        expired: false,
+      },
+      {
+        alertType: 'X',
+        alertCode: 'XC',
+        active: true,
+        expired: false,
+      },
+    ],
+  }
   before(() => {
     cy.clearCookies()
     cy.task('reset')
@@ -75,6 +110,8 @@ context('Cell move view residential location', () => {
         count: 2,
         data: [inmate1, inmate2],
       })
+      cy.task('stubGetPrisoners', [prisoner1, prisoner2])
+
       cy.visit('/view-residential-location?location=1')
 
       cy.get('[data-test="prisoner-search-results-table"]').find('tr').its('length').should('eq', 3)
@@ -104,6 +141,9 @@ context('Cell move view residential location', () => {
         count: 1,
         data: [inmate1],
       })
+
+      cy.task('stubGetPrisoners', [prisoner1, prisoner2])
+
       cy.visit('/view-residential-location?location=2')
 
       cy.get('[data-test="prisoner-cell-history-link"]').its('length').should('eq', 1)

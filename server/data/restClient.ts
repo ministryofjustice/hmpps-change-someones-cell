@@ -69,7 +69,7 @@ export default class RestClient {
         .set(headers)
         .responseType(responseType)
         .timeout(this.timeoutConfig())
-
+      // @ts-expect-error: expected error
       return raw ? result : result.body
     } catch (error) {
       const sanitisedError = sanitiseError(error)
@@ -100,7 +100,7 @@ export default class RestClient {
         .set(headers)
         .responseType(responseType)
         .timeout(this.timeoutConfig())
-
+      // @ts-expect-error: expected error
       return raw ? result : result.body
     } catch (error) {
       const sanitisedError = sanitiseError(error)
@@ -143,7 +143,7 @@ export default class RestClient {
         .set(headers)
         .responseType(responseType)
         .timeout(this.timeoutConfig())
-
+      // @ts-expect-error: expected error
       return raw ? result : result.body
     } catch (error) {
       const sanitisedError = sanitiseError(error)

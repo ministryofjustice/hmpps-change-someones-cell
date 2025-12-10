@@ -292,7 +292,7 @@ context('A user can search for a cell', () => {
           count: 2,
           data: [inmate1, inmate2],
         })
-        cy.visit(`/view-residential-location?location=1`)
+
         cy.task('stubGetPrisoner', {
           ...prisonerFullDetails,
           prisonerNumber: 'A1234BC',
@@ -301,6 +301,10 @@ context('A user can search for a cell', () => {
           ...prisonerFullDetails,
           prisonerNumber: 'B4567CD',
         })
+
+        cy.task('stubGetPrisoners', [prisoner1, prisoner2])
+
+        cy.visit(`/view-residential-location?location=1`)
       })
 
       it('should have a back button linking to the previous page', () => {
