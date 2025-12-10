@@ -92,7 +92,7 @@
           },
           { text: prisoner.offenderNo },
           { text: prisoner.assignedLivingUnitDesc },
-          { html: alertFlags(prisoner.alerts, newLine=true) + categoryFlag('', prisoner.categoryCode, false) },
+          { html: categoryFlag('', prisoner.categoryCode, false) + alertFlags(prisoner.alerts, newLine=true) },
           { html: cellHistoryLinkHtml },
           { html: cellSearchLinkHtml }
         ]), rows) %}
