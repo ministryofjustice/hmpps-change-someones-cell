@@ -2,11 +2,11 @@
   {% set classes = 'govuk-!-margin-bottom-1 dps-cat-a-tag' if categoryCode in ['A', 'E', 'H', 'P'] %}
   {% set text %}
     {% if categoryCode in ['A', 'E'] %}
-      CAT A
+      Cat A
     {% elif categoryCode === 'H' %}
-      CAT A High
+      Cat A High
     {% elif categoryCode === 'P' %}
-      CAT A Prov
+      Cat A Prov
     {% else %}
       {% if default %}
         {{ categoryText | showDefault('Not entered') }}
