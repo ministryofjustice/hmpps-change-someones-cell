@@ -98,6 +98,7 @@ context('A user can select a cell', () => {
             firstName: 'Bob',
             lastName: 'Doe',
             cellLocation: '1-1',
+            category: 'H',
             alerts: [
               {
                 alertType: 'P',
@@ -164,7 +165,7 @@ context('A user can select a cell', () => {
               spaces: 1,
               occupier: 'Doe, Bob\nView details\nfor Doe, Bob',
               csra: 'Standard\n\nView details\nfor Doe, Bob',
-              relevantAlerts: 'PEEP',
+              relevantAlerts: 'PEEP\nCAT A High',
               selectCell: 'Select cell',
             })
           })

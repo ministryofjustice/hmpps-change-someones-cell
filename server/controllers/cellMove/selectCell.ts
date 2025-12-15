@@ -40,6 +40,7 @@ const getCellOccupants = ({
       name: `${properCaseName(occupant.lastName)}, ${properCaseName(occupant.firstName)}`,
       viewOffenderDetails: `/prisoner/${occupant.prisonerNumber}/cell-move/prisoner-details`,
       alerts: alertFlagLabels.filter(label => label.alertCodes.some(code => alertCodes.includes(code))),
+      category: occupant.category,
       nonAssociation: Boolean(
         nonAssociations &&
           nonAssociations.nonAssociations &&

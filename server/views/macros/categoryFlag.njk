@@ -1,12 +1,12 @@
 {% macro categoryFlag(categoryText, categoryCode, default = true) %}
-  {% set classes = 'govuk-!-margin-bottom-1 dps-cat-a-tag' if categoryCode in ['A', 'E', 'H', 'P'] %}
+  {% set classes = 'cat-a-status cat-a-status--' + categoryCode if categoryCode in ['A', 'E', 'H', 'P'] %}
   {% set text %}
     {% if categoryCode in ['A', 'E'] %}
-      Cat A
+      CAT A
     {% elif categoryCode === 'H' %}
-      Cat A High
+      CAT A High
     {% elif categoryCode === 'P' %}
-      Cat A Prov
+      CAT A Prov
     {% else %}
       {% if default %}
         {{ categoryText | showDefault('Not entered') }}
