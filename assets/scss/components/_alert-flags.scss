@@ -132,28 +132,26 @@
   }
 }
 
-@media(min-width: 40.0625em) {
-    .dps-cat-a-tag {
-        font-size:1rem;
-        line-height: 1.25
-    }
-}
+.cat-a-status {
+  @extend %status-style;
 
-.dps-cat-a-tag {
-    font-family: GDS Transport,arial,sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    font-weight: 400;
-    font-size: .875rem;
-    line-height: 1.1428571429;
-    display: inline-block;
-    height: 26px;
-    padding: 6px 20px 0;
-    color: #fff;
-    background-color: #912b88;
-    text-decoration: none;
-    font-weight: 700;
-    overflow-wrap: break-word
+  &--a,
+  &--e {
+    color: #00437b;
+    border-color: #00437b;
+  }
+
+  &--h {
+    background-color: #00437b;
+    color: white;
+    border-color: #00437b;
+  }
+
+  &--p {
+    border: 3px dashed;
+    color: #00437b;
+    border-color: #00437b;
+  }
 }
 
 .non-association {

@@ -31,7 +31,7 @@
     <h3 class="govuk-heading-s govuk-!-margin-bottom-1">Relevant alerts</h3>
     {% if alerts.length or prisonerDetails.category in ['A', 'E', 'H', 'P'] %}
       <div class="govuk-!-margin-bottom-3" data-test="alerts">
-       {{ categoryFlag('', prisonerDetails.category, false) }} {{ alertFlags(alerts) }} 
+        {{ alertFlags(alerts) }} {{ categoryFlag('', prisonerDetails.category, false) }}
       </div>
     {% else %}
       <p class="govuk-body" data-test="alerts">None</p>
