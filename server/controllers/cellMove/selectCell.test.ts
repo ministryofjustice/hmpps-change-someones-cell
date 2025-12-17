@@ -603,6 +603,7 @@ describe('Select a cell', () => {
             prisonersInCell: [
               {
                 ...offender,
+                category: 'H',
                 firstName: 'bob1',
                 lastName: 'doe1',
                 prisonId: 'MDI',
@@ -666,6 +667,7 @@ describe('Select a cell', () => {
               actualCapacity: 2,
               occupants: [
                 {
+                  category: 'H',
                   alerts: [
                     {
                       alertCodes: ['HA'],
@@ -704,6 +706,7 @@ describe('Select a cell', () => {
               actualCapacity: 2,
               occupants: [
                 {
+                  category: 'C',
                   alerts: [
                     {
                       alertCodes: ['HA'],
@@ -742,6 +745,7 @@ describe('Select a cell', () => {
               actualCapacity: 2,
               occupants: [
                 {
+                  category: 'C',
                   alerts: [
                     {
                       alertCodes: ['HA'],
@@ -875,6 +879,7 @@ describe('Select a cell', () => {
               occupants: [
                 {
                   alerts: [],
+                  category: 'C',
                   cellId: '1-1-1',
                   csra: 'High',
                   csraDetailsUrl: '/prisoner/A111111/cell-move/cell-sharing-risk-assessment-details',
