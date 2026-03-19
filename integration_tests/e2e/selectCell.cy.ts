@@ -148,7 +148,7 @@ context('A user can select a cell', () => {
       page.checkStillOnPage()
     })
 
-    it('should display the correct cell information', () => {
+    it('should display the correct cell information.', () => {
       const page = SelectCellPage.goTo(offenderNo)
 
       page.cellResults().then($table => {
