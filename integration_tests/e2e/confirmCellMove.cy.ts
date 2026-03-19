@@ -1,7 +1,7 @@
 import ConfirmCellMovePage from '../pages/confirmCellMovePage'
 
 import { assertHasRequestCount } from '../assertions'
-
+/* eslint-disable @typescript-eslint/no-require-imports */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const offenderBasicDetails = require('../mockApis/responses/offenderBasicDetails.json')
 

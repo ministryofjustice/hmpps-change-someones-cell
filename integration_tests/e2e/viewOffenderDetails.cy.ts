@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import OffenderDetailsPage from '../pages/offenderDetailsPage'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires

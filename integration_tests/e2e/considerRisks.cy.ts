@@ -1,7 +1,7 @@
 import ConsiderRisksPage from '../pages/considerRisksPage'
 import SelectCellPage from '../pages/selectCellPage'
 import ConfirmCellMovePage from '../pages/confirmCellMovePage'
-
+/* eslint-disable @typescript-eslint/no-require-imports */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const offenderFullDetails = require('../mockApis/responses/offenderFullDetails.json')
 // eslint-disable-next-line @typescript-eslint/no-var-requires

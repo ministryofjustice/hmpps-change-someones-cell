@@ -1,7 +1,7 @@
 import moment from 'moment'
 import SearchForCellPage from '../pages/searchForCellPage'
 import SelectCellPage from '../pages/selectCellPage'
-
+/* eslint-disable @typescript-eslint/no-require-imports */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const offenderFullDetails = require('../mockApis/responses/offenderFullDetails.json')
 // eslint-disable-next-line @typescript-eslint/no-var-requires
