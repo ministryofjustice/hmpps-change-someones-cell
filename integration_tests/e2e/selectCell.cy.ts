@@ -163,8 +163,8 @@ context('A user can select a cell', () => {
               cellType: 'Listener / crisis cell,\nLocate flat',
               capacity: 3,
               spaces: 1,
-              occupier: 'Doe, Bob\nView details\nfor Doe, Bob',
-              csra: 'Standard\n\nView details\nfor Doe, Bob',
+              occupier: 'Doe, Bob\nView details for Doe, Bob',
+              csra: 'Standard\n\nView details for Doe, Bob',
               relevantAlerts: 'PEEP\nCAT A High',
               selectCell: 'Select cell',
             })
