@@ -147,8 +147,8 @@
     "@types/superagent": "^8.1.9",
     "@types/supertest": "^6.0.3",
     "@types/uuid": "^9.0.8",
-    "@typescript-eslint/eslint-plugin": "^6.12.0",
-    "@typescript-eslint/parser": "^6.12.0",
+    "@typescript-eslint/eslint-plugin": "^8.57.1",
+    "@typescript-eslint/parser": "^8.57.1",
     "audit-ci": "^7.1.0",
     "concurrently": "^9.2.1",
     "cookie-session": "^2.1.0",
@@ -182,6 +182,10 @@
   "overrides": {
     "@babel/helpers": "7.28.4",
     "@babel/runtime": "7.28.4",
-    "tmp": "0.2.5"
+    "tmp": "0.2.5",
+    "cypress-multi-reporters": {
+      "serialize-javascript": "^7.0.4",
+      "diff": "^8.0.3"
+    }
   }
 }

@@ -8,7 +8,7 @@ type Params = {
 
 export default ({ prisonerDetailsService }: Params) => {
   return async (req: Request, res: Response) => {
-    const { offenderNo } = req.params
+    const { offenderNo } = req.params as { offenderNo: string }
     const { systemClientToken } = res.locals
 
     const { firstName, lastName } = await prisonerDetailsService.getDetails(systemClientToken, offenderNo, false)
