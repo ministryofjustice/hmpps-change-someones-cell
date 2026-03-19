@@ -1,5 +1,5 @@
 import OffenderDetailsPage from '../pages/offenderDetailsPage'
-
+/* eslint-disable @typescript-eslint/no-require-imports */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const offenderFullDetails = require('../mockApis/responses/offenderFullDetails.json')
 

@@ -1,6 +1,6 @@
 import SelectCellPage from '../pages/selectCellPage'
 import ConsiderRisksPage from '../pages/considerRisksPage'
-
+/* eslint-disable @typescript-eslint/no-require-imports */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const prisonerFullDetails = require('../mockApis/responses/prisonerFullDetails.json')
 // eslint-disable-next-line @typescript-eslint/no-var-requires

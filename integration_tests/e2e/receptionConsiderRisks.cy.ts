@@ -1,6 +1,6 @@
 import moment from 'moment'
 import considerRisksPage from '../pages/receptionConsiderRisksPage'
-
+/* eslint-disable @typescript-eslint/no-require-imports */
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const offenderFullDetails = require('../mockApis/responses/offenderFullDetails.json')
 // eslint-disable-next-line @typescript-eslint/no-var-requires

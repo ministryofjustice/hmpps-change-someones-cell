@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import ConfirmCellMovePage from '../pages/confirmCellMovePage'
 
 import { assertHasRequestCount } from '../assertions'

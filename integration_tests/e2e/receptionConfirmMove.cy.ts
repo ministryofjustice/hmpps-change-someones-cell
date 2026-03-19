@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import receptionConfirmMovePage from '../pages/receptionConfirmMovePage'
 
 // eslint-disable-next-line @typescript-eslint/no-var-requires

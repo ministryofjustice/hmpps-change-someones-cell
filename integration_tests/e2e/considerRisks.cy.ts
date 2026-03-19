@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-require-imports */
 import ConsiderRisksPage from '../pages/considerRisksPage'
 import SelectCellPage from '../pages/selectCellPage'
 import ConfirmCellMovePage from '../pages/confirmCellMovePage'
