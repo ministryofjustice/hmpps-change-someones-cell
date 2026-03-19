@@ -48,7 +48,7 @@ export default ({ prisonerCellAllocationService, prisonerDetailsService }: Param
   }
 
   const view = async (req: Request, res: Response) => {
-    const { offenderNo } = req.params
+    const { offenderNo } = req.params as { offenderNo: string }
     const { systemClientToken } = res.locals
 
     const { firstName, lastName } = await prisonerDetailsService.getPrisoner(systemClientToken, offenderNo)
@@ -80,7 +80,7 @@ export default ({ prisonerCellAllocationService, prisonerDetailsService }: Param
   }
 
   const post: RequestHandler = async (req: Request, res: Response) => {
-    const { offenderNo } = req.params
+    const { offenderNo } = req.params as { offenderNo: string }
     const { systemClientToken } = res.locals
     const { reason, comment } = req.body
     req.flash('formValues', { reason, comment } as any)
