@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: "46 6 * * MON-FRI" # Every weekday
 jobs:
-  security-kotlin-trivy-check:
+  security-typescript-trivy-check:
     permissions:
       contents: read
       actions: read
