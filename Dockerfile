@@ -3,7 +3,7 @@ FROM node:22-alpine AS base
 
 RUN apk --update-cache upgrade --available \
   && apk --no-cache add tzdata \
-  && rm -rf /var/cache/apk/* \
+  && rm -rf /var/cache/apk/*
 
 LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 
