@@ -1,9 +1,9 @@
 # Stage: base image
-FROM node:22.19-bookworm-slim as base
+FROM node:22-alpine AS base
 
-ARG BUILD_NUMBER
-ARG GIT_REF
-ARG GIT_BRANCH
+RUN apk --update-cache upgrade --available \
+  && apk --no-cache add tzdata \
+  && rm -rf /var/cache/apk/*
 
 LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 
@@ -11,9 +11,13 @@ ENV TZ=Europe/London
 RUN ln -snf "/usr/share/zoneinfo/$TZ" /etc/localtime && echo "$TZ" > /etc/timezone
 
 RUN addgroup --gid 2000 --system appgroup && \
-        adduser --uid 2000 --system appuser --gid 2000
+    adduser --uid 2000 --system appuser --ingroup appgroup
 
 WORKDIR /app
+
+ARG BUILD_NUMBER
+ARG GIT_REF
+ARG GIT_BRANCH
 
 # Cache breaking and ensure required build / git args defined
 RUN test -n "$BUILD_NUMBER" || (echo "BUILD_NUMBER not set" && false)
@@ -25,24 +29,16 @@ ENV BUILD_NUMBER=${BUILD_NUMBER}
 ENV GIT_REF=${GIT_REF}
 ENV GIT_BRANCH=${GIT_BRANCH}
 
-RUN apt-get update && \
-        apt-get upgrade -y && \
-        apt-get install -y procps && \
-        apt-get autoremove -y && \
-        rm -rf /var/lib/apt/lists/*
-
 # Stage: build assets
-FROM base as build
+FROM base AS build
 
 ARG BUILD_NUMBER
 ARG GIT_REF
 ARG GIT_BRANCH
 
-RUN apt-get update && \
-        apt-get install -y make python-is-python3 2to3
-
 COPY package*.json ./
 RUN CYPRESS_INSTALL_BINARY=0 npm run setup --no-audit
+ENV NODE_ENV='production'
 
 COPY . .
 RUN npm run build
