@@ -127,7 +127,7 @@
     "redis-mock": "^0.56.3",
     "superagent": "^10.3.0",
     "url-value-parser": "^2.2.0",
-    "uuid": "^10.0.0"
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
     "@ministryofjustice/hmpps-npm-script-allowlist": "0.0.4",
