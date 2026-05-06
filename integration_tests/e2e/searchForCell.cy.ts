@@ -1,11 +1,8 @@
 import moment from 'moment'
 import SearchForCellPage from '../pages/searchForCellPage'
 import SelectCellPage from '../pages/selectCellPage'
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const offenderFullDetails = require('../mockApis/responses/offenderFullDetails.json')
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const prisonerFullDetails = require('../mockApis/responses/prisonerFullDetails.json')
+import offenderFullDetails from '../mockApis/responses/offenderFullDetails.json'
+import prisonerFullDetails from '../mockApis/responses/prisonerFullDetails.json'
 
 const offenderNo = 'A12345'
 

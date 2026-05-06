@@ -43,10 +43,8 @@ const getCellOccupants = ({
       category: occupant.category,
       nonAssociation: Boolean(
         nonAssociations &&
-          nonAssociations.nonAssociations &&
-          nonAssociations.nonAssociations.find(
-            na => na.otherPrisonerDetails.prisonerNumber === occupant.prisonerNumber,
-          ),
+        nonAssociations.nonAssociations &&
+        nonAssociations.nonAssociations.find(na => na.otherPrisonerDetails.prisonerNumber === occupant.prisonerNumber),
       ),
       csra: occupant.csra || 'Not entered',
       csraDetailsUrl: `/prisoner/${occupant.prisonerNumber}/cell-move/cell-sharing-risk-assessment-details`,

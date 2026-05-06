@@ -1,7 +1,5 @@
 import CellSharingRiskAssessmentPage from '../pages/cellSharingRiskAssessmentDetailsPage'
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const offenderFullDetails = require('../mockApis/responses/offenderFullDetails.json')
+import offenderFullDetails from '../mockApis/responses/offenderFullDetails.json'
 
 const offenderNo = 'A12345'
 
