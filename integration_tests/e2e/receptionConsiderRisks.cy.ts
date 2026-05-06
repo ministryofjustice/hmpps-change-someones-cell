@@ -1,12 +1,8 @@
 import moment from 'moment'
 import considerRisksPage from '../pages/receptionConsiderRisksPage'
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const offenderFullDetails = require('../mockApis/responses/offenderFullDetails.json')
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const offenderBasicDetails = require('../mockApis/responses/offenderBasicDetails.json')
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const prisonerFullDetails = require('../mockApis/responses/prisonerFullDetails.json')
+import offenderFullDetails from '../mockApis/responses/offenderFullDetails.json'
+import offenderBasicDetails from '../mockApis/responses/offenderBasicDetails.json'
+import prisonerFullDetails from '../mockApis/responses/prisonerFullDetails.json'
 
 const offenderNo = 'G3878UK'
 

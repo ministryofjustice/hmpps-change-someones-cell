@@ -1,9 +1,6 @@
 import receptionConfirmationPage from '../pages/receptionConfirmationPage'
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const offenderFullDetails = require('../mockApis/responses/offenderFullDetails.json')
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const offenderBasicDetails = require('../mockApis/responses/offenderBasicDetails.json')
+import offenderFullDetails from '../mockApis/responses/offenderFullDetails.json'
+import offenderBasicDetails from '../mockApis/responses/offenderBasicDetails.json'
 
 const offenderNo = 'G3878UK'
 
