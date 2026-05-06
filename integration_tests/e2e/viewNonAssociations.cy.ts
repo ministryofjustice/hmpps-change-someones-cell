@@ -1,8 +1,6 @@
 import moment from 'moment'
 import NonAssociationsPage from '../pages/nonAssociationsPage'
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const prisonerFullDetails = require('../mockApis/responses/prisonerFullDetails.json')
+import prisonerFullDetails from '../mockApis/responses/prisonerFullDetails.json'
 
 const prisonerNumber = 'A12345'
 

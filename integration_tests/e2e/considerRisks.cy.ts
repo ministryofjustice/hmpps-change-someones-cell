@@ -1,13 +1,9 @@
 import ConsiderRisksPage from '../pages/considerRisksPage'
 import SelectCellPage from '../pages/selectCellPage'
 import ConfirmCellMovePage from '../pages/confirmCellMovePage'
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const offenderFullDetails = require('../mockApis/responses/offenderFullDetails.json')
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const offenderBasicDetails = require('../mockApis/responses/offenderBasicDetails.json')
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const prisonerFullDetails = require('../mockApis/responses/prisonerFullDetails.json')
+import offenderFullDetails from '../mockApis/responses/offenderFullDetails.json'
+import offenderBasicDetails from '../mockApis/responses/offenderBasicDetails.json'
+import prisonerFullDetails from '../mockApis/responses/prisonerFullDetails.json'
 
 const offenderNo = 'A1234A'
 
