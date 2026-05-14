@@ -18,7 +18,7 @@
     "start-feature": "export $(cat feature.env) && node $NODE_DEBUG_OPTION dist/server.js | bunyan -o short",
     "watch-node-feature": "export $(cat feature.env) && nodemon --watch dist/ $NODE_DEBUG_OPTION dist/server.js | bunyan -o short",
     "start-feature:dev": "concurrently -k -p \"[{name}]\" -n \"Views,TypeScript,Node,Sass\" -c \"yellow.bold,cyan.bold,green.bold,blue.bold\" \"npm run watch-views\" \"npm run watch-ts\" \"npm run watch-node-feature\" \"npm run watch-sass\"",
-    "lint": "eslint . --cache --max-warnings 0 --fix",
+    "lint": "eslint . --cache --max-warnings 0",
     "typecheck": "tsc && tsc -p integration_tests",
     "test": "jest",
     "test:ci": "jest --runInBand",
@@ -187,8 +187,6 @@
     "@babel/runtime": "7.29.2",
     "serialize-javascript": ">=7.0.5",
     "tmp": "0.2.5",
-    "eslint-config-airbnb-base": {
-      "eslint": "^10.3.0"
-    }
+    "eslint": "^10.3.0"
   }
 }
