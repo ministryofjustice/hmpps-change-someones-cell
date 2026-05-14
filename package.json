@@ -105,7 +105,7 @@
     "connect-redis": "^7.1.1",
     "cookie-parser": "^1.4.7",
     "csrf-sync": "^4.2.1",
-    "express": "^4.22.1",
+    "express": "^5.2.1",
     "express-async-errors": "^3.1.1",
     "express-prom-bundle": "^6.6.0",
     "express-session": "^1.19.0",
