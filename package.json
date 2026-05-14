@@ -130,6 +130,7 @@
     "uuid": "^14.0.0"
   },
   "devDependencies": {
+    "@ministryofjustice/eslint-config-hmpps": "1.0.3",
     "@ministryofjustice/hmpps-npm-script-allowlist": "0.0.4",
     "@ministryofjustice/hmpps-precommit-hooks": "2.0.2",
     "@types/bunyan": "^1.8.11",
@@ -157,11 +158,11 @@
     "cypress": "15.14.2",
     "cypress-multi-reporters": "^2.0.5",
     "dotenv": "^17.4.2",
-    "eslint": "^8.57.1",
+    "eslint": "^10.3.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^10.1.8",
-    "eslint-import-resolver-typescript": "^3.7.0",
-    "eslint-plugin-cypress": "^2.15.2",
+    "eslint-import-resolver-typescript": "^4.4.4",
+    "eslint-plugin-cypress": "^6.4.1",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-no-only-tests": "3.4.0",
     "eslint-plugin-prettier": "^5.5.5",
@@ -185,6 +186,7 @@
     "@babel/helpers": "7.29.2",
     "@babel/runtime": "7.29.2",
     "serialize-javascript": ">=7.0.5",
-    "tmp": "0.2.5"
+    "tmp": "0.2.5",
+    "eslint": "^10.3.0"
   }
 }

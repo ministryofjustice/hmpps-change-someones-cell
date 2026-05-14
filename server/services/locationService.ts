@@ -16,7 +16,7 @@ export default class LocationService {
   }
 
   async getLocation(token: string, key: string): Promise<Location> {
-    return await this.locationsInsidePrisonApiClient.getLocation(token, key)
+    return this.locationsInsidePrisonApiClient.getLocation(token, key)
   }
 
   async getActiveAgenciesInLocationService(token: string, prisonId: string): Promise<boolean> {
@@ -36,6 +36,6 @@ export default class LocationService {
   }
 
   async getAgencyDetails(token: string, agencyId: string): Promise<Agency> {
-    return await this.prisonApiClient.getAgencyDetails(token, agencyId)
+    return this.prisonApiClient.getAgencyDetails(token, agencyId)
   }
 }
