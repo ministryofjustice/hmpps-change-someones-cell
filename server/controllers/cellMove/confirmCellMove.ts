@@ -88,7 +88,6 @@ export default ({
   }
 
   const sendCellMoveAnalyticsEvent = (req, agencyId: string, cellType: string) => {
-    // eslint-disable-next-line no-underscore-dangle
     const gaClientId = req.cookies?._ga?.match(/.*\.(\d+\.\d+)$/)[1]
 
     analyticsService

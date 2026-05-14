@@ -17,11 +17,11 @@ export default class PrisonerCellAllocationService {
   ) {}
 
   async getInmates(token: string, locationId: string, keywords?: string, returnAlerts?: boolean): Promise<Offender[]> {
-    return await this.prisonApiClient.getInmates(token, locationId, keywords, returnAlerts)
+    return this.prisonApiClient.getInmates(token, locationId, keywords, returnAlerts)
   }
 
   async getInmatesAtLocation(token: string, locationId: string): Promise<Occupant[]> {
-    return await this.locationsInsidePrisonApiClient.getInmatesAtLocation(token, locationId)
+    return this.locationsInsidePrisonApiClient.getInmatesAtLocation(token, locationId)
   }
 
   async getCellsWithCapacity(
@@ -31,15 +31,15 @@ export default class PrisonerCellAllocationService {
     subLocation?: string,
   ): Promise<CellLocation[]> {
     if (location === 'ALL') {
-      return await this.locationsInsidePrisonApiClient.getCellsWithCapacity(token, agencyId)
+      return this.locationsInsidePrisonApiClient.getCellsWithCapacity(token, agencyId)
     }
 
     const groupName = subLocation ? `${location}_${subLocation}` : location
-    return await this.locationsInsidePrisonApiClient.getCellsWithCapacity(token, agencyId, groupName)
+    return this.locationsInsidePrisonApiClient.getCellsWithCapacity(token, agencyId, groupName)
   }
 
   async getCellMoveReasonTypes(token: string) {
-    return await this.prisonApiClient.getCellMoveReasonTypes(token)
+    return this.prisonApiClient.getCellMoveReasonTypes(token)
   }
 
   async moveToCell(
@@ -50,7 +50,7 @@ export default class PrisonerCellAllocationService {
     cellMoveReasonCode: string,
     commentText: string,
   ) {
-    return await this.whereaboutsApiClient.moveToCell(
+    return this.whereaboutsApiClient.moveToCell(
       token,
       bookingId,
       offenderNo,
@@ -61,19 +61,19 @@ export default class PrisonerCellAllocationService {
   }
 
   async moveToCellSwap(token: string, bookingId: number) {
-    return await this.prisonApiClient.moveToCellSwap(token, bookingId)
+    return this.prisonApiClient.moveToCellSwap(token, bookingId)
   }
 
   async getHistoryByDate(token: string, agencyId: string, assignmentDate: string) {
-    return await this.prisonApiClient.getHistoryByDate(token, agencyId, assignmentDate)
+    return this.prisonApiClient.getHistoryByDate(token, agencyId, assignmentDate)
   }
 
   async getOffenderCellHistory(token: string, bookingId: number) {
-    return await this.prisonApiClient.getOffenderCellHistory(token, bookingId)
+    return this.prisonApiClient.getOffenderCellHistory(token, bookingId)
   }
 
   async getReceptionsWithCapacity(token: string, agencyId: string) {
-    return await this.prisonApiClient.getReceptionsWithCapacity(token, agencyId)
+    return this.prisonApiClient.getReceptionsWithCapacity(token, agencyId)
   }
 
   async getOffendersInReception(token: string, agencyId: string): Promise<OffenderWithAlerts[]> {

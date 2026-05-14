@@ -261,7 +261,6 @@ export default ({
         ),
       ).join(',')
 
-      // eslint-disable-next-line no-underscore-dangle
       const gaClientId = req.cookies?._ga?.match(/.*\.(\d+\.\d+)$/)[1]
 
       analyticsService

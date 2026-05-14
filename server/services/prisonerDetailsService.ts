@@ -16,12 +16,12 @@ export default class PrisonerDetailsService {
   }
 
   async getPrisoner(token: string, prisonerNumber: string): Promise<Prisoner> {
-    return await this.prisonerSearchApiClient.getPrisoner(token, prisonerNumber)
+    return this.prisonerSearchApiClient.getPrisoner(token, prisonerNumber)
   }
 
   async getPrisoners(token: string, prisonerNumbers: string[]): Promise<Prisoner[]> {
     if (prisonerNumbers.length > 0) {
-      return await this.prisonerSearchApiClient.getPrisoners(token, prisonerNumbers)
+      return this.prisonerSearchApiClient.getPrisoners(token, prisonerNumbers)
     }
     return []
   }

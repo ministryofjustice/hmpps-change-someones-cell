@@ -19,15 +19,15 @@ export default class UserService {
   }
 
   async getUserRoles(token: string): Promise<string[]> {
-    return await this.manageUsersApiClient.getUserRoles(token)
+    return this.manageUsersApiClient.getUserRoles(token)
   }
 
   async setActiveCaseload(token: string, caseload: CaseLoad) {
-    return await this.prisonApiClient.setActiveCaseload(token, caseload)
+    return this.prisonApiClient.setActiveCaseload(token, caseload)
   }
 
   async userCaseLoads(token: string) {
-    return await this.prisonApiClient.userCaseLoads(token)
+    return this.prisonApiClient.userCaseLoads(token)
   }
 
   async getStaffDetails(token: string, username: string) {
