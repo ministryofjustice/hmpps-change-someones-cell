@@ -1,8 +1,8 @@
 {
+  "extends": "@tsconfig/node24/tsconfig.json",
   "compilerOptions": {
-    "target": "es5",
     "noEmit": true,
-    "lib": ["es5", "dom", "es2015.promise"],
+    "lib": ["esnext", "dom", "esnext.promise"],
     "types": ["cypress", "express", "express-session"],
     "esModuleInterop": true,
     "skipLibCheck": true
