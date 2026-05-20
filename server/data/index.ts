@@ -45,7 +45,6 @@ export type DataAccess = ReturnType<typeof dataAccess>
 export {
   AlertsApiClient,
   HmppsAuthClient,
-  RestClientBuilder,
   ManageUsersApiClient,
   PrisonApiClient,
   WhereaboutsApiClient,
@@ -55,3 +54,4 @@ export {
   PrisonerSearchApiClient,
   applicationInsightsClient,
 }
+export type { RestClientBuilder }

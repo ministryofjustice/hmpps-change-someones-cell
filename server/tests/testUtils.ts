@@ -7,7 +7,7 @@ export class MockUserService extends UserService {
     super(undefined, undefined)
   }
 
-  async getUserRoles(_token: string) {
+  override async getUserRoles(_token: string) {
     return ['CELL_MOVE']
   }
 }
