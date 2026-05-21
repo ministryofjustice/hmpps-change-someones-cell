@@ -133,7 +133,7 @@
     "@ministryofjustice/eslint-config-hmpps": "1.0.3",
     "@tsconfig/node24": "^24.0.4",
     "@ministryofjustice/hmpps-npm-script-allowlist": "0.0.5",
-    "@ministryofjustice/hmpps-precommit-hooks": "3.0.0",
+    "@ministryofjustice/hmpps-precommit-hooks": "3.0.1",
     "@types/bunyan": "^1.8.11",
     "@types/bunyan-format": "^0.2.9",
     "@types/compression": "^1.8.1",
@@ -159,7 +159,7 @@
     "cypress": "15.15.0",
     "cypress-multi-reporters": "^2.0.5",
     "dotenv": "^17.4.2",
-    "eslint": "^10.3.0",
+    "eslint": "^10.4.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",
@@ -188,6 +188,6 @@
     "@babel/runtime": "7.29.2",
     "serialize-javascript": ">=7.0.5",
     "tmp": "0.2.5",
-    "eslint": "^10.3.0"
+    "eslint": "^10.4.0"
   }
 }
