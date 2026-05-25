@@ -132,7 +132,7 @@
   "devDependencies": {
     "@ministryofjustice/eslint-config-hmpps": "1.0.3",
     "@tsconfig/node24": "^24.0.4",
-    "@ministryofjustice/hmpps-npm-script-allowlist": "0.0.5",
+    "@ministryofjustice/hmpps-npm-script-allowlist": "0.0.6",
     "@ministryofjustice/hmpps-precommit-hooks": "3.0.1",
     "@types/bunyan": "^1.8.11",
     "@types/bunyan-format": "^0.2.9",
@@ -148,11 +148,11 @@
     "@types/nunjucks": "^3.2.6",
     "@types/passport": "^1.0.17",
     "@types/passport-oauth2": "^1.8.0",
-    "@types/superagent": "^8.1.9",
+    "@types/superagent": "^8.1.10",
     "@types/supertest": "^7.2.0",
     "@types/uuid": "^9.0.8",
-    "@typescript-eslint/eslint-plugin": "8.59.3",
-    "@typescript-eslint/parser": "8.59.3",
+    "@typescript-eslint/eslint-plugin": "8.59.4",
+    "@typescript-eslint/parser": "8.59.4",
     "audit-ci": "^7.1.0",
     "concurrently": "^9.2.1",
     "cookie-session": "^2.1.1",
@@ -180,7 +180,7 @@
     "prettier-plugin-jinja-template": "2.2.0",
     "sass": "^1.99.0",
     "supertest": "^7.2.2",
-    "ts-jest": "^29.4.9",
+    "ts-jest": "^29.4.10",
     "typescript": "^6.0.3"
   },
   "overrides": {
