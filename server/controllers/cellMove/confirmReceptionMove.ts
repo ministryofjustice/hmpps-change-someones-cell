@@ -92,8 +92,7 @@ export default ({ prisonerCellAllocationService, prisonerDetailsService }: Param
     }
 
     const { bookingId, prisonId } = await prisonerDetailsService.getPrisoner(systemClientToken, offenderNo)
-    logger.info(`Move offender ${offenderNo} with booking id of ${bookingId}`) 
-  
+    logger.info(`Move offender ${offenderNo} with booking id of ${bookingId}`)
     const receptionOccupancy = await prisonerCellAllocationService.getReceptionsWithCapacity(
       systemClientToken,
       prisonId,

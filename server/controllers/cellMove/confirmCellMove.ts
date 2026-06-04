@@ -198,7 +198,7 @@ export default ({
       const { bookingId, prisonId } = await prisonerDetailsService.getPrisoner(systemClientToken, offenderNo)
       const agencyId = prisonId
       if (cellId === CSWAP) return await makeCSwap(req, res, { agencyId, bookingId, offenderNo })
-      logger.info(`Move offender ${offenderNo} with booking id of ${bookingId}`) 
+      logger.info(`Move offender ${offenderNo} with booking id of ${bookingId}`)
       return await makeCellMove(req, res, {
         cellId,
         bookingId,
