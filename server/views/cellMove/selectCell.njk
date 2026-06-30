@@ -150,7 +150,7 @@
   {% endif %}
 
   {% if cells.length %}
-    <table class="govuk-table govuk-table--with-child-rows" data-test="cell-results-table">
+    <table class="govuk-table govuk-table--with-child-rows" data-test="cell-results-table" data-module="moj-sortable-table">
       <thead class="govuk-table__head">
         <tr class="govuk-table__row">
           <th scope="col" class="govuk-table__header" data-test="location-table-header">Location</th>
@@ -188,15 +188,4 @@
 
 {% block pageScripts %}
   <script src="/assets/js/selectCell.js"></script>
-{% endblock %}
-
-{% block bodyEnd %}
-  {{ super() }}
-  <script src="/assets/moj/components/sortable-table/sortable-table.js"></script>
-  <script nonce="{{ cspNonce }}">
-  new MOJFrontend.SortableTable({
-    table: $('table')[0],
-  })
-  </script>
-
 {% endblock %}

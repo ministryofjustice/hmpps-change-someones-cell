@@ -114,20 +114,10 @@
                     attributes: { "aria-sort": "descending" }
                 }],
             rows: rows,
-            attributes: { "data-test": "cell-history-table" }
+            attributes: { "data-test": "cell-history-table", "data-module": "moj-sortable-table" }
         }) }}
     {% endif %}
 
 
 
-{% endblock %}
-
-{% block bodyEnd %}
-    {{ super() }}
-    <script src="/assets/moj/components/sortable-table/sortable-table.js"></script>
-    <script nonce="{{ cspNonce }}">
-      new MOJFrontend.SortableTable({
-        table: $('table')[0],
-      })
-    </script>
 {% endblock %}
