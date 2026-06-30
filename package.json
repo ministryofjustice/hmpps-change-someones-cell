@@ -93,7 +93,7 @@
     ]
   },
   "dependencies": {
-    "@ministryofjustice/frontend": "^2.2.5",
+    "@ministryofjustice/frontend": "^9.0.0",
     "agentkeepalive": "^4.6.0",
     "applicationinsights": "^2.9.8",
     "axios": "1.17.0",
@@ -115,7 +115,7 @@
     "govuk-frontend": "^6.2.0",
     "helmet": "^8.2.0",
     "http-errors": "^2.0.1",
-    "jquery": "^3.7.1",
+    "jquery": "^4.0.0",
     "jwt-decode": "^4.0.0",
     "moment": "^2.30.1",
     "nocache": "^4.0.0",

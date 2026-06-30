@@ -32,7 +32,7 @@
       titleText: "There is a problem",
       errorList: errors,
       attributes: { 'data-qa-errors': true }
-      }) 
+      })
     }}
   {% endif %}
 
@@ -122,21 +122,11 @@
             { text: "" }
           ],
           rows: rows,
-          attributes: { "data-test": "prisoner-search-results-table" }
+          attributes: { "data-test": "prisoner-search-results-table", "data-module": "moj-sortable-table" }
         }) }}
       </div>
     {% else %}
     <p class="govuk-body">There are no prisoners currently in this location.</p>
     {% endif %}
   {% endif %}
-{% endblock %}
-
-{% block bodyEnd %}
-  {{ super() }}
-  <script src="/assets/moj/components/sortable-table/sortable-table.js"></script>
-  <script nonce="{{ cspNonce }}">
-    new MOJFrontend.SortableTable({
-      table: $('table')[0],
-    })
-  </script>
 {% endblock %}
