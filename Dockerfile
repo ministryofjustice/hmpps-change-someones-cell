@@ -3,7 +3,8 @@ FROM node:24-alpine AS base
 
 RUN apk --update-cache upgrade --available \
   && apk --no-cache add tzdata \
-  && rm -rf /var/cache/apk/*
+  && rm -rf /var/cache/apk/* \
+  && npm install -g npm@latest
 
 LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 
