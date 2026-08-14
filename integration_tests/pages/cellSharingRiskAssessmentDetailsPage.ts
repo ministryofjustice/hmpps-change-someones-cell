@@ -8,7 +8,7 @@ const cellSharingRiskAssessmentDetailsPage: () => any = () =>
 
 export default {
   verifyOnPage: cellSharingRiskAssessmentDetailsPage,
-  goTo: offenderNo => {
+  goTo: (offenderNo: string) => {
     cy.visit(`/prisoner/${offenderNo}/cell-move/cell-sharing-risk-assessment-details`)
     return cellSharingRiskAssessmentDetailsPage()
   },

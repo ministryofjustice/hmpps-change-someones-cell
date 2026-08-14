@@ -22,7 +22,7 @@ const searchForCellPage: () => any = () =>
 
 export default {
   verifyOnPage: searchForCellPage,
-  goTo: offenderNo => {
+  goTo: (offenderNo: string) => {
     cy.visit(`/prisoner/${offenderNo}/cell-move/search-for-cell`)
     return searchForCellPage()
   },

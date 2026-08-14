@@ -29,7 +29,7 @@ export const stubMoveToCell = (status: number) =>
     },
   })
 
-export const verifyMoveToCell = body => verifyPosts('/whereabouts/cell/make-cell-move?lockTimeout=true', body)
+export const verifyMoveToCell = (body: object) => verifyPosts('/whereabouts/cell/make-cell-move?lockTimeout=true', body)
 
 export default {
   stubHealth,

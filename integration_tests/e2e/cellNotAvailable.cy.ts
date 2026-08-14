@@ -24,7 +24,7 @@ context('A user is presented with a cell no longer available error page', () => 
     page
       .selectAnotherCellLink()
       .invoke('attr', 'href')
-      .then(href => {
+      .then((href: string) => {
         expect(href).to.equal('/prisoner/A12345/cell-move/select-cell')
       })
   })

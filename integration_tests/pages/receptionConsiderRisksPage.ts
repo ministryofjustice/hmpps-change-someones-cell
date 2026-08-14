@@ -28,7 +28,7 @@ const receptionConsiderRisksPage: () => any = () =>
 
 export default {
   verifyOnPage: receptionConsiderRisksPage,
-  goTo: offenderNo => {
+  goTo: (offenderNo: string) => {
     cy.visit(`/prisoner/${offenderNo}/reception-move/consider-risks-reception`, { failOnStatusCode: false })
     return receptionConsiderRisksPage()
   },

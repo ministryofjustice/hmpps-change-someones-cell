@@ -256,7 +256,7 @@ describe('Confirm reception move', () => {
       prisonerCellAllocationService.getReceptionsWithCapacity.mockResolvedValue([])
       await controller.post(req, res)
 
-      expect(logger.info).toBeCalled()
+      expect(logger.info).toHaveBeenCalled()
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/A12345/reception-move/reception-full`)
     })
 
@@ -283,9 +283,9 @@ describe('Confirm reception move', () => {
       prisonerCellAllocationService.getReceptionsWithCapacity.mockResolvedValue([reception])
       prisonerCellAllocationService.moveToCell.mockRejectedValue(error)
 
-      await expect(controller.post(req, res)).rejects.toThrowError(error)
+      await expect(controller.post(req, res)).rejects.toThrow(error)
 
-      expect(logger.error).toBeCalled()
+      expect(logger.error).toHaveBeenCalled()
       expect(res.locals.redirectUrl).toBe('/prisoner/A12345/reception-move/consider-risks-reception')
     })
 

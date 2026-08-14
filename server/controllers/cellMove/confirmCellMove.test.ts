@@ -440,7 +440,7 @@ describe('Change cell play back details', () => {
 
       prisonerDetailsService.getPrisoner = jest.fn().mockRejectedValue(error)
 
-      await expect(controller.post(req, res)).rejects.toThrowError(error)
+      await expect(controller.post(req, res)).rejects.toThrow(error)
 
       expect(res.locals.redirectUrl).toBe(`/prisoner/${offenderNo}/cell-move/select-cell`)
       expect(res.locals.homeUrl).toBe(`${config.prisonerProfileUrl}/prisoner/${offenderNo}`)
@@ -469,7 +469,7 @@ describe('Change cell play back details', () => {
 
       req.body = { ...req.body, cellId }
 
-      await expect(controller.post(req, res)).rejects.toThrowError(error)
+      await expect(controller.post(req, res)).rejects.toThrow(error)
 
       expect(analyticsService.sendEvents.mock.calls.length).toBe(0)
 

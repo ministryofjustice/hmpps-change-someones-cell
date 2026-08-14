@@ -8,7 +8,7 @@ const cellNotAvailablePage = (cellDescription: string): any =>
   })
 
 export default {
-  goTo: ({ offenderNo, cellDescription }) => {
+  goTo: ({ offenderNo, cellDescription }: { offenderNo: string; cellDescription: string }) => {
     cy.visit(`/prisoner/${offenderNo}/cell-move/cell-not-available?cellDescription=${cellDescription}`)
     return cellNotAvailablePage(cellDescription)
   },

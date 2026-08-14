@@ -7,9 +7,27 @@ const offenderNo = 'A12345'
 
 context('A user can select a cell', () => {
   const assertRow = (
-    rowIndex,
-    columns,
-    { location, cellType, capacity, spaces, occupier, csra, relevantAlerts, selectCell },
+    rowIndex: number,
+    columns: JQuery<HTMLElement>,
+    {
+      location,
+      cellType,
+      capacity,
+      spaces,
+      occupier,
+      csra,
+      relevantAlerts,
+      selectCell,
+    }: {
+      location: string
+      cellType: string
+      capacity: number
+      spaces: number
+      occupier: string
+      csra: string
+      relevantAlerts: string
+      selectCell: string
+    },
   ) => {
     const index = rowIndex * 8
 
@@ -148,9 +166,9 @@ context('A user can select a cell', () => {
     it('should display the correct cell information', () => {
       const page = SelectCellPage.goTo(offenderNo)
 
-      page.cellResults().then($table => {
-        cy.get($table).find('tr').its('length').should('eq', 2)
-        cy.get($table)
+      page.cellResults().then(($table: JQuery<HTMLElement>) => {
+        cy.wrap($table).find('tr').its('length').should('eq', 2)
+        cy.wrap($table)
           .find('tr')
           .then($tableRows => {
             const columns = $tableRows.find('td')
@@ -193,14 +211,14 @@ context('A user can select a cell', () => {
       page
         .selectCswapLink()
         .invoke('attr', 'href')
-        .then(href => {
+        .then((href: string) => {
           expect(href).to.equal('/prisoner/A12345/cell-move/confirm-cell-move?cellId=C-SWAP')
         })
     })
   })
 
   context('without cell data', () => {
-    const response = []
+    const response: object[] = []
 
     beforeEach(() => {
       cy.task('stubCellsWithCapacity', { prisonId: 'MDI', response })

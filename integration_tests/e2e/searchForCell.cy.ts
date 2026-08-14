@@ -183,7 +183,7 @@ context('A user can search for a cell', () => {
     page
       .selectCswapLink()
       .invoke('attr', 'href')
-      .then(href => {
+      .then((href: string) => {
         expect(href).to.equal('/prisoner/A12345/cell-move/confirm-cell-move?cellId=C-SWAP')
       })
   })

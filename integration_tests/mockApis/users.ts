@@ -15,7 +15,7 @@ export const stubHealth = (status = 200) =>
     },
   })
 
-export const stubUser = (username, caseload) => {
+export const stubUser = (username?: string, caseload?: string) => {
   const user = username || 'ITAG_USER'
   const activeCaseLoadId = caseload || 'MDI'
   return stubFor({
@@ -60,7 +60,7 @@ export const stubUserMeRoles = (roles: string[] = []) =>
     body: roles.map(role => ({ roleCode: role })),
   })
 
-export const stubEmail = username =>
+export const stubEmail = (username: string) =>
   stubFor({
     request: {
       method: 'GET',

@@ -1,6 +1,6 @@
 import { stubFor } from './wiremock'
 
-export const stubGlobalAlerts = alerts =>
+export const stubGlobalAlerts = (alerts?: object) =>
   stubFor({
     request: {
       method: 'POST',

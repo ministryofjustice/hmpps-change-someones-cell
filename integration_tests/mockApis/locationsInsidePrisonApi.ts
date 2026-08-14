@@ -15,7 +15,7 @@ export const stubHealth = (status = 200) =>
     },
   })
 
-export const stubGroups = (caseload, status = 200) => {
+export const stubGroups = (caseload: { id: string }, status = 200) => {
   const json = [
     {
       name: '1',
@@ -139,7 +139,7 @@ export const stubActivePrisons = (activeAgencies: LocationInfo) => {
   })
 }
 
-export const stubLocation = location => {
+export const stubLocation = (location?: object) => {
   return stubFor({
     request: {
       method: 'GET',
@@ -155,7 +155,7 @@ export const stubLocation = location => {
   })
 }
 
-export const stubInmatesAtLocation = inmates => {
+export const stubInmatesAtLocation = (inmates?: object[]) => {
   return stubFor({
     request: {
       method: 'GET',
@@ -171,7 +171,15 @@ export const stubInmatesAtLocation = inmates => {
   })
 }
 
-export const stubCellsWithCapacityByGroupName = ({ prisonId, groupName, response }) =>
+export const stubCellsWithCapacityByGroupName = ({
+  prisonId,
+  groupName,
+  response,
+}: {
+  prisonId: string
+  groupName: string
+  response: object
+}) =>
   stubFor({
     request: {
       method: 'GET',
@@ -186,7 +194,7 @@ export const stubCellsWithCapacityByGroupName = ({ prisonId, groupName, response
     },
   })
 
-export const stubCellsWithCapacity = ({ prisonId, response }) =>
+export const stubCellsWithCapacity = ({ prisonId, response }: { prisonId: string; response: object }) =>
   stubFor({
     request: {
       method: 'GET',

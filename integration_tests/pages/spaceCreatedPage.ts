@@ -6,7 +6,7 @@ const spaceCreatedPage = (name: string): any =>
   })
 
 export default {
-  goTo: ({ offenderNo, name }) => {
+  goTo: ({ offenderNo, name }: { offenderNo: string; name: string }) => {
     cy.visit(`/prisoner/${offenderNo}/cell-move/space-created`)
     return spaceCreatedPage(name)
   },

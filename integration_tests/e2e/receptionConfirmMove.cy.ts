@@ -199,7 +199,7 @@ describe('Reception full journey', () => {
       .verifyOnPage()
       .errorSummaryList()
       .find('li')
-      .then($errors => {
+      .then(($errors: JQuery<HTMLElement>) => {
         expect($errors.get(0).innerText).to.contain(
           'This reception move cannot be carried out because a user currently has this prisoner open in P-Nomis, please try later',
         )

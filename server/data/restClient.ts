@@ -23,7 +23,7 @@ interface RequestWithBody extends Request {
 }
 
 interface StreamRequest {
-  path?: string
+  path?: string | null
   headers?: Record<string, string>
   errorLogger?: (e: UnsanitisedError) => void
 }
@@ -71,7 +71,7 @@ export default class RestClient {
         .timeout(this.timeoutConfig())
       return (raw ? result : result.body) as Response
     } catch (error) {
-      const sanitisedError = sanitiseError(error)
+      const sanitisedError = sanitiseError(error as UnsanitisedError)
       logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: 'GET'`)
       throw sanitisedError
     }
@@ -101,7 +101,7 @@ export default class RestClient {
         .timeout(this.timeoutConfig())
       return (raw ? result : result.body) as Response
     } catch (error) {
-      const sanitisedError = sanitiseError(error)
+      const sanitisedError = sanitiseError(error as UnsanitisedError)
       logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: '${method.toUpperCase()}'`)
       throw sanitisedError
     }
@@ -143,7 +143,7 @@ export default class RestClient {
         .timeout(this.timeoutConfig())
       return (raw ? result : result.body) as Response
     } catch (error) {
-      const sanitisedError = sanitiseError(error)
+      const sanitisedError = sanitiseError(error as UnsanitisedError)
       logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: 'DELETE'`)
       throw sanitisedError
     }
