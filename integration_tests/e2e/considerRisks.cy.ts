@@ -306,7 +306,6 @@ context('A user can see conflicts in cell', () => {
     ])
     cy.task('stubGroups', { id: 'MDI' })
     cy.task('stubActivePrisons')
-    cy.task('stubGetAlerts', { agencyId: 'MDI', alerts: [{ offenderNo: 'A12345', alertCode: 'PEEP' }] })
     cy.task('stubCsraAssessments', {
       offenderNumbers: ['A12345'],
       assessments: [
@@ -549,7 +548,6 @@ context('A user can see conflicts in cell', () => {
           ],
         },
       ])
-      cy.task('stubGetAlerts', { agencyId: 'MDI', alerts: [{ offenderNo: 'A12345', alertCode: 'PEEP' }] })
       cy.task('stubCsraAssessments', {
         offenderNumbers: ['A12345'],
         assessments: [

@@ -183,21 +183,6 @@ export const stubOffenderCellHistory = history =>
     },
   })
 
-export const stubGetAlerts = ({ agencyId, alerts }) =>
-  stubFor({
-    request: {
-      method: 'POST',
-      urlPathPattern: `/api/bookings/offenderNo/${agencyId}/alerts`,
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: alerts || [],
-    },
-  })
-
 export const stubCsraAssessments = (offenderNumbers, assessments = []) =>
   stubFor({
     request: {
@@ -380,7 +365,6 @@ export default {
   stubMainOffence,
   stubOffenderBasicDetails,
   stubOffenderCellHistory,
-  stubGetAlerts,
   stubCsraAssessments,
   stubSpecificOffenderFullDetails,
   stubPrisonerFullDetail,

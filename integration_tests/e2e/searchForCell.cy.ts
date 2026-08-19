@@ -358,7 +358,6 @@ context('A user can search for a cell', () => {
           inmates: [{ offenderNo: 'A12345', firstName: 'Bob', lastName: 'Doe', assignedLivingUnitId: 1 }],
         })
 
-        cy.task('stubGetAlerts', { agencyId: 'MDI', alerts: [{ offenderNo: 'A12345', alertCode: 'PEEP' }] })
         cy.task('stubCsraAssessments', {
           offenderNumbers: ['A12345'],
           assessments: [
