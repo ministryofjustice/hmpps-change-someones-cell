@@ -72,7 +72,7 @@ describe('View Residential Location', () => {
   })
 
   describe('index', () => {
-    it('should make a call to whereabouts to get available locations', async () => {
+    it('should make a call to the locations API to get available locations', async () => {
       req.query = {}
 
       await controller(req, res)
@@ -80,7 +80,7 @@ describe('View Residential Location', () => {
       expect(locationService.searchGroups).toHaveBeenCalledWith(systemClientToken, 'MDI')
     })
 
-    it('should make a call to whereabouts to get location id from the location key', async () => {
+    it('should make a call to the locations API to get location id from the location key', async () => {
       const locationValue = ''
       req.query = {
         location: locationValue,
@@ -91,7 +91,7 @@ describe('View Residential Location', () => {
       expect(locationService.getAgencyGroupLocationPrefix).toHaveBeenCalledWith(systemClientToken, 'MDI', locationValue)
     })
 
-    it('should make a call to get inmates using shortened location prefix from whereabouts if present', async () => {
+    it('should make a call to get inmates using shortened location prefix from the locations API if present', async () => {
       locationService.getAgencyGroupLocationPrefix = jest.fn().mockReturnValue({
         locationPrefix: 'MDI-1-',
       })
@@ -105,7 +105,7 @@ describe('View Residential Location', () => {
       expect(prisonerCellAllocationService.getInmates).toHaveBeenCalledWith(systemClientToken, 'MDI-1', null, true)
     })
 
-    it('should make a call to get inmates using location id built from case load and location key if whereabouts prefix not present', async () => {
+    it('should make a call to get inmates using location id built from case load and location key if location prefix not present', async () => {
       locationService.getAgencyGroupLocationPrefix = jest.fn().mockReturnValue(null)
 
       req.query = {

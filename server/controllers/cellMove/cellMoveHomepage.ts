@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import config from '../../config'
 
-type WhereaboutsTask = {
+type HomepageTask = {
   id: string
   heading: string
   description: string
@@ -10,7 +10,7 @@ type WhereaboutsTask = {
   enabled: boolean
 }
 
-const whereaboutsTasks: (prisonName: string) => WhereaboutsTask[] = prisonName => [
+const homepageTasks: (prisonName: string) => HomepageTask[] = prisonName => [
   {
     id: 'search-for-prisoner',
     heading: 'Search for a prisoner',
@@ -58,7 +58,7 @@ export default (req: Request, res: Response) => {
   const { activeCaseLoad } = res.locals.user
 
   return res.render('cellMove/cellMoveHomepage', {
-    tasks: whereaboutsTasks(activeCaseLoad.description)
+    tasks: homepageTasks(activeCaseLoad.description)
       .filter(task => task.enabled)
       .map(({ roles, enabled, ...task }) => task),
   })

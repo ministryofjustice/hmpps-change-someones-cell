@@ -1,4 +1,4 @@
-import { stubFor, verifyPut } from './wiremock'
+import { stubFor } from './wiremock'
 
 export const stubUserCaseloads = caseloads =>
   stubFor({
@@ -273,23 +273,6 @@ export const stubCellMoveTypes = types =>
     },
   })
 
-export const stubMoveToCellSwap = () =>
-  stubFor({
-    request: {
-      method: 'PUT',
-      urlPathPattern: '/api/bookings/[0-9]+?/move-to-cell-swap',
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: {},
-    },
-  })
-
-export const verifyMoveToCellSwap = ({ bookingId }) => verifyPut(`/api/bookings/${bookingId}/move-to-cell-swap`)
-
 export const stubAgencyDetails = (agencyId, details, status = 200) =>
   stubFor({
     request: {
@@ -386,8 +369,6 @@ export default {
   stubPrisonerFullDetail,
   stubBookingDetails,
   stubCellMoveTypes,
-  stubMoveToCellSwap,
-  verifyMoveToCellSwap,
   stubAgencyDetails,
   stubCellMoveHistory,
   stubStaff,

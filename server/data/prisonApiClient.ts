@@ -402,15 +402,6 @@ export default class PrisonApiClient {
   }
 
   /**
-   * @deprecated NOT USED REMOVE
-   */
-  moveToCellSwap(token: string, bookingId: number) {
-    return PrisonApiClient.restClient(token).put<OffenderDetails>({
-      path: `/api/bookings/${bookingId}/move-to-cell-swap`,
-    })
-  }
-
-  /**
    * @deprecated Main offence can be obtained from prisoner search
    */
   getMainOffence(token: string, bookingId: number) {

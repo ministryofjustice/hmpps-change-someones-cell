@@ -1,4 +1,4 @@
-import { LocationsInsidePrisonApiClient, PrisonApiClient, WhereaboutsApiClient, AlertsApiClient } from '../data'
+import { LocationsInsidePrisonApiClient, PrisonApiClient, CellMovementsApiClient, AlertsApiClient } from '../data'
 import { Offender, OffenderInReception } from '../data/prisonApiClient'
 import { Alert } from '../data/alertsApiClient'
 import logger from '../../logger'
@@ -12,7 +12,7 @@ export default class PrisonerCellAllocationService {
   constructor(
     private readonly alertsApiClient: AlertsApiClient,
     private readonly prisonApiClient: PrisonApiClient,
-    private readonly whereaboutsApiClient: WhereaboutsApiClient,
+    private readonly cellMovementsApiClient: CellMovementsApiClient,
     private readonly locationsInsidePrisonApiClient: LocationsInsidePrisonApiClient,
   ) {}
 
@@ -42,26 +42,14 @@ export default class PrisonerCellAllocationService {
     return this.prisonApiClient.getCellMoveReasonTypes(token)
   }
 
-  async moveToCell(
-    token: string,
-    bookingId: number,
-    offenderNo: string,
-    internalLocationDescriptionDestination: string,
-    cellMoveReasonCode: string,
-    commentText: string,
-  ) {
-    return this.whereaboutsApiClient.moveToCell(
-      token,
-      bookingId,
-      offenderNo,
-      internalLocationDescriptionDestination,
-      cellMoveReasonCode,
-      commentText,
-    )
+  // No bookingId on either call: the cell movements API resolves the current booking itself
+  // from prisoner-search. bookingId is a NOMIS-only concept being retired from new services.
+  async moveToCell(token: string, offenderNo: string, toLocationKey: string, reasonCode: string, commentText: string) {
+    return this.cellMovementsApiClient.moveToCell(token, offenderNo, toLocationKey, reasonCode, commentText)
   }
 
-  async moveToCellSwap(token: string, bookingId: number) {
-    return this.prisonApiClient.moveToCellSwap(token, bookingId)
+  async moveToCellSwap(token: string, offenderNo: string) {
+    return this.cellMovementsApiClient.moveToCellSwap(token, offenderNo)
   }
 
   async getHistoryByDate(token: string, agencyId: string, assignmentDate: string) {

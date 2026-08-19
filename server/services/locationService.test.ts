@@ -1,12 +1,10 @@
 import { PrisonApiClient, LocationsInsidePrisonApiClient } from '../data'
 import { Agency } from '../data/prisonApiClient'
-import { LocationGroup, LocationPrefix } from '../data/whereaboutsApiClient'
-import { Location, LocationInfo } from '../data/locationsInsidePrisonApiClient'
+import { LocationGroup, LocationPrefix, Location, LocationInfo } from '../data/locationsInsidePrisonApiClient'
 import LocationService from './locationService'
 import { SanitisedError } from '../sanitisedError'
 
 jest.mock('../data/prisonApiClient')
-jest.mock('../data/whereaboutsApiClient')
 jest.mock('../data/locationsInsidePrisonApiClient')
 
 const prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
