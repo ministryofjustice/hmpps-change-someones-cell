@@ -140,8 +140,6 @@ export default ({
         ),
       )
 
-      // If the location is 'ALL' we do not need to call the locations API,
-      // we can directly call prisonApi.
       const cells = await prisonerCellAllocationService.getCellsWithCapacity(
         systemClientToken,
         prisonerDetails.prisonId,
