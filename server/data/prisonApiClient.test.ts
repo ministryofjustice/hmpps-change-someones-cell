@@ -159,21 +159,6 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('moveToCellSwap', () => {
-    it('should request the move to cell swap', async () => {
-      const response = { data: 'data' }
-      const bookingId = 432
-
-      fakePrisonApiClient
-        .put(`/api/bookings/${bookingId}/move-to-cell-swap`, {})
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .reply(200, response)
-
-      const output = await prisonApiClient.moveToCellSwap(accessToken, bookingId)
-      expect(output).toEqual(response)
-    })
-  })
-
   describe('getMainOffence', () => {
     it('should return data from api', async () => {
       const response = { data: 'data' }

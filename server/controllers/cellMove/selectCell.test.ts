@@ -4,10 +4,9 @@ import NonAssociationsService from '../../services/nonAssociationsService'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import { Alert } from '../../data/prisonApiClient'
-import { LocationGroup } from '../../data/whereaboutsApiClient'
+import { LocationGroup, CellLocation } from '../../data/locationsInsidePrisonApiClient'
 import { Prisoner } from '../../data/prisonerSearchApiClient'
 import { PrisonerNonAssociation } from '../../data/nonAssociationsApiClient'
-import { CellLocation } from '../../data/locationsInsidePrisonApiClient'
 
 jest.mock('../../services/locationService')
 jest.mock('../../services/nonAssociationsService')

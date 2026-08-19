@@ -6,7 +6,7 @@ import components from './integration_tests/mockApis/components'
 import prisonApi from './integration_tests/mockApis/prisonApi'
 import alertsApi from './integration_tests/mockApis/alertsApi'
 import users from './integration_tests/mockApis/users'
-import whereabouts from './integration_tests/mockApis/whereabouts'
+import cellMovementsApi from './integration_tests/mockApis/cellMovementsApi'
 import locationsInsidePrisonApi from './integration_tests/mockApis/locationsInsidePrisonApi'
 import nonAssociationsApi from './integration_tests/mockApis/nonAssociationsApi'
 import prisonerSearchApi from './integration_tests/mockApis/prisonerSearchApi'
@@ -44,7 +44,7 @@ export default defineConfig({
             auth.stubHealth(),
             users.stubHealth(),
             prisonApi.stubHealth(),
-            whereabouts.stubHealth(),
+            cellMovementsApi.stubHealth(),
             locationsInsidePrisonApi.stubHealth(),
             tokenVerification.stubHealth(),
             prisonerSearchApi.stubHealth(),
@@ -68,10 +68,10 @@ export default defineConfig({
           prisonApi.stubPrisonerFullDetail(prisonerDetail, offenderNo, fullInfo),
         stubBookingDetails: details => prisonApi.stubBookingDetails(details),
         stubCellMoveTypes: type => prisonApi.stubCellMoveTypes(type),
-        stubMoveToCell: (status: number) => whereabouts.stubMoveToCell(status),
-        stubMoveToCellSwap: () => prisonApi.stubMoveToCellSwap(),
-        verifyMoveToCell: body => whereabouts.verifyMoveToCell(body),
-        verifyMoveToCellSwap: ({ bookingId }) => prisonApi.verifyMoveToCellSwap({ bookingId }),
+        stubMoveToCell: (status: number) => cellMovementsApi.stubMoveToCell(status),
+        stubMoveToCellSwap: (status: number) => cellMovementsApi.stubMoveToCellSwap(status),
+        verifyMoveToCell: body => cellMovementsApi.verifyMoveToCell(body),
+        verifyMoveToCellSwap: body => cellMovementsApi.verifyMoveToCellSwap(body),
         stubAgencyDetails: ({ agencyId, details }) => Promise.all([prisonApi.stubAgencyDetails(agencyId, details)]),
         stubCellMoveHistory: ({ assignmentDate, agencyId, cellMoves }) =>
           prisonApi.stubCellMoveHistory({ assignmentDate, agencyId, cellMoves }),

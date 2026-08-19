@@ -17,7 +17,7 @@ import TokenStore from './tokenStore'
 import FeComponentsClient from './feComponentsClient'
 import PrisonApiClient from './prisonApiClient'
 import AlertsApiClient from './alertsApiClient'
-import WhereaboutsApiClient from './whereaboutsApiClient'
+import CellMovementsApiClient from './cellMovementsApiClient'
 import LocationsInsidePrisonApiClient from './locationsInsidePrisonApiClient'
 import NonAssociationsApiClient from './nonAssociationsApiClient'
 import GoogleAnalyticsClient from './googleAnalyticsClient'
@@ -32,7 +32,7 @@ export const dataAccess = () => ({
   feComponentsClient: new FeComponentsClient(),
   prisonApiClient: new PrisonApiClient(),
   alertsApiClient: new AlertsApiClient(),
-  whereaboutsApiClient: new WhereaboutsApiClient(),
+  cellMovementsApiClient: new CellMovementsApiClient(),
   locationsInsidePrisonApiClient: new LocationsInsidePrisonApiClient(),
   nonAssociationsApiClient: new NonAssociationsApiClient(),
   googleAnalyticsClient: new GoogleAnalyticsClient(),
@@ -47,7 +47,7 @@ export {
   HmppsAuthClient,
   ManageUsersApiClient,
   PrisonApiClient,
-  WhereaboutsApiClient,
+  CellMovementsApiClient,
   LocationsInsidePrisonApiClient,
   NonAssociationsApiClient,
   GoogleAnalyticsClient,

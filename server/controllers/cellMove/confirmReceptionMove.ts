@@ -106,7 +106,6 @@ export default ({ prisonerCellAllocationService, prisonerDetailsService }: Param
     try {
       await prisonerCellAllocationService.moveToCell(
         systemClientToken,
-        bookingId,
         offenderNo,
         receptionOccupancy[0].description,
         reason,

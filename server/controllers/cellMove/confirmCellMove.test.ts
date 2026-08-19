@@ -415,8 +415,7 @@ describe('Change cell play back details', () => {
       expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/cell-move/select-cell')
     })
 
-    it('should call whereabouts api to make the cell move', async () => {
-      prisonerDetailsService.getDetails = jest.fn().mockResolvedValue({ bookingId: 1 })
+    it('should call the cell movements API to make the cell move', async () => {
       req.body = { reason: 'BEH', cellId, comment: 'Hello world' }
 
       await controller.post(req, res)
@@ -424,7 +423,6 @@ describe('Change cell play back details', () => {
       expect(prisonerDetailsService.getPrisoner).toHaveBeenCalledWith(systemClientToken, 'A12345')
       expect(prisonerCellAllocationService.moveToCell).toHaveBeenCalledWith(
         systemClientToken,
-        1,
         'A12345',
         'MDI-A-1-1',
         'BEH',
@@ -490,7 +488,7 @@ describe('Change cell play back details', () => {
   })
 
   describe('Post handle C-SWAP cell move', () => {
-    it('should call elite api to make the C-SWAP cell move', async () => {
+    it('should call the cell movements API to make the C-SWAP cell move', async () => {
       req.body = { cellId: 'C-SWAP' }
       res.locals = {
         user: {
@@ -506,7 +504,7 @@ describe('Change cell play back details', () => {
       await controller.post(req, res)
 
       expect(prisonerDetailsService.getPrisoner).toHaveBeenCalledWith(systemClientToken, 'A12345')
-      expect(prisonerCellAllocationService.moveToCellSwap).toHaveBeenCalledWith(systemClientToken, 1)
+      expect(prisonerCellAllocationService.moveToCellSwap).toHaveBeenCalledWith(systemClientToken, 'A12345')
       expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/cell-move/space-created')
     })
 
@@ -536,6 +534,21 @@ describe('Change cell play back details', () => {
 
       expect(analyticsService.sendEvents.mock.calls.length).toBe(0)
       expect(metricsService.trackEvent.mock.calls.length).toBe(0)
+    })
+
+    it('should flash an error and redirect back on a http 423 locked response', async () => {
+      prisonerCellAllocationService.moveToCellSwap.mockRejectedValue(makeError('status', 423))
+      req.body = { cellId: 'C-SWAP' }
+
+      await controller.post(req, res)
+
+      expect(req.flash).toHaveBeenCalledWith('errors', [
+        {
+          text: 'This cell move cannot be carried out because a user currently has this prisoner open in P-Nomis, please try later',
+        },
+      ])
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/cell-move/confirm-cell-move?cellId=C-SWAP')
+      expect(analyticsService.sendEvents.mock.calls.length).toBe(0)
     })
   })
 })
