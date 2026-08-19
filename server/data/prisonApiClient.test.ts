@@ -129,21 +129,6 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('getAlerts', () => {
-    it('should query the API for alerts', async () => {
-      const response = { data: 'data' }
-      const offenderNumbers = ['A1234', 'B4321']
-
-      fakePrisonApiClient
-        .post('/api/bookings/offenderNo/BXI/alerts', offenderNumbers)
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .reply(200, response)
-
-      const output = await prisonApiClient.getAlerts(accessToken, 'BXI', offenderNumbers)
-      expect(output).toEqual(response)
-    })
-  })
-
   describe('getCsraAssessments', () => {
     it('should query the API for alerts', async () => {
       const response = { data: 'data' }

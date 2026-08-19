@@ -378,13 +378,6 @@ export default class PrisonApiClient {
     })
   }
 
-  getAlerts(token: string, agencyId: string, offenderNumbers: string[]) {
-    return PrisonApiClient.restClient(token).post<Alert[]>({
-      path: `/api/bookings/offenderNo/${agencyId}/alerts`,
-      data: offenderNumbers,
-    })
-  }
-
   getCsraAssessments(token: string, offenderNumbers: string[]) {
     return PrisonApiClient.restClient(token).post<Assessment[]>({
       path: '/api/offender-assessments/csra/list',
