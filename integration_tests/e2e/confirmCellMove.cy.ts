@@ -64,10 +64,9 @@ context('A user can confirm the cell move', () => {
     page.form().submitButton().click()
 
     cy.task('verifyMoveToCell', {
-      bookingId,
-      offenderNo,
-      cellMoveReasonCode: 'ADM',
-      internalLocationDescriptionDestination: 'MDI-1-1-1',
+      prisonerNumber: offenderNo,
+      toLocationKey: 'MDI-1-1-1',
+      reasonCode: 'ADM',
       commentText: comment,
     }).then(assertHasRequestCount(1))
 
@@ -102,7 +101,7 @@ context('A user can confirm the cell move', () => {
 
     page.form().submitButton().click()
 
-    cy.task('verifyMoveToCellSwap', { bookingId: 1234 }).then(assertHasRequestCount(1))
+    cy.task('verifyMoveToCellSwap', { prisonerNumber: offenderNo }).then(assertHasRequestCount(1))
 
     cy.location('pathname').should('eq', '/prisoner/A12345/cell-move/space-created')
   })
@@ -117,10 +116,9 @@ context('A user can confirm the cell move', () => {
     page.form().submitButton().click()
 
     cy.task('verifyMoveToCell', {
-      bookingId,
-      offenderNo,
-      cellMoveReasonCode: 'ADM',
-      internalLocationDescriptionDestination: 'MDI-1-1-1',
+      prisonerNumber: offenderNo,
+      toLocationKey: 'MDI-1-1-1',
+      reasonCode: 'ADM',
       commentText: comment,
     }).then(assertHasRequestCount(1))
 

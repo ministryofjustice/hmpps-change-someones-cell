@@ -214,7 +214,6 @@ describe('Confirm reception move', () => {
       expect(prisonerDetailsService.getPrisoner).toHaveBeenCalledWith(systemClientToken, 'A12345')
       expect(prisonerCellAllocationService.moveToCell).toHaveBeenCalledWith(
         systemClientToken,
-        1,
         'A12345',
         'LEI-RECP',
         'GM',

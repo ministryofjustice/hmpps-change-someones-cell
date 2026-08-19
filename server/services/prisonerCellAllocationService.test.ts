@@ -1,21 +1,20 @@
-import { LocationsInsidePrisonApiClient, PrisonApiClient, WhereaboutsApiClient, AlertsApiClient } from '../data'
+import { LocationsInsidePrisonApiClient, PrisonApiClient, CellMovementsApiClient, AlertsApiClient } from '../data'
 import {
   BedAssignment,
   Offender,
   OffenderCell,
-  OffenderDetails,
   OffenderInReception,
   Page,
   ReferenceCode,
 } from '../data/prisonApiClient'
-import { CellMoveResponse } from '../data/whereaboutsApiClient'
+import { CellMovement } from '../data/cellMovementsApiClient'
 import PrisonerCellAllocationService from './prisonerCellAllocationService'
 import { CellLocation, Occupant } from '../data/locationsInsidePrisonApiClient'
 
 jest.mock('../data/alertsApiClient')
 jest.mock('../data/prisonApiClient')
 jest.mock('../data/prisonerSearchApiClient')
-jest.mock('../data/whereaboutsApiClient')
+jest.mock('../data/cellMovementsApiClient')
 jest.mock('../data/locationsInsidePrisonApiClient')
 
 const token = 'some token'
@@ -23,18 +22,18 @@ const token = 'some token'
 describe('Prisoner cell allocation service', () => {
   let alertsApiClient: jest.Mocked<AlertsApiClient>
   let prisonApiClient: jest.Mocked<PrisonApiClient>
-  let whereaboutsApiClient: jest.Mocked<WhereaboutsApiClient>
+  let cellMovementsApiClient: jest.Mocked<CellMovementsApiClient>
   let prisonerCellAllocationService: PrisonerCellAllocationService
   let locationsInsidePrisonApiClient: jest.Mocked<LocationsInsidePrisonApiClient>
   beforeEach(() => {
     alertsApiClient = new AlertsApiClient() as jest.Mocked<AlertsApiClient>
     prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
-    whereaboutsApiClient = new WhereaboutsApiClient() as jest.Mocked<WhereaboutsApiClient>
+    cellMovementsApiClient = new CellMovementsApiClient() as jest.Mocked<CellMovementsApiClient>
     locationsInsidePrisonApiClient = new LocationsInsidePrisonApiClient() as jest.Mocked<LocationsInsidePrisonApiClient>
     prisonerCellAllocationService = new PrisonerCellAllocationService(
       alertsApiClient,
       prisonApiClient,
-      whereaboutsApiClient,
+      cellMovementsApiClient,
       locationsInsidePrisonApiClient,
     )
   })
@@ -154,7 +153,7 @@ describe('Prisoner cell allocation service', () => {
     }
 
     const prisonApiCells: CellLocation[] = [cell]
-    const whereaboutsApiCells: CellLocation[] = [{ ...cell, id: '01909bc6-c0f6-75b2-af0f-ffb935211faf' }]
+    const locationsApiCells: CellLocation[] = [{ ...cell, id: '01909bc6-c0f6-75b2-af0f-ffb935211faf' }]
 
     it('calls Prison API when searching for ALL', async () => {
       locationsInsidePrisonApiClient.getCellsWithCapacity.mockResolvedValue(prisonApiCells)
@@ -165,8 +164,8 @@ describe('Prisoner cell allocation service', () => {
       expect(result[0].id).toEqual(prisonApiCells[0].id)
     })
 
-    it('calls Whereabouts API when not searching for ALL', async () => {
-      locationsInsidePrisonApiClient.getCellsWithCapacity.mockResolvedValue(whereaboutsApiCells)
+    it('calls the locations API when not searching for ALL', async () => {
+      locationsInsidePrisonApiClient.getCellsWithCapacity.mockResolvedValue(locationsApiCells)
 
       const result = await prisonerCellAllocationService.getCellsWithCapacity(token, 'LEI', 'location', 'subLocation')
 
@@ -175,7 +174,7 @@ describe('Prisoner cell allocation service', () => {
         'LEI',
         'location_subLocation',
       )
-      expect(result[0].id).toEqual(whereaboutsApiCells[0].id)
+      expect(result[0].id).toEqual(locationsApiCells[0].id)
     })
 
     it('Propagates error', async () => {
@@ -216,71 +215,62 @@ describe('Prisoner cell allocation service', () => {
   })
 
   describe('moveToCell', () => {
-    const cellMoveResponse: CellMoveResponse = {
-      cellMoveResult: {
-        bookingId: 300,
-        agencyId: 'BXI',
-        assignedLivingUnitId: 400,
-        assignedLivingUnitDesc: '1-1-400',
-        bedAssignmentHistorySequence: 0,
-        caseNoteId: 0,
-      },
+    const cellMovement: CellMovement = {
+      id: 'e19a2b16-6b7b-4a3e-9f1a-2d8e5c4f3a21',
+      movementType: 'CELL_MOVE',
+      prisonerNumber: 'AB1000C',
+      fromLocationKey: 'BXI-1-1-300',
+      toLocationKey: 'BXI-1-1-400',
+      reasonCode: 'blah',
+      occurredAt: '2026-08-19T10:00:00',
+      recordedBy: 'A_USER',
+      status: 'COMPLETED',
     }
 
-    it('performs cell move via Whereabouts API', async () => {
-      whereaboutsApiClient.moveToCell.mockResolvedValue(cellMoveResponse)
-      const result = await prisonerCellAllocationService.moveToCell(token, 300, 'AB1000C', '1-1-400', 'blah', 'yup')
+    it('performs the cell move via the cell movements API', async () => {
+      cellMovementsApiClient.moveToCell.mockResolvedValue(cellMovement)
+      const result = await prisonerCellAllocationService.moveToCell(token, 'AB1000C', 'BXI-1-1-400', 'blah', 'yup')
 
-      expect(whereaboutsApiClient.moveToCell).toHaveBeenCalledWith(token, 300, 'AB1000C', '1-1-400', 'blah', 'yup')
-      expect(result).toEqual(cellMoveResponse)
+      expect(cellMovementsApiClient.moveToCell).toHaveBeenCalledWith(token, 'AB1000C', 'BXI-1-1-400', 'blah', 'yup')
+      expect(result).toEqual(cellMovement)
     })
 
     it('propagates error', async () => {
-      whereaboutsApiClient.moveToCell.mockRejectedValue(new Error('some error'))
+      cellMovementsApiClient.moveToCell.mockRejectedValue(new Error('some error'))
 
       await expect(
-        prisonerCellAllocationService.moveToCell(token, 300, 'AB1000C', '1-1-400', 'blah', 'yup'),
+        prisonerCellAllocationService.moveToCell(token, 'AB1000C', 'BXI-1-1-400', 'blah', 'yup'),
       ).rejects.toEqual(new Error('some error'))
     })
   })
 
   describe('moveToCellSwap', () => {
-    const details: OffenderDetails = {
-      bookingId: 1234,
-      offenderNo: 'A1234',
-      firstName: 'Test',
-      lastName: 'User',
-      csraClassificationCode: 'HI',
-      agencyId: 'MDI',
-      assignedLivingUnit: {
-        agencyId: 'BXI',
-        locationId: 5432,
-        description: '1-1-001',
-        agencyName: 'Brixton (HMP)',
-      },
-      alerts: [],
-      dateOfBirth: '1990-10-12',
-      age: 29,
-      assignedLivingUnitId: 5432,
-      assignedLivingUnitDesc: '1-1-001',
-      categoryCode: 'C',
-      alertsDetails: ['XA', 'XVL'],
-      alertsCodes: ['XA', 'XVL'],
-      assessments: [],
+    const cellSwap: CellMovement = {
+      id: '7c1e2f3a-1111-4d4d-8888-aaaaaaaaaaaa',
+      movementType: 'CELL_SWAP',
+      prisonerNumber: 'A1234BC',
+      fromLocationKey: 'MDI-1-1-001',
+      toLocationKey: 'MDI-CSWAP',
+      reasonCode: 'ADM',
+      occurredAt: '2026-08-19T10:00:00',
+      recordedBy: 'A_USER',
+      status: 'COMPLETED',
     }
 
-    it('performs cell move via Prison API', async () => {
-      prisonApiClient.moveToCellSwap.mockResolvedValue(details)
-      const result = await prisonerCellAllocationService.moveToCellSwap(token, 1234)
+    it('performs the cell swap via the cell movements API', async () => {
+      cellMovementsApiClient.moveToCellSwap.mockResolvedValue(cellSwap)
+      const result = await prisonerCellAllocationService.moveToCellSwap(token, 'A1234BC')
 
-      expect(prisonApiClient.moveToCellSwap).toHaveBeenCalledWith(token, 1234)
-      expect(result).toEqual(details)
+      expect(cellMovementsApiClient.moveToCellSwap).toHaveBeenCalledWith(token, 'A1234BC')
+      expect(result).toEqual(cellSwap)
     })
 
     it('propagates error', async () => {
-      prisonApiClient.moveToCellSwap.mockRejectedValue(new Error('some error'))
+      cellMovementsApiClient.moveToCellSwap.mockRejectedValue(new Error('some error'))
 
-      await expect(prisonerCellAllocationService.moveToCellSwap(token, 1234)).rejects.toEqual(new Error('some error'))
+      await expect(prisonerCellAllocationService.moveToCellSwap(token, 'A1234BC')).rejects.toEqual(
+        new Error('some error'),
+      )
     })
   })
 

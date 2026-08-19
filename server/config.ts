@@ -122,13 +122,15 @@ export default {
       },
       agent: new AgentConfig(Number(get('NON_ASSOCIATIONS_API_TIMEOUT_RESPONSE', 10000))),
     },
-    whereaboutsApi: {
-      url: get('WHEREABOUTS_API_URL', 'http://localhost:8082', requiredInProduction),
+    cellMovementsApi: {
+      // 15s rather than the house 10s: a move orchestrates prisoner-search, locations and a
+      // prison-api call whose P-NOMIS lock wait is 10s on its own.
+      url: get('CELL_MOVEMENTS_API_URL', 'http://localhost:8082', requiredInProduction),
       timeout: {
-        response: Number(get('WHEREABOUTS_API_TIMEOUT_RESPONSE', 12000)),
-        deadline: Number(get('WHEREABOUTS_API_TIMEOUT_DEADLINE', 12000)),
+        response: Number(get('CELL_MOVEMENTS_API_TIMEOUT_RESPONSE', 15000)),
+        deadline: Number(get('CELL_MOVEMENTS_API_TIMEOUT_DEADLINE', 15000)),
       },
-      agent: new AgentConfig(Number(get('WHEREABOUTS_API_TIMEOUT_RESPONSE', 12000))),
+      agent: new AgentConfig(Number(get('CELL_MOVEMENTS_API_TIMEOUT_RESPONSE', 15000))),
     },
     locationsInsidePrisonApi: {
       url: get('LOCATIONS_INSIDE_PRISON_API_URL', 'http://localhost:8083', requiredInProduction),
