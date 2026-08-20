@@ -17,7 +17,7 @@ describe('Change cell play back details', () => {
   const analyticsService = jest.mocked(new AnalyticsService(undefined))
   const locationService = jest.mocked(new LocationService(undefined, undefined))
   const prisonerCellAllocationService = jest.mocked(
-    new PrisonerCellAllocationService(undefined, undefined, undefined, undefined),
+    new PrisonerCellAllocationService(undefined, undefined, undefined, undefined, undefined),
   )
   const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
   const metricsService = jest.mocked(new MetricsService(undefined))

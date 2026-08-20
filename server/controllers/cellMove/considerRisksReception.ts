@@ -18,7 +18,7 @@ export default ({ nonAssociationsService, prisonerCellAllocationService, prisone
   const view = async (req, res) => {
     const { offenderNo } = req.params
     const { systemClientToken, user } = res.locals
-    const { allCaseloads: userCaseLoads, userRoles, activeCaseLoadId } = user
+    const { allCaseloads: userCaseLoads, userRoles } = user
 
     try {
       const [prisonerDetails, assessments] = await Promise.all([
@@ -26,12 +26,15 @@ export default ({ nonAssociationsService, prisonerCellAllocationService, prisone
         prisonerDetailsService.getCsraAssessments(systemClientToken, [offenderNo]),
       ])
 
-      const receptionOccupancy = await prisonerCellAllocationService.getReceptionsWithCapacity(
+      // Capacity and the in-reception roll come from one call, both scoped to the prisoner's
+      // prison. The roll previously used the user's active caseload, which for a multi-caseload
+      // user viewing a prisoner elsewhere listed the wrong establishment's reception.
+      const reception = await prisonerCellAllocationService.getReceptionOccupancy(
         systemClientToken,
         prisonerDetails.agencyId,
       )
 
-      if (!receptionOccupancy.length) {
+      if (!reception.hasSpace) {
         logger.info('Can not move to reception as already full to capacity')
         return res.redirect(`/prisoner/${offenderNo}/reception-move/reception-full`)
       }
@@ -68,10 +71,7 @@ export default ({ nonAssociationsService, prisonerCellAllocationService, prisone
       const offenderNumbersOfAllNonAssociations = nonAssociations.nonAssociations.map(
         offender => offender.otherPrisonerDetails.prisonerNumber,
       )
-      const offendersInReception = await prisonerCellAllocationService.getOffendersInReception(
-        systemClientToken,
-        activeCaseLoadId,
-      )
+      const offendersInReception = reception.offenders
       const offenderNumbersOfAllInReception = offendersInReception.map(offender => offender.offenderNo)
 
       let offenderCsraStatus = []

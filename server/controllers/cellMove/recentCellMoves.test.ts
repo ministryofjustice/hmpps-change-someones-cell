@@ -49,7 +49,7 @@ const dataSets = {
 
 describe('Recent cell moves', () => {
   const prisonerCellAllocationService = jest.mocked(
-    new PrisonerCellAllocationService(undefined, undefined, undefined, undefined),
+    new PrisonerCellAllocationService(undefined, undefined, undefined, undefined, undefined),
   )
 
   let controller

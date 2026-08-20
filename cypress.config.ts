@@ -85,10 +85,7 @@ export default defineConfig({
           locationsInsidePrisonApi.stubCellsWithCapacityByGroupName({ prisonId, groupName, response }),
         stubStaff: ({ staffId, details }) => Promise.all([prisonApi.stubStaff(staffId, details)]),
         stubGlobalAlerts: alertsApi.stubGlobalAlerts,
-        stubReceptionWithCapacity: ({ agencyId, reception }) =>
-          prisonApi.stubReceptionWithCapacity(agencyId, reception),
-        stubOffendersInReception: ({ agencyId, inReception }) =>
-          prisonApi.stubOffendersInReception(agencyId, inReception),
+        stubAttributeSearch: prisoners => prisonerSearchApi.stubAttributeSearch(prisoners),
       })
     },
     baseUrl: 'http://localhost:3007',

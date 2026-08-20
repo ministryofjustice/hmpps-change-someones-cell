@@ -215,32 +215,4 @@ describe('prisonApiClient', () => {
       expect(output).toEqual(response)
     })
   })
-
-  describe('getReceptionsWithCapacity', () => {
-    it('should return data from api', async () => {
-      const response = { data: 'data' }
-
-      fakePrisonApiClient
-        .get('/api/agencies/BXI/receptionsWithCapacity')
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .reply(200, response)
-
-      const output = await prisonApiClient.getReceptionsWithCapacity(accessToken, 'BXI')
-      expect(output).toEqual(response)
-    })
-  })
-
-  describe('getOffendersInReception', () => {
-    it('should return data from api', async () => {
-      const response = { data: 'data' }
-
-      fakePrisonApiClient
-        .get('/api/movements/rollcount/BXI/in-reception')
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .reply(200, response)
-
-      const output = await prisonApiClient.getOffendersInReception(accessToken, 'BXI')
-      expect(output).toEqual(response)
-    })
-  })
 })

@@ -70,18 +70,14 @@ before(() => {
   })
   cy.task('stubOffenderBasicDetails', offenderBasicDetails)
   cy.task('stubGetPrisoner', prisonerFullDetails)
-  cy.task('stubReceptionWithCapacity', {
-    agencyId: 'MDI',
-    reception: [
-      {
-        id: 4007,
-        description: 'MDI-RECP',
-        capacity: 100,
-        noOfOccupants: 100,
-        attributes: [],
-      },
-    ],
+  // The real MDI-RECP shape: workingCapacity 0 must fall back to maxCapacity.
+  cy.task('stubLocation', {
+    prisonId: 'MDI',
+    key: 'MDI-RECP',
+    pathHierarchy: 'RECP',
+    capacity: { maxCapacity: 99, workingCapacity: 0 },
   })
+  cy.task('stubAttributeSearch', [])
   cy.task('stubCellMoveTypes', [
     {
       domain: 'CHG_HOUS_RSN',
@@ -152,10 +148,16 @@ describe('Reception confirm move page ', () => {
 
 describe('Reception full journey', () => {
   it('should redirect to reception full page', () => {
-    cy.task('stubReceptionWithCapacity', {
-      agencyId: 'MDI',
-      reception: [],
+    // One occupant against a capacity of one: reception is full.
+    cy.task('stubLocation', {
+      prisonId: 'MDI',
+      key: 'MDI-RECP',
+      pathHierarchy: 'RECP',
+      capacity: { maxCapacity: 1, workingCapacity: 0 },
     })
+    cy.task('stubAttributeSearch', [
+      { prisonerNumber: 'A1111AA', firstName: 'Full', lastName: 'House', prisonId: 'MDI', cellLocation: 'RECP' },
+    ])
 
     const page = receptionConfirmMovePage.goTo(offenderNo)
     page.form().selectReceptionReason().click()
@@ -176,18 +178,14 @@ describe('Reception full journey', () => {
   })
 
   it('A user is presented with locked message when 423 error', () => {
-    cy.task('stubReceptionWithCapacity', {
-      agencyId: 'MDI',
-      reception: [
-        {
-          id: 4007,
-          description: 'MDI-RECP',
-          capacity: 100,
-          noOfOccupants: 100,
-          attributes: [],
-        },
-      ],
+    // The real MDI-RECP shape: workingCapacity 0 must fall back to maxCapacity.
+    cy.task('stubLocation', {
+      prisonId: 'MDI',
+      key: 'MDI-RECP',
+      pathHierarchy: 'RECP',
+      capacity: { maxCapacity: 99, workingCapacity: 0 },
     })
+    cy.task('stubAttributeSearch', [])
     cy.task('stubMoveToCell', 423)
 
     const page = receptionConfirmMovePage.goTo(offenderNo)

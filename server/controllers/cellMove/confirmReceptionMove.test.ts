@@ -1,8 +1,8 @@
 import confirmReceptionMove from './confirmReceptionMove'
 import logger from '../../../logger'
-import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
+import PrisonerCellAllocationService, { Reception } from '../../services/prisonerCellAllocationService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
-import { OffenderCell, ReferenceCode } from '../../data/prisonApiClient'
+import { ReferenceCode } from '../../data/prisonApiClient'
 import config from '../../config'
 
 jest.mock('../../services/prisonerCellAllocationService')
@@ -10,7 +10,7 @@ jest.mock('../../services/prisonerDetailsService')
 
 describe('Confirm reception move', () => {
   const prisonerCellAllocationService = jest.mocked(
-    new PrisonerCellAllocationService(undefined, undefined, undefined, undefined),
+    new PrisonerCellAllocationService(undefined, undefined, undefined, undefined, undefined),
   )
   const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
 
@@ -46,14 +46,14 @@ describe('Confirm reception move', () => {
     flash: jest.fn(),
   }
 
-  const reception: OffenderCell = {
-    id: 6352,
-    description: 'LEI-RECP',
-    userDescription: 'LEI-RECP',
+  const reception: Reception = {
+    locationKey: 'LEI-RECP',
     capacity: 100,
-    noOfOccupants: 2,
-    attributes: [],
+    occupants: 2,
+    hasSpace: true,
   }
+
+  const fullReception: Reception = { ...reception, occupants: 100, hasSpace: false }
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -198,7 +198,7 @@ describe('Confirm reception move', () => {
         reason: 'GM',
         comment: 'my comments',
       }
-      prisonerCellAllocationService.getReceptionsWithCapacity.mockResolvedValue([])
+      prisonerCellAllocationService.getReceptionCapacity.mockResolvedValue(fullReception)
       await controller.post(req, res)
       expect(req.flash).toHaveBeenCalledWith('formValues', { comment: 'my comments', reason: 'GM' })
     })
@@ -208,7 +208,7 @@ describe('Confirm reception move', () => {
         reason: 'GM',
         comment: 'my comments',
       }
-      prisonerCellAllocationService.getReceptionsWithCapacity.mockResolvedValue([reception])
+      prisonerCellAllocationService.getReceptionCapacity.mockResolvedValue(reception)
 
       await controller.post(req, res)
       expect(prisonerDetailsService.getPrisoner).toHaveBeenCalledWith(systemClientToken, 'A12345')
@@ -223,7 +223,7 @@ describe('Confirm reception move', () => {
 
     it('should call flash if no user inputs', async () => {
       req.body = {}
-      prisonerCellAllocationService.getReceptionsWithCapacity.mockResolvedValue([])
+      prisonerCellAllocationService.getReceptionCapacity.mockResolvedValue(fullReception)
       await controller.post(req, res)
 
       expect(req.flash).toHaveBeenNthCalledWith(1, 'formValues', {})
@@ -239,7 +239,7 @@ describe('Confirm reception move', () => {
         reason: 'GM',
         comment: 'abc',
       }
-      prisonerCellAllocationService.getReceptionsWithCapacity.mockResolvedValue([reception])
+      prisonerCellAllocationService.getReceptionCapacity.mockResolvedValue(reception)
 
       await controller.post(req, res)
       expect(req.flash).toHaveBeenNthCalledWith(1, 'formValues', { comment: 'abc', reason: 'GM' })
@@ -252,7 +252,7 @@ describe('Confirm reception move', () => {
         reason: 'GM',
         comment: 'my comments',
       }
-      prisonerCellAllocationService.getReceptionsWithCapacity.mockResolvedValue([])
+      prisonerCellAllocationService.getReceptionCapacity.mockResolvedValue(fullReception)
       await controller.post(req, res)
 
       expect(logger.info).toBeCalled()
@@ -264,7 +264,7 @@ describe('Confirm reception move', () => {
         reason: 'GM',
         comment: 'my comments',
       }
-      prisonerCellAllocationService.getReceptionsWithCapacity.mockResolvedValue([reception])
+      prisonerCellAllocationService.getReceptionCapacity.mockResolvedValue(reception)
 
       await controller.post(req, res)
 
@@ -279,7 +279,7 @@ describe('Confirm reception move', () => {
         comment: 'my comments',
       }
 
-      prisonerCellAllocationService.getReceptionsWithCapacity.mockResolvedValue([reception])
+      prisonerCellAllocationService.getReceptionCapacity.mockResolvedValue(reception)
       prisonerCellAllocationService.moveToCell.mockRejectedValue(error)
 
       await expect(controller.post(req, res)).rejects.toThrowError(error)
@@ -293,7 +293,7 @@ describe('Confirm reception move', () => {
         reason: 'GM',
         comment: 'abc',
       }
-      prisonerCellAllocationService.getReceptionsWithCapacity.mockResolvedValue([reception])
+      prisonerCellAllocationService.getReceptionCapacity.mockResolvedValue(reception)
 
       await controller.post(req, res)
       expect(req.flash).toHaveBeenNthCalledWith(1, 'formValues', { comment: 'abc', reason: 'GM' })
