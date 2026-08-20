@@ -53,6 +53,7 @@ const apiChecks = [
   service('hmppsAuth', `${config.apis.hmppsAuth.url}/health/ping`, config.apis.hmppsAuth.agent),
   service('manageUsersApi', `${config.apis.manageUsersApi.url}/health/ping`, config.apis.manageUsersApi.agent),
   service('cellMovementsApi', `${config.apis.cellMovementsApi.url}/health/ping`, config.apis.cellMovementsApi.agent),
+  service('prisonRegisterApi', `${config.apis.prisonRegisterApi.url}/health/ping`, config.apis.prisonRegisterApi.agent),
   service(
     'locationsInsidePrisonApi',
     `${config.apis.locationsInsidePrisonApi.url}/health/ping`,

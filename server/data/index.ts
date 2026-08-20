@@ -18,6 +18,7 @@ import FeComponentsClient from './feComponentsClient'
 import PrisonApiClient from './prisonApiClient'
 import AlertsApiClient from './alertsApiClient'
 import CellMovementsApiClient from './cellMovementsApiClient'
+import PrisonRegisterApiClient from './prisonRegisterApiClient'
 import LocationsInsidePrisonApiClient from './locationsInsidePrisonApiClient'
 import NonAssociationsApiClient from './nonAssociationsApiClient'
 import GoogleAnalyticsClient from './googleAnalyticsClient'
@@ -33,6 +34,7 @@ export const dataAccess = () => ({
   prisonApiClient: new PrisonApiClient(),
   alertsApiClient: new AlertsApiClient(),
   cellMovementsApiClient: new CellMovementsApiClient(),
+  prisonRegisterApiClient: new PrisonRegisterApiClient(),
   locationsInsidePrisonApiClient: new LocationsInsidePrisonApiClient(),
   nonAssociationsApiClient: new NonAssociationsApiClient(),
   googleAnalyticsClient: new GoogleAnalyticsClient(),
@@ -48,6 +50,7 @@ export {
   ManageUsersApiClient,
   PrisonApiClient,
   CellMovementsApiClient,
+  PrisonRegisterApiClient,
   LocationsInsidePrisonApiClient,
   NonAssociationsApiClient,
   GoogleAnalyticsClient,

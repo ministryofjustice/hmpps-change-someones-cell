@@ -10,6 +10,7 @@ import cellMovementsApi from './integration_tests/mockApis/cellMovementsApi'
 import locationsInsidePrisonApi from './integration_tests/mockApis/locationsInsidePrisonApi'
 import nonAssociationsApi from './integration_tests/mockApis/nonAssociationsApi'
 import prisonerSearchApi from './integration_tests/mockApis/prisonerSearchApi'
+import prisonRegister from './integration_tests/mockApis/prisonRegister'
 
 export default defineConfig({
   chromeWebSecurity: false,
@@ -45,6 +46,7 @@ export default defineConfig({
             users.stubHealth(),
             prisonApi.stubHealth(),
             cellMovementsApi.stubHealth(),
+            prisonRegister.stubHealth(),
             locationsInsidePrisonApi.stubHealth(),
             tokenVerification.stubHealth(),
             prisonerSearchApi.stubHealth(),
@@ -72,7 +74,7 @@ export default defineConfig({
         stubMoveToCellSwap: (status: number) => cellMovementsApi.stubMoveToCellSwap(status),
         verifyMoveToCell: body => cellMovementsApi.verifyMoveToCell(body),
         verifyMoveToCellSwap: body => cellMovementsApi.verifyMoveToCellSwap(body),
-        stubAgencyDetails: ({ agencyId, details }) => Promise.all([prisonApi.stubAgencyDetails(agencyId, details)]),
+        stubPrisonById: ({ prisonId, prisonName }) => prisonRegister.stubPrisonById({ prisonId, prisonName }),
         stubCellMoveHistory: ({ assignmentDate, agencyId, cellMoves }) =>
           prisonApi.stubCellMoveHistory({ assignmentDate, agencyId, cellMoves }),
         stubGetPrisoners: prisoners => Promise.all([prisonerSearchApi.stubGetPrisoners(prisoners)]),

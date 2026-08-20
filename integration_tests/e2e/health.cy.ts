@@ -33,6 +33,10 @@ context('Health page reports health correctly', () => {
             status: 'UP',
             details: 'UP',
           },
+          prisonRegisterApi: {
+            status: 'UP',
+            details: 'UP',
+          },
           locationsInsidePrisonApi: {
             status: 'UP',
             details: 'UP',
