@@ -258,21 +258,6 @@ export const stubCellMoveTypes = types =>
     },
   })
 
-export const stubAgencyDetails = (agencyId, details, status = 200) =>
-  stubFor({
-    request: {
-      method: 'GET',
-      url: `/api/agencies/${agencyId}?activeOnly=false`,
-    },
-    response: {
-      status,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: details || {},
-    },
-  })
-
 export const stubCellMoveHistory = ({ assignmentDate, agencyId, cellMoves }) =>
   stubFor({
     request: {
@@ -353,7 +338,6 @@ export default {
   stubPrisonerFullDetail,
   stubBookingDetails,
   stubCellMoveTypes,
-  stubAgencyDetails,
   stubCellMoveHistory,
   stubStaff,
   stubReceptionWithCapacity,

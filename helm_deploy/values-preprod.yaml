@@ -19,6 +19,7 @@ generic-service:
     PRISONER_PROFILE_URL: "https://prisoner-preprod.digital.prison.service.justice.gov.uk"
     NON_ASSOCIATIONS_API_URL: "https://non-associations-api-preprod.hmpps.service.justice.gov.uk"
     CELL_MOVEMENTS_API_URL: "https://change-someones-cell-api-preprod.hmpps.service.justice.gov.uk"
+    PRISON_REGISTER_API_URL: "https://prison-register-preprod.hmpps.service.justice.gov.uk"
     LOCATIONS_INSIDE_PRISON_API_URL: "https://locations-inside-prison-api-preprod.hmpps.service.justice.gov.uk"
     PRISONER_SEARCH_API_URL: "https://prisoner-search-preprod.prison.service.justice.gov.uk"
     ESTABLISHMENT_ROLL_URL: "https://prison-roll-count-preprod.hmpps.service.justice.gov.uk"

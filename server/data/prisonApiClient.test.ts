@@ -173,20 +173,6 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('getAgencyDetails', () => {
-    it('should return data from api', async () => {
-      const response = { data: 'data' }
-
-      fakePrisonApiClient
-        .get('/api/agencies/BXI?activeOnly=false')
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .reply(200, response)
-
-      const output = await prisonApiClient.getAgencyDetails(accessToken, 'BXI')
-      expect(output).toEqual(response)
-    })
-  })
-
   describe('getHistoryByDate', () => {
     it('should return data from api', async () => {
       const response = { data: 'data' }

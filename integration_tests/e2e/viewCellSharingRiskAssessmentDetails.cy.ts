@@ -36,7 +36,7 @@ context('A user can view non associations', () => {
         },
       ],
     })
-    cy.task('stubAgencyDetails', { agencyId: 'MDI', details: { description: 'HMP Moorland' } })
+    cy.task('stubPrisonById', { prisonId: 'MDI', prisonName: 'HMP Moorland' })
   })
 
   it('Shows the correct data for non-associations', () => {
