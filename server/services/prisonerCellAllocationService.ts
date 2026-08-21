@@ -1,11 +1,48 @@
-import { LocationsInsidePrisonApiClient, PrisonApiClient, CellMovementsApiClient, AlertsApiClient } from '../data'
-import { Offender, OffenderInReception } from '../data/prisonApiClient'
+import {
+  LocationsInsidePrisonApiClient,
+  PrisonApiClient,
+  CellMovementsApiClient,
+  AlertsApiClient,
+  PrisonerSearchApiClient,
+} from '../data'
+import { Offender } from '../data/prisonApiClient'
 import { Alert } from '../data/alertsApiClient'
+import { Prisoner } from '../data/prisonerSearchApiClient'
 import logger from '../../logger'
-import { CellLocation, Occupant } from '../data/locationsInsidePrisonApiClient'
+import { CellLocation, Location, Occupant, getActualCapacity } from '../data/locationsInsidePrisonApiClient'
 
-export interface OffenderWithAlerts extends OffenderInReception {
-  alerts?: string[]
+/**
+ * The capacity check is RECP only - prison-api's `receptionsWithCapacity` looked up
+ * `locationCode = "RECP"` and nothing else, so counting anywhere else would make reception
+ * look fuller than it is and push users to the reception-full dead end.
+ */
+export const RECEPTION_CAPACITY_LOCATION = 'RECP'
+
+/**
+ * The roll list is wider. prison-api's `GET_OFFENDERS_IN_RECEPTION` matched any uncertified,
+ * top-level, unit-typed location (`CERTIFIED_FLAG = 'N' AND UNIT_TYPE IS NOT NULL AND
+ * PARENT_INTERNAL_LOCATION_ID IS NULL`) - the virtual set - so restricting to RECP would drop
+ * people the screen shows today. Matches locations-inside-prison's own
+ * `getReceptionLocationCodes()`, which likewise excludes CSWAP.
+ */
+export const RECEPTION_ROLL_LOCATIONS = ['RECP', 'COURT', 'TAP']
+
+export interface Reception {
+  locationKey: string
+  capacity: number
+  occupants: number
+  hasSpace: boolean
+}
+
+export interface ReceptionWithOccupants extends Reception {
+  offenders: OffenderWithAlerts[]
+}
+
+export interface OffenderWithAlerts {
+  offenderNo: string
+  firstName: string
+  lastName: string
+  alerts: string[]
 }
 
 export default class PrisonerCellAllocationService {
@@ -14,6 +51,7 @@ export default class PrisonerCellAllocationService {
     private readonly prisonApiClient: PrisonApiClient,
     private readonly cellMovementsApiClient: CellMovementsApiClient,
     private readonly locationsInsidePrisonApiClient: LocationsInsidePrisonApiClient,
+    private readonly prisonerSearchApiClient: PrisonerSearchApiClient,
   ) {}
 
   async getInmates(token: string, locationId: string, keywords?: string, returnAlerts?: boolean): Promise<Offender[]> {
@@ -60,36 +98,89 @@ export default class PrisonerCellAllocationService {
     return this.prisonApiClient.getOffenderCellHistory(token, bookingId)
   }
 
-  async getReceptionsWithCapacity(token: string, agencyId: string) {
-    return this.prisonApiClient.getReceptionsWithCapacity(token, agencyId)
+  /**
+   * Whether reception has room, and the key to move someone into.
+   *
+   * Capacity comes from locations-inside-prison and occupancy from prisoner-search, because LIP
+   * cannot report occupancy for a reception: RECP is a VirtualResidentialLocation rather than a
+   * Cell, so its `cells-with-capacity` and `prisoner-locations` endpoints both filter it out.
+   */
+  async getReceptionCapacity(token: string, agencyId: string): Promise<Reception> {
+    const [location, prisoners] = await Promise.all([
+      this.getReceptionLocation(token, agencyId),
+      this.prisonerSearchApiClient.findPrisonersInCellLocations(token, agencyId, [RECEPTION_CAPACITY_LOCATION]),
+    ])
+
+    return this.toReception(agencyId, location, prisoners.length)
   }
 
-  async getOffendersInReception(token: string, agencyId: string): Promise<OffenderWithAlerts[]> {
-    const offenders = await this.prisonApiClient.getOffendersInReception(token, agencyId)
+  /**
+   * As [getReceptionCapacity], plus who is currently in reception, with their active alerts.
+   *
+   * One prisoner-search call serves both answers: the roll set is a superset of the capacity set,
+   * so the RECP occupancy is filtered out of the same result rather than fetched again.
+   */
+  async getReceptionOccupancy(token: string, agencyId: string): Promise<ReceptionWithOccupants> {
+    const [location, prisoners] = await Promise.all([
+      this.getReceptionLocation(token, agencyId),
+      this.prisonerSearchApiClient.findPrisonersInCellLocations(token, agencyId, RECEPTION_ROLL_LOCATIONS),
+    ])
 
-    if (!offenders || offenders.length === 0) {
+    const inReception = prisoners.filter(p => p.cellLocation === RECEPTION_CAPACITY_LOCATION).length
+
+    return {
+      ...this.toReception(agencyId, location, inReception),
+      offenders: await this.withAlerts(token, agencyId, prisoners),
+    }
+  }
+
+  private toReception(agencyId: string, location: Location, occupants: number): Reception {
+    const locationKey = `${agencyId}-${RECEPTION_CAPACITY_LOCATION}`
+
+    // A prison with no reception is "no space", which is what prison-api's empty list meant.
+    if (!location) {
+      return { locationKey, capacity: 0, occupants, hasSpace: false }
+    }
+
+    const capacity = getActualCapacity(location.capacity)
+    return { locationKey, capacity, occupants, hasSpace: occupants < capacity }
+  }
+
+  private async getReceptionLocation(token: string, agencyId: string): Promise<Location> {
+    const locationKey = `${agencyId}-${RECEPTION_CAPACITY_LOCATION}`
+    try {
+      return await this.locationsInsidePrisonApiClient.getLocation(token, locationKey)
+    } catch (error) {
+      if (error.status === 404) {
+        logger.warn(`No reception location ${locationKey} in locations-inside-prison`)
+        return null
+      }
+      throw error
+    }
+  }
+
+  private async withAlerts(token: string, agencyId: string, prisoners: Prisoner[]): Promise<OffenderWithAlerts[]> {
+    if (!prisoners || prisoners.length === 0) {
       logger.info(`Agency ${agencyId} has no prisoners in reception`)
       return []
     }
 
-    const offenderNumbers = offenders.map(o => o.offenderNo)
-    const alerts = await this.getActiveAlerts(token, offenderNumbers)
+    const alerts = await this.getActiveAlerts(
+      token,
+      prisoners.map(p => p.prisonerNumber),
+    )
 
-    return this.addAlerts(offenders, alerts)
+    return prisoners.map(prisoner => ({
+      offenderNo: prisoner.prisonerNumber,
+      firstName: prisoner.firstName,
+      lastName: prisoner.lastName,
+      alerts: alerts ? this.alertCodesForOffenderNo(alerts, prisoner.prisonerNumber) : [],
+    }))
   }
 
   private async getActiveAlerts(token: string, offenderNumbers: string[]) {
     const alerts = await this.alertsApiClient.getAlertsGlobal(token, offenderNumbers)
     return alerts?.content.filter(alert => alert.isActive)
-  }
-
-  private addAlerts(offenders: OffenderInReception[], alerts: Alert[]) {
-    return alerts
-      ? offenders.map(offender => ({
-          ...offender,
-          alerts: this.alertCodesForOffenderNo(alerts, offender.offenderNo),
-        }))
-      : offenders
   }
 
   private alertCodesForOffenderNo(alerts: Alert[], offenderNo: string) {

@@ -123,18 +123,6 @@ export interface Location {
   subLocations: boolean
 }
 
-export interface OffenderCell {
-  id: number
-  description: string
-  userDescription?: string
-  capacity: number
-  noOfOccupants: number
-  attributes: {
-    code: string
-    description: string
-  }[]
-}
-
 export interface ReferenceCode {
   domain: string
   code: string
@@ -267,19 +255,11 @@ export interface Page<T> {
   empty: boolean
 }
 
-export interface OffenderInReception {
-  offenderNo: string
-  bookingId: number
-  dateOfBirth: string
-  firstName: string
-  lastName: string
-}
-
 export default class PrisonApiClient {
   constructor() {}
 
-  private static restClient(token: string, extraConfig: object = {}): RestClient {
-    return new RestClient('Prison Api Client', { ...config.apis.prisonApi, ...extraConfig }, token)
+  private static restClient(token: string): RestClient {
+    return new RestClient('Prison Api Client', config.apis.prisonApi, token)
   }
 
   /**
@@ -372,24 +352,6 @@ export default class PrisonApiClient {
     return PrisonApiClient.restClient(token).get<Page<BedAssignment>>({
       path: `/api/bookings/${bookingId}/cell-history`,
       query: { page: 0, size: 20 },
-    })
-  }
-
-  /**
-   * @todo Move functionality to location API
-   */
-  getReceptionsWithCapacity(token: string, agencyId: string) {
-    return PrisonApiClient.restClient(token, { timeout: { deadline: 30000 } }).get<OffenderCell[]>({
-      path: `/api/agencies/${agencyId}/receptionsWithCapacity`,
-    })
-  }
-
-  /**
-   * @todo Reception roll count should be obtainable from prisoner search
-   */
-  getOffendersInReception(token: string, agencyId: string) {
-    return PrisonApiClient.restClient(token).get<OffenderInReception[]>({
-      path: `/api/movements/rollcount/${agencyId}/in-reception`,
     })
   }
 }

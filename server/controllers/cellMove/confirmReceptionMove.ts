@@ -93,12 +93,9 @@ export default ({ prisonerCellAllocationService, prisonerDetailsService }: Param
 
     const { bookingId, prisonId } = await prisonerDetailsService.getPrisoner(systemClientToken, offenderNo)
     logger.info(`Move offender ${offenderNo} with booking id of ${bookingId}`)
-    const receptionOccupancy = await prisonerCellAllocationService.getReceptionsWithCapacity(
-      systemClientToken,
-      prisonId,
-    )
+    const reception = await prisonerCellAllocationService.getReceptionCapacity(systemClientToken, prisonId)
 
-    if (!receptionOccupancy.length) {
+    if (!reception.hasSpace) {
       logger.info('Can not move to reception as already full to capacity')
       return res.redirect(`/prisoner/${offenderNo}/reception-move/reception-full`)
     }
@@ -107,7 +104,7 @@ export default ({ prisonerCellAllocationService, prisonerDetailsService }: Param
       await prisonerCellAllocationService.moveToCell(
         systemClientToken,
         offenderNo,
-        receptionOccupancy[0].description,
+        reception.locationKey,
         reason,
         comment,
       )

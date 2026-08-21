@@ -24,8 +24,8 @@ All API clients are constructed in `server/data/index.ts` and injected into serv
 |---|---|---|
 | **whereabouts** | **The cell move itself** | `POST /cell/make-cell-move` |
 | prison-api | Bookings, cell history, reference data, C-SWAP, images | `server/data/prisonApiClient.ts:399,409,430,442,452` |
-| locations-inside-prison | Cells, capacity, occupancy, location groups | `server/data/locationsInsidePrisonApiClient.ts:77-104` |
-| prisoner-search | Prisoner detail and alerts | `server/data/prisonerSearchApiClient.ts:35,41` |
+| locations-inside-prison | Cells, capacity, occupancy, location groups, reception capacity | `server/data/locationsInsidePrisonApiClient.ts:77-104` |
+| prisoner-search | Prisoner detail and alerts, reception occupancy and roll | `server/data/prisonerSearchApiClient.ts:35,41,67` |
 | alerts | Active alerts for reception lists | `server/data/alertsApiClient.ts:26` |
 | non-associations | Non-association checks | `server/data/nonAssociationsApiClient.ts:49` |
 | manage-users | Current user and roles | `server/data/manageUsersApiClient.ts:29,34` |
@@ -69,7 +69,15 @@ consider-risks-reception → confirm-reception-move → [POST] → confirmation
 ```
 
 `server/controllers/cellMove/confirmReceptionMove.ts:107` calls the **same**
-`moveToCell`, passing the first available reception location as the destination.
+`moveToCell`, passing the `{prisonId}-RECP` location key as the destination — the same kind of
+locations-inside-prison key the cell journey uses, so both journeys now share one identifier.
+
+Reception capacity and the in-reception roll no longer come from prison-api (MAPA-288). Capacity
+is the locations-inside-prison location, and occupancy is a prisoner-search attribute search on
+`cellLocation` — locations-inside-prison cannot report it, because `RECP` is a
+`VirtualResidentialLocation` rather than a `Cell` and its occupancy endpoints filter it out.
+Note the two use different location sets, matching what prison-api did: capacity is `RECP` alone,
+while the roll matches every virtual location (`RECP`, `COURT`, `TAP`).
 
 ### C-SWAP — note the asymmetry
 

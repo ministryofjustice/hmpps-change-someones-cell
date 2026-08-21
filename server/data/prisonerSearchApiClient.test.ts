@@ -35,4 +35,55 @@ describe('prisonerSearchApiClient', () => {
       expect(output).toEqual(response)
     })
   })
+
+  describe('findPrisonersInCellLocations', () => {
+    // Asserting the whole body on purpose: prisoner-search answers a query it does not understand
+    // with an empty result rather than an error, which would read here as "reception is empty".
+    const expectedBody = {
+      joinType: 'AND',
+      queries: [
+        {
+          joinType: 'AND',
+          matchers: [
+            { type: 'String', attribute: 'prisonId', condition: 'IS', searchTerm: 'MDI' },
+            { type: 'String', attribute: 'cellLocation', condition: 'IN', searchTerm: 'RECP,COURT,TAP' },
+            { type: 'String', attribute: 'inOutStatus', condition: 'IS', searchTerm: 'IN' },
+          ],
+        },
+      ],
+    }
+
+    it('should search for prisoners in the given cell locations', async () => {
+      const prisoner = { prisonerNumber: 'A1234BC', firstName: 'JOHN', lastName: 'SMITH' }
+
+      fakePrisonerSearchApiClient
+        .post('/attribute-search', expectedBody)
+        .query({ size: 2000 })
+        .matchHeader('authorization', `Bearer ${accessToken}`)
+        .reply(200, { content: [prisoner], totalElements: 1, totalPages: 1 })
+
+      const output = await prisonerSearchApiClient.findPrisonersInCellLocations(accessToken, 'MDI', [
+        'RECP',
+        'COURT',
+        'TAP',
+      ])
+
+      expect(output).toEqual([prisoner])
+    })
+
+    it('should return an empty list when the search matches nobody', async () => {
+      fakePrisonerSearchApiClient
+        .post('/attribute-search', expectedBody)
+        .query({ size: 2000 })
+        .reply(200, { content: [], totalElements: 0, totalPages: 0 })
+
+      const output = await prisonerSearchApiClient.findPrisonersInCellLocations(accessToken, 'MDI', [
+        'RECP',
+        'COURT',
+        'TAP',
+      ])
+
+      expect(output).toEqual([])
+    })
+  })
 })

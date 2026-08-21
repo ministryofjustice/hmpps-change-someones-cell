@@ -95,18 +95,14 @@ before(() => {
   })
   cy.task('stubGetPrisoner', prisonerFullDetails)
   cy.task('stubOffenderBasicDetails', offenderBasicDetails)
-  cy.task('stubReceptionWithCapacity', {
-    agencyId: 'MDI',
-    reception: [
-      {
-        id: 4007,
-        description: 'MDI-RECP',
-        capacity: 100,
-        noOfOccupants: 100,
-        attributes: [],
-      },
-    ],
+  // The real MDI-RECP shape: workingCapacity 0 must fall back to maxCapacity.
+  cy.task('stubLocation', {
+    prisonId: 'MDI',
+    key: 'MDI-RECP',
+    pathHierarchy: 'RECP',
+    capacity: { maxCapacity: 99, workingCapacity: 0 },
   })
+  cy.task('stubAttributeSearch', [])
   cy.task('stubCsraAssessments', {
     offenderNumbers: [offenderNo, 'G0873UU', 'G6795VD'],
     assessments: [
@@ -236,39 +232,20 @@ before(() => {
       },
     ],
   })
-  cy.task('stubOffendersInReception', {
-    agencyId: 'MDI',
-    inReception: [
-      {
-        offenderNo: 'G0873UU',
-        bookingId: 844072,
-        dateOfBirth: '1950-12-02',
-        firstName: 'Daren',
-        lastName: 'Wetch',
-      },
-      {
-        offenderNo: 'G6980GG',
-        bookingId: 1142296,
-        dateOfBirth: '1984-03-17',
-        firstName: 'Onshinthomasin',
-        lastName: 'Aisho',
-      },
-      {
-        offenderNo: 'G6795VD',
-        bookingId: 1090088,
-        dateOfBirth: '1991-01-10',
-        firstName: 'Conrad',
-        lastName: 'Nattrass',
-      },
-      {
-        offenderNo: 'G2755UN',
-        bookingId: 1161005,
-        dateOfBirth: '1989-06-16',
-        firstName: 'Okouston',
-        lastName: 'Bradisha',
-      },
-    ],
-  })
+  // Reception occupancy and the roll are one search now, so this also drives "has space":
+  // four in RECP against the stubbed capacity of 99.
+  cy.task('stubAttributeSearch', [
+    { prisonerNumber: 'G0873UU', firstName: 'Daren', lastName: 'Wetch', prisonId: 'MDI', cellLocation: 'RECP' },
+    {
+      prisonerNumber: 'G6980GG',
+      firstName: 'Onshinthomasin',
+      lastName: 'Aisho',
+      prisonId: 'MDI',
+      cellLocation: 'RECP',
+    },
+    { prisonerNumber: 'G6795VD', firstName: 'Conrad', lastName: 'Nattrass', prisonId: 'MDI', cellLocation: 'RECP' },
+    { prisonerNumber: 'G2755UN', firstName: 'Okouston', lastName: 'Bradisha', prisonId: 'MDI', cellLocation: 'RECP' },
+  ])
   cy.task('stubMoveToCell')
 })
 
@@ -301,10 +278,16 @@ context('Successful reception move journey', () => {
 
 context('Reception full journey', () => {
   it('should redirect to reception full page', () => {
-    cy.task('stubReceptionWithCapacity', {
-      agencyId: 'MDI',
-      reception: [],
+    // One occupant against a capacity of one: reception is full.
+    cy.task('stubLocation', {
+      prisonId: 'MDI',
+      key: 'MDI-RECP',
+      pathHierarchy: 'RECP',
+      capacity: { maxCapacity: 1, workingCapacity: 0 },
     })
+    cy.task('stubAttributeSearch', [
+      { prisonerNumber: 'A1111AA', firstName: 'Full', lastName: 'House', prisonId: 'MDI', cellLocation: 'RECP' },
+    ])
 
     cy.visit(`/prisoner/${offenderNo}/reception-move/consider-risks-reception`, { failOnStatusCode: false })
 

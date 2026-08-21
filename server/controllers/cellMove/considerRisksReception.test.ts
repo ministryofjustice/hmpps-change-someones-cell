@@ -1,7 +1,7 @@
 import considerRisksReception from './considerRisksReception'
 import logger from '../../../logger'
 import NonAssociationsService from '../../services/nonAssociationsService'
-import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
+import PrisonerCellAllocationService, { OffenderWithAlerts } from '../../services/prisonerCellAllocationService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import { Assessment } from '../../data/prisonApiClient'
 import config from '../../config'
@@ -97,25 +97,34 @@ const prisoner = {
 describe('Consider risks reception', () => {
   const nonAssociationsService = jest.mocked(new NonAssociationsService(undefined))
   const prisonerCellAllocationService = jest.mocked(
-    new PrisonerCellAllocationService(undefined, undefined, undefined, undefined),
+    new PrisonerCellAllocationService(undefined, undefined, undefined, undefined, undefined),
   )
   const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
+
+  // Capacity and the roll now arrive from one call, so the two are mocked together.
+  const mockOffendersInReception = (offenders: OffenderWithAlerts[]) =>
+    prisonerCellAllocationService.getReceptionOccupancy.mockResolvedValue({
+      locationKey: 'ABC-RECP',
+      capacity: 10,
+      occupants: 9,
+      hasSpace: true,
+      offenders,
+    })
+
+  const mockReceptionFull = () =>
+    prisonerCellAllocationService.getReceptionOccupancy.mockResolvedValue({
+      locationKey: 'ABC-RECP',
+      capacity: 10,
+      occupants: 10,
+      hasSpace: false,
+      offenders: [],
+    })
 
   beforeEach(() => {
     prisonerDetailsService.getDetails.mockResolvedValue(prisonerDetails)
     prisonerDetailsService.getPrisoner.mockResolvedValue(prisoner)
     prisonerDetailsService.getCsraAssessments.mockResolvedValue([assessment])
-    prisonerCellAllocationService.getReceptionsWithCapacity.mockResolvedValue([
-      {
-        id: 123,
-        description: 'ABC-1-RECEP',
-        capacity: 10,
-        noOfOccupants: 9,
-        attributes: [],
-      },
-    ])
-
-    prisonerCellAllocationService.getOffendersInReception.mockResolvedValue([])
+    mockOffendersInReception([])
     nonAssociationsService.getNonAssociations = jest.fn().mockResolvedValue({ nonAssociations: [] })
 
     res.render = jest.fn()
@@ -161,7 +170,7 @@ describe('Consider risks reception', () => {
 
     it('should redirect if reception already full', async () => {
       req.body = { considerRisksReception: 'yes' }
-      prisonerCellAllocationService.getReceptionsWithCapacity.mockResolvedValue([])
+      mockReceptionFull()
       await controller.view(req, res)
       expect(res.redirect).toHaveBeenCalledWith(`/prisoner/${someOffenderNumber}/reception-move/reception-full`)
       expect(logger.info).toHaveBeenCalledWith('Can not move to reception as already full to capacity')
@@ -190,13 +199,11 @@ describe('Consider risks reception', () => {
       )
     })
     it('should use singular description when only one person in reception', async () => {
-      prisonerCellAllocationService.getOffendersInReception.mockResolvedValue([
+      mockOffendersInReception([
         {
           offenderNo: 'B123',
           firstName: 'Jack',
           lastName: 'Simpson',
-          bookingId: 323,
-          dateOfBirth: '2002-01-02',
           alerts: [],
         },
       ])
@@ -220,21 +227,17 @@ describe('Consider risks reception', () => {
       )
     })
     it('should populate view model with other prisoners in reception', async () => {
-      prisonerCellAllocationService.getOffendersInReception.mockResolvedValue([
+      mockOffendersInReception([
         {
           offenderNo: 'A123',
           firstName: 'Max',
           lastName: 'Mercedes',
-          bookingId: 123,
-          dateOfBirth: '2002-01-01',
           alerts: [],
         },
         {
           offenderNo: 'B123',
           firstName: 'Jack',
           lastName: 'Simpson',
-          bookingId: 323,
-          dateOfBirth: '2002-01-02',
           alerts: [],
         },
       ])
@@ -286,7 +289,7 @@ describe('Consider risks reception', () => {
     })
 
     it('should get csra assessments only once if no other prisoners in reception', async () => {
-      prisonerCellAllocationService.getOffendersInReception.mockResolvedValue([])
+      mockOffendersInReception([])
       await controller.view(req, res)
       expect(prisonerDetailsService.getCsraAssessments).toHaveBeenCalledTimes(1)
     })
