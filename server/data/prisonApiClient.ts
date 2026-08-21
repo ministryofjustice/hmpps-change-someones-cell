@@ -123,19 +123,6 @@ export interface Location {
   subLocations: boolean
 }
 
-export interface ReferenceCode {
-  domain: string
-  code: string
-  description: string
-  parentDomain?: string
-  parentCode?: string
-  activeFlag: 'Y' | 'N'
-  listSeq?: number
-  systemDataFlag?: 'Y' | 'N'
-  expiredDate?: string
-  subCodes?: ReferenceCode[]
-}
-
 export interface OffenceDetail {
   bookingId: number
   offenceDescription: string
@@ -315,15 +302,6 @@ export default class PrisonApiClient {
     return PrisonApiClient.restClient(token).post<Assessment[]>({
       path: '/api/offender-assessments/csra/list',
       data: offenderNumbers,
-    })
-  }
-
-  getCellMoveReasonTypes(token: string) {
-    const headers = { 'Page-Limit': '1000' }
-
-    return PrisonApiClient.restClient(token).get<ReferenceCode[]>({
-      path: '/api/reference-domains/domains/CHG_HOUS_RSN',
-      headers,
     })
   }
 

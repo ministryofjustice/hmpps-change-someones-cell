@@ -69,7 +69,7 @@ export default defineConfig({
         stubPrisonerFullDetail: ({ prisonerDetail, offenderNo, fullInfo }) =>
           prisonApi.stubPrisonerFullDetail(prisonerDetail, offenderNo, fullInfo),
         stubBookingDetails: details => prisonApi.stubBookingDetails(details),
-        stubCellMoveTypes: type => prisonApi.stubCellMoveTypes(type),
+        stubCellMoveReasons: reasons => cellMovementsApi.stubCellMoveReasons(reasons),
         stubMoveToCell: (status: number) => cellMovementsApi.stubMoveToCell(status),
         stubMoveToCellSwap: (status: number) => cellMovementsApi.stubMoveToCellSwap(status),
         verifyMoveToCell: body => cellMovementsApi.verifyMoveToCell(body),

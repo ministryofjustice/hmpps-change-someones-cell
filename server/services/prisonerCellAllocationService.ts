@@ -6,6 +6,7 @@ import {
   PrisonerSearchApiClient,
 } from '../data'
 import { Offender } from '../data/prisonApiClient'
+import { CellMoveReason } from '../data/cellMovementsApiClient'
 import { Alert } from '../data/alertsApiClient'
 import { Prisoner } from '../data/prisonerSearchApiClient'
 import logger from '../../logger'
@@ -76,8 +77,13 @@ export default class PrisonerCellAllocationService {
     return this.locationsInsidePrisonApiClient.getCellsWithCapacity(token, agencyId, groupName)
   }
 
-  async getCellMoveReasonTypes(token: string) {
-    return this.prisonApiClient.getCellMoveReasonTypes(token)
+  /**
+   * In display order, and including retired reasons - see
+   * [CellMovementsApiClient.getCellMoveReasons]. Callers offering a choice filter on `active`;
+   * callers resolving a historic code must not.
+   */
+  async getCellMoveReasonTypes(token: string): Promise<CellMoveReason[]> {
+    return this.cellMovementsApiClient.getCellMoveReasons(token)
   }
 
   // No bookingId on either call: the cell movements API resolves the current booking itself

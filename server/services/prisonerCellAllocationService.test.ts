@@ -5,8 +5,8 @@ import {
   AlertsApiClient,
   PrisonerSearchApiClient,
 } from '../data'
-import { BedAssignment, Offender, Page, ReferenceCode } from '../data/prisonApiClient'
-import { CellMovement } from '../data/cellMovementsApiClient'
+import { BedAssignment, Offender, Page } from '../data/prisonApiClient'
+import { CellMovement, CellMoveReason } from '../data/cellMovementsApiClient'
 import PrisonerCellAllocationService from './prisonerCellAllocationService'
 import { CellLocation, Location, Occupant, getActualCapacity } from '../data/locationsInsidePrisonApiClient'
 import { Prisoner } from '../data/prisonerSearchApiClient'
@@ -196,28 +196,24 @@ describe('Prisoner cell allocation service', () => {
   })
 
   describe('getCellMoveReasonTypes', () => {
-    const reasonCodes: ReferenceCode[] = [
-      {
-        domain: 'CHG_HOUS_RSN',
-        code: 'ADM',
-        description: 'Administrative',
-        activeFlag: 'N',
-        listSeq: 1,
-        systemDataFlag: 'N',
-        subCodes: [],
-      },
+    // Retired reasons are passed through untouched - the history screen needs them to resolve a
+    // description for historic movements. Filtering belongs to the callers offering a choice.
+    const reasons: CellMoveReason[] = [
+      { code: 'ADM', description: 'Administrative', active: false },
+      { code: 'GM', description: 'General moves', active: true },
     ]
 
-    it('Retrieves cell move reasons reference data', async () => {
-      prisonApiClient.getCellMoveReasonTypes.mockResolvedValue(reasonCodes)
+    it('Retrieves cell move reasons from the cell movements API', async () => {
+      cellMovementsApiClient.getCellMoveReasons.mockResolvedValue(reasons)
 
       const result = await prisonerCellAllocationService.getCellMoveReasonTypes(token)
 
-      expect(result).toEqual(reasonCodes)
+      expect(result).toEqual(reasons)
+      expect(cellMovementsApiClient.getCellMoveReasons).toHaveBeenCalledWith(token)
     })
 
     it('Propagates error', async () => {
-      prisonApiClient.getCellMoveReasonTypes.mockRejectedValue(new Error('some error'))
+      cellMovementsApiClient.getCellMoveReasons.mockRejectedValue(new Error('some error'))
 
       await expect(prisonerCellAllocationService.getCellMoveReasonTypes(token)).rejects.toEqual(new Error('some error'))
     })

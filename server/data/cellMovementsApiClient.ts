@@ -16,6 +16,13 @@ export interface CellMovement {
   status: 'PENDING' | 'COMPLETED' | 'CASE_NOTE_FAILED'
 }
 
+export interface CellMoveReason {
+  code: string
+  description: string
+  /** False for a retired reason: still returned so historic movements resolve, but not selectable. */
+  active: boolean
+}
+
 /**
  * Client for hmpps-change-someones-cell-api, which performs the NOMIS move, records the
  * MOVED_CELL case note and keeps its own record of every movement.
@@ -59,6 +66,24 @@ export default class CellMovementsApiClient {
     return CellMovementsApiClient.restClient(token).post<CellMovement>({
       path: '/cell-movements/cell-swap',
       data: { prisonerNumber },
+    })
+  }
+
+  /**
+   * The reasons a prisoner can be moved between cells - reference data this API owns, having taken
+   * it over from prison-api's CHG_HOUS_RSN domain.
+   *
+   * Two things about the response are contracts, not incidental:
+   *
+   * - **It is already in display order.** Do not sort it. There is no sequence field to sort on,
+   *   deliberately, so that a second consumer cannot invent a second ordering.
+   * - **It includes retired reasons**, marked `active: false`. They cannot be chosen for a new
+   *   move, but historic movements carry them, so a screen resolving a code to a description needs
+   *   them. Filter on `active` when offering a choice; do not filter when looking a code up.
+   */
+  getCellMoveReasons(token: string) {
+    return CellMovementsApiClient.restClient(token).get<CellMoveReason[]>({
+      path: '/cell-movements/reasons',
     })
   }
 }

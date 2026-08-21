@@ -178,24 +178,9 @@ describe('Change cell play back details', () => {
 
     it('should make a request to retrieve all cell move case note types for none c-swap moves', async () => {
       prisonerCellAllocationService.getCellMoveReasonTypes.mockResolvedValue([
-        {
-          domain: 'CHG_HOUS_RSN',
-          code: 'ADM',
-          description: 'Admin',
-          activeFlag: 'Y',
-        },
-        {
-          domain: 'CHG_HOUS_RSN',
-          code: 'SA',
-          description: 'Safety',
-          activeFlag: 'Y',
-        },
-        {
-          domain: 'CHG_HOUS_RSN',
-          code: 'UNUSED',
-          description: 'Unused value',
-          activeFlag: 'N',
-        },
+        { code: 'ADM', description: 'Admin', active: true },
+        { code: 'SA', description: 'Safety', active: true },
+        { code: 'UNUSED', description: 'Unused value', active: false },
       ])
 
       await controller.index(req, res)
@@ -231,18 +216,8 @@ describe('Change cell play back details', () => {
 
     it('should unpack form values out of req.flash', async () => {
       prisonerCellAllocationService.getCellMoveReasonTypes.mockResolvedValue([
-        {
-          domain: 'CHG_HOUS_RSN',
-          code: 'ADM',
-          description: 'Admin',
-          activeFlag: 'Y',
-        },
-        {
-          domain: 'CHG_HOUS_RSN',
-          code: 'SA',
-          description: 'Safety',
-          activeFlag: 'Y',
-        },
+        { code: 'ADM', description: 'Admin', active: true },
+        { code: 'SA', description: 'Safety', active: true },
       ])
       req.flash.mockImplementation(() => [
         {
@@ -267,22 +242,10 @@ describe('Change cell play back details', () => {
       )
     })
 
-    it('should show cell move reasons in Db order', async () => {
+    it("should render cell move reasons in the API's order, without re-sorting", async () => {
       prisonerCellAllocationService.getCellMoveReasonTypes.mockResolvedValue([
-        {
-          domain: 'CHG_HOUS_RSN',
-          code: 'ADM',
-          description: 'Admin',
-          listSeq: 2,
-          activeFlag: 'Y',
-        },
-        {
-          domain: 'CHG_HOUS_RSN',
-          code: 'SA',
-          description: 'Safety',
-          listSeq: 1,
-          activeFlag: 'Y',
-        },
+        { code: 'ADM', description: 'Admin', active: true },
+        { code: 'SA', description: 'Safety', active: true },
       ])
       req.flash.mockImplementation(() => [
         {
@@ -296,9 +259,11 @@ describe('Change cell play back details', () => {
       expect(res.render).toHaveBeenCalledWith(
         'cellMove/confirmCellMove.njk',
         expect.objectContaining({
+          // The API's order, preserved. This fixture used to carry listSeq values that the
+          // controller sorted on; the API now returns the list ready to render.
           cellMoveReasonRadioValues: [
-            { checked: false, text: 'Safety', value: 'SA' },
             { checked: true, text: 'Admin', value: 'ADM' },
+            { checked: false, text: 'Safety', value: 'SA' },
           ],
           formValues: {
             comment: 'Hello',

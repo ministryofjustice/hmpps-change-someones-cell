@@ -243,21 +243,6 @@ export const stubBookingDetails = details =>
     },
   })
 
-export const stubCellMoveTypes = types =>
-  stubFor({
-    request: {
-      method: 'GET',
-      urlPattern: '/api/reference-domains/domains/CHG_HOUS_RSN',
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: types,
-    },
-  })
-
 export const stubCellMoveHistory = ({ assignmentDate, agencyId, cellMoves }) =>
   stubFor({
     request: {
@@ -307,7 +292,6 @@ export default {
   stubSpecificOffenderFullDetails,
   stubPrisonerFullDetail,
   stubBookingDetails,
-  stubCellMoveTypes,
   stubCellMoveHistory,
   stubStaff,
 }

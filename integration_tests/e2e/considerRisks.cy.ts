@@ -421,17 +421,9 @@ context('A user can see conflicts in cell', () => {
     const page = ConsiderRisksPage.goTo(offenderNo, 'MDI-1-1-1')
 
     cy.task('stubBookingDetails', { firstName: 'Bob', lastName: 'Doe' })
-    cy.task('stubCellMoveTypes', [
-      {
-        code: 'ADM',
-        activeFlag: 'Y',
-        description: 'Administrative',
-      },
-      {
-        code: 'BEH',
-        activeFlag: 'Y',
-        description: 'Behaviour',
-      },
+    cy.task('stubCellMoveReasons', [
+      { code: 'ADM', description: 'Administrative', active: true },
+      { code: 'BEH', description: 'Behaviour', active: true },
     ])
 
     page.form().confirmationYes().click()
@@ -473,17 +465,9 @@ context('A user can see conflicts in cell', () => {
       bookingId: 1234,
       alerts: [],
     })
-    cy.task('stubCellMoveTypes', [
-      {
-        code: 'ADM',
-        activeFlag: 'Y',
-        description: 'Administrative',
-      },
-      {
-        code: 'BEH',
-        activeFlag: 'Y',
-        description: 'Behaviour',
-      },
+    cy.task('stubCellMoveReasons', [
+      { code: 'ADM', description: 'Administrative', active: true },
+      { code: 'BEH', description: 'Behaviour', active: true },
     ])
 
     cy.visit(`/prisoner/${offenderNo}/cell-move/consider-risks?cellId=MDI-1-1-1`)
