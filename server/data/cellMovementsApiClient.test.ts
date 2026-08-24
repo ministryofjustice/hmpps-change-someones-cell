@@ -56,4 +56,21 @@ describe('cellMovementsApiClient', () => {
       expect(output.movementType).toEqual('CELL_SWAP')
     })
   })
+
+  describe('getCellMoveReasons', () => {
+    it('returns the reasons as the API orders them, retired ones included', async () => {
+      const reasons = [
+        { code: 'ADM', description: 'Administrative', active: false },
+        { code: 'RAIM', description: 'Reception and induction moves', active: true },
+        { code: 'GM', description: 'General moves', active: true },
+      ]
+
+      fakeApi.get('/cell-movements/reasons').matchHeader('authorization', `Bearer ${accessToken}`).reply(200, reasons)
+
+      const output = await client.getCellMoveReasons(accessToken)
+
+      // Returned verbatim - no filtering, and in particular no re-sorting.
+      expect(output).toEqual(reasons)
+    })
+  })
 })

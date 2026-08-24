@@ -5,31 +5,18 @@ import LocationService from '../../services/locationService'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import { properCaseName, putLastNameFirst } from '../../utils'
-import { getConfirmBackLinkData } from './cellMoveUtils'
-import { ReferenceCode } from '../../data/prisonApiClient'
+import { getConfirmBackLinkData, toReasonRadioItems } from './cellMoveUtils'
 import { getActualCapacity } from '../../data/locationsInsidePrisonApiClient'
 import MetricsEvent from '../../data/metricsEvent'
 import MetricsService from '../../services/metricsService'
 
 const CSWAP = 'C-SWAP'
 
-const sortOnListSeq = (a: ReferenceCode, b: ReferenceCode) => a.listSeq - b.listSeq
-
 const cellMoveReasons = async (
   token,
   prisonerCellAllocationService: PrisonerCellAllocationService,
   selectedReason: string,
-) => {
-  const cellMoveReasonTypes = await prisonerCellAllocationService.getCellMoveReasonTypes(token)
-  return cellMoveReasonTypes
-    .filter(type => type.activeFlag === 'Y')
-    .sort(sortOnListSeq)
-    .map(type => ({
-      value: type.code,
-      text: type.description,
-      checked: type.code === selectedReason,
-    }))
-}
+) => toReasonRadioItems(await prisonerCellAllocationService.getCellMoveReasonTypes(token), selectedReason)
 
 type Params = {
   analyticsService: AnalyticsService

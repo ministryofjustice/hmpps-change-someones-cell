@@ -78,61 +78,13 @@ before(() => {
     capacity: { maxCapacity: 99, workingCapacity: 0 },
   })
   cy.task('stubAttributeSearch', [])
-  cy.task('stubCellMoveTypes', [
-    {
-      domain: 'CHG_HOUS_RSN',
-      code: 'RAIM',
-      description: 'Reception and induction moves',
-      activeFlag: 'Y',
-      listSeq: 1,
-      systemDataFlag: 'N',
-      subCodes: [],
-    },
-    {
-      domain: 'CHG_HOUS_RSN',
-      code: 'SS',
-      description: 'Someone’s safety',
-      activeFlag: 'Y',
-      listSeq: 2,
-      systemDataFlag: 'N',
-      subCodes: [],
-    },
-    {
-      domain: 'CHG_HOUS_RSN',
-      code: 'SPP',
-      description: 'Security of the prison or other people',
-      activeFlag: 'Y',
-      listSeq: 2,
-      systemDataFlag: 'N',
-      subCodes: [],
-    },
-    {
-      domain: 'CHG_HOUS_RSN',
-      code: 'HOSP',
-      description: 'Healthcare',
-      activeFlag: 'Y',
-      listSeq: 2,
-      systemDataFlag: 'N',
-      subCodes: [],
-    },
-    {
-      domain: 'CHG_HOUS_RSN',
-      code: 'PCM',
-      description: 'Maintenance of the prison or cell',
-      activeFlag: 'Y',
-      listSeq: 2,
-      systemDataFlag: 'N',
-      subCodes: [],
-    },
-    {
-      domain: 'CHG_HOUS_RSN',
-      code: 'PCGMM',
-      description: 'General moves',
-      activeFlag: 'Y',
-      listSeq: 2,
-      systemDataFlag: 'N',
-      subCodes: [],
-    },
+  cy.task('stubCellMoveReasons', [
+    { code: 'RAIM', description: 'Reception and induction moves', active: true },
+    { code: 'SS', description: 'Someone’s safety', active: true },
+    { code: 'SPP', description: 'Security of the prison or other people', active: true },
+    { code: 'HOSP', description: 'Healthcare', active: true },
+    { code: 'PCM', description: 'Maintenance of the prison or cell', active: true },
+    { code: 'GM', description: 'General moves', active: true },
   ])
 })
 

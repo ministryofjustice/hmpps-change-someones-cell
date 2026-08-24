@@ -1,8 +1,8 @@
 import confirmReceptionMove from './confirmReceptionMove'
 import logger from '../../../logger'
 import PrisonerCellAllocationService, { Reception } from '../../services/prisonerCellAllocationService'
+import { CellMoveReason } from '../../data/cellMovementsApiClient'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
-import { ReferenceCode } from '../../data/prisonApiClient'
 import config from '../../config'
 
 jest.mock('../../services/prisonerCellAllocationService')
@@ -66,17 +66,8 @@ describe('Confirm reception move', () => {
     })
 
     prisonerCellAllocationService.getCellMoveReasonTypes = jest.fn().mockResolvedValue([
-      {
-        activeFlag: 'N',
-        code: 'ADM',
-        domain: 'CHG_HOUS_RSN',
-        description: 'Administrative',
-      },
-      {
-        activeFlag: 'N',
-        code: 'BEH',
-        description: 'Behaviour',
-      },
+      { code: 'ADM', description: 'Administrative', active: false },
+      { code: 'BEH', description: 'Behaviour', active: false },
     ])
 
     req.params = {
@@ -111,19 +102,10 @@ describe('Confirm reception move', () => {
     })
 
     it('Should include correct radio options in render data', async () => {
-      const receptionMoveTypes: ReferenceCode[] = [
-        {
-          code: 'ADM',
-          description: 'Administrative',
-          activeFlag: 'N',
-          domain: 'CHG_HOUS_RSN',
-        },
-        {
-          code: 'GM',
-          description: 'General moves',
-          activeFlag: 'Y',
-          domain: 'CHG_HOUS_RSN',
-        },
+      // ADM is retired: served for display elsewhere, but never offered as a choice here.
+      const receptionMoveTypes: CellMoveReason[] = [
+        { code: 'ADM', description: 'Administrative', active: false },
+        { code: 'GM', description: 'General moves', active: true },
       ]
       prisonerCellAllocationService.getCellMoveReasonTypes.mockResolvedValue(receptionMoveTypes)
       await controller.view(req, res)

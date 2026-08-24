@@ -4,9 +4,7 @@ import logger from '../../../logger'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
 import config from '../../config'
-import { ReferenceCode } from '../../data/prisonApiClient'
-
-const sortOnListSeq = (a: ReferenceCode, b: ReferenceCode) => a.listSeq - b.listSeq
+import { toReasonRadioItems } from './cellMoveUtils'
 
 const validate = ({ reason, comment }) => {
   const errors = []
@@ -35,17 +33,8 @@ type Params = {
 }
 
 export default ({ prisonerCellAllocationService, prisonerDetailsService }: Params) => {
-  const receptionMoveReasons = async (token: string, selectedReason: string) => {
-    const receptionMoveReasonTypes = await prisonerCellAllocationService.getCellMoveReasonTypes(token)
-    return receptionMoveReasonTypes
-      .filter(type => type.activeFlag === 'Y')
-      .sort(sortOnListSeq)
-      .map(type => ({
-        value: type.code,
-        text: type.description,
-        checked: type.code === selectedReason,
-      }))
-  }
+  const receptionMoveReasons = async (token: string, selectedReason: string) =>
+    toReasonRadioItems(await prisonerCellAllocationService.getCellMoveReasonTypes(token), selectedReason)
 
   const view = async (req: Request, res: Response) => {
     const { offenderNo } = req.params

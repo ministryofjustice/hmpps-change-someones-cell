@@ -144,21 +144,6 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('getCellMoveReasonTypes', () => {
-    it('should return data from api', async () => {
-      const response = { data: 'data' }
-
-      fakePrisonApiClient
-        .get('/api/reference-domains/domains/CHG_HOUS_RSN')
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .matchHeader('Page-Limit', '1000')
-        .reply(200, response)
-
-      const output = await prisonApiClient.getCellMoveReasonTypes(accessToken)
-      expect(output).toEqual(response)
-    })
-  })
-
   describe('getMainOffence', () => {
     it('should return data from api', async () => {
       const response = { data: 'data' }

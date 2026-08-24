@@ -35,17 +35,9 @@ context('A user can confirm the cell move', () => {
     })
     cy.task('stubMoveToCell')
     cy.task('stubMoveToCellSwap')
-    cy.task('stubCellMoveTypes', [
-      {
-        code: 'ADM',
-        activeFlag: 'Y',
-        description: 'Administrative',
-      },
-      {
-        code: 'BEH',
-        activeFlag: 'Y',
-        description: 'Behaviour',
-      },
+    cy.task('stubCellMoveReasons', [
+      { code: 'ADM', description: 'Administrative', active: true },
+      { code: 'BEH', description: 'Behaviour', active: true },
     ])
     cy.task('stubOffenderBasicDetails', offenderBasicDetails)
   })
