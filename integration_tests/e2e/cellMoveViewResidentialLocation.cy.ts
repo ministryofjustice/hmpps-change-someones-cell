@@ -1,5 +1,5 @@
 context('Cell move view residential location', () => {
-  const toOffender = $cell => ({
+  const toOffender = ($cell: HTMLCollectionOf<HTMLTableCellElement>) => ({
     name: $cell[1]?.textContent,
     prisonNo: $cell[2]?.textContent,
     location: $cell[3]?.textContent,

@@ -15,7 +15,7 @@ export const stubHealth = (status = 200) => {
   })
 }
 
-export const stubVerifyToken = active => {
+export const stubVerifyToken = (active: boolean) => {
   return stubFor({
     request: {
       method: 'POST',

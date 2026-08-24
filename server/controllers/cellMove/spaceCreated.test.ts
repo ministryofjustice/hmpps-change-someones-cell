@@ -80,7 +80,7 @@ describe('Space created', () => {
       const error = new Error('Network error')
       prisonerDetailsService.getDetails.mockRejectedValue(error)
 
-      await expect(controller(req, res)).rejects.toThrowError(error)
+      await expect(controller(req, res)).rejects.toThrow(error)
       expect(res.locals.redirectUrl).toBe(`/prisoner/${offenderNo}/cell-move/search-for-cell`)
       expect(res.locals.homeUrl).toBe(`${config.prisonerProfileUrl}/prisoner/${offenderNo}`)
     })

@@ -1,6 +1,6 @@
 import { stubFor } from './wiremock'
 
-export const stubUserCaseloads = caseloads =>
+export const stubUserCaseloads = (caseloads?: object[]) =>
   stubFor({
     request: {
       method: 'GET',
@@ -106,7 +106,17 @@ export const stubHealth = (status = 200) =>
     },
   })
 
-export const stubInmates = ({ locationId, params, count, data = [] }) =>
+export const stubInmates = ({
+  locationId,
+  params,
+  count,
+  data = [],
+}: {
+  locationId: string
+  params?: Record<string, string>
+  count: number
+  data?: object[]
+}) =>
   stubFor({
     request: {
       method: 'GET',
@@ -123,7 +133,7 @@ export const stubInmates = ({ locationId, params, count, data = [] }) =>
     },
   })
 
-export const stubOffenderFullDetails = details =>
+export const stubOffenderFullDetails = (details?: object) =>
   stubFor({
     request: {
       method: 'GET',
@@ -138,7 +148,7 @@ export const stubOffenderFullDetails = details =>
     },
   })
 
-export const stubMainOffence = (offence, status = 200) =>
+export const stubMainOffence = (offence: object, status = 200) =>
   stubFor({
     request: {
       method: 'GET',
@@ -153,7 +163,7 @@ export const stubMainOffence = (offence, status = 200) =>
     },
   })
 
-export const stubOffenderBasicDetails = offender =>
+export const stubOffenderBasicDetails = (offender?: object) =>
   stubFor({
     request: {
       method: 'GET',
@@ -168,7 +178,7 @@ export const stubOffenderBasicDetails = offender =>
     },
   })
 
-export const stubOffenderCellHistory = history =>
+export const stubOffenderCellHistory = (history?: object) =>
   stubFor({
     request: {
       method: 'GET',
@@ -198,7 +208,7 @@ export const stubCsraAssessments = (offenderNumbers, assessments = []) =>
     },
   })
 
-export const stubSpecificOffenderFullDetails = details =>
+export const stubSpecificOffenderFullDetails = (details: { offenderNo: string }) =>
   stubFor({
     request: {
       method: 'GET',
@@ -213,7 +223,7 @@ export const stubSpecificOffenderFullDetails = details =>
     },
   })
 
-export const stubPrisonerFullDetail = (prisonerDetail, offenderNo, fullInfo = true) =>
+export const stubPrisonerFullDetail = (prisonerDetail: object, offenderNo: string, fullInfo = true) =>
   stubFor({
     request: {
       method: 'GET',
@@ -228,7 +238,7 @@ export const stubPrisonerFullDetail = (prisonerDetail, offenderNo, fullInfo = tr
     },
   })
 
-export const stubBookingDetails = details =>
+export const stubBookingDetails = (details?: object) =>
   stubFor({
     request: {
       method: 'GET',
@@ -258,7 +268,7 @@ export const stubCellMoveHistory = ({ assignmentDate, agencyId, cellMoves }) =>
     },
   })
 
-export const stubStaff = (staffId, details) =>
+export const stubStaff = (staffId: string | number, details?: object) =>
   stubFor({
     request: {
       method: 'GET',

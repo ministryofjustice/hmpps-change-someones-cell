@@ -31,7 +31,7 @@ context('A user get confirmation of a cell move', () => {
     page
       .backToSearchLink()
       .invoke('attr', 'href')
-      .then(href => {
+      .then((href: string) => {
         expect(href).to.equal('/prisoner-search')
       })
   })

@@ -6,7 +6,17 @@ const cellMoveConfirmationPage = (name: string, cellDescription: string): any =>
   })
 
 export default {
-  goTo: ({ offenderNo, name, cellDescription, cellId }) => {
+  goTo: ({
+    offenderNo,
+    name,
+    cellDescription,
+    cellId,
+  }: {
+    offenderNo: string
+    name: string
+    cellDescription: string
+    cellId: string
+  }) => {
     cy.visit(`/prisoner/${offenderNo}/cell-move/confirmation?cellId=${cellId}`)
     return cellMoveConfirmationPage(name, cellDescription)
   },

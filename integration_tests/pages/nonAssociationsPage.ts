@@ -8,7 +8,7 @@ const nonAssociationsPage: () => any = () =>
 
 export default {
   verifyOnPage: nonAssociationsPage,
-  goTo: offenderNo => {
+  goTo: (offenderNo: string) => {
     cy.visit(`/prisoner/${offenderNo}/cell-move/non-associations`)
     return nonAssociationsPage()
   },

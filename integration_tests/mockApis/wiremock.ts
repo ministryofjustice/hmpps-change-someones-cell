@@ -2,12 +2,12 @@ import superagent from 'superagent'
 
 const url = 'http://localhost:9091/__admin'
 
-const stubFor = mapping => superagent.post(`${url}/mappings`).send(mapping)
+const stubFor = (mapping: object) => superagent.post(`${url}/mappings`).send(mapping)
 
 /** Makes stateful stubs */
-const stubScenario = ({ scenarioName, mappings }) => {
+const stubScenario = ({ scenarioName, mappings }: { scenarioName: string; mappings: Record<string, object> }) => {
   let previousState = 'Started'
-  const promises = Object.entries(mappings).map(([state, mapping]: [any, object]) => {
+  const promises = Object.entries(mappings).map(([state, mapping]) => {
     const promise = superagent.post(`${url}/mappings`).send({
       ...mapping,
       scenarioName,
@@ -22,18 +22,18 @@ const stubScenario = ({ scenarioName, mappings }) => {
 
 const getRequests = () => superagent.get(`${url}/requests`)
 
-const getMatchingRequests = body => superagent.post(`${url}/requests/find`).send(body)
+const getMatchingRequests = (body: object) => superagent.post(`${url}/requests/find`).send(body)
 
 const resetStubs = () => Promise.all([superagent.delete(`${url}/mappings`), superagent.delete(`${url}/requests`)])
 
-const resetStub = ({ requestUrl, method }) => {
+const resetStub = ({ requestUrl, method }: { requestUrl: string; method: string }) => {
   return superagent.post(`${url}/requests/remove`).send({
     method,
     url: requestUrl,
   })
 }
 
-const verifyPosts = (requestUrl, body) => {
+const verifyPosts = (requestUrl: string, body?: object) => {
   const bodyPatterns =
     (body && {
       bodyPatterns: [{ equalToJson: JSON.stringify(body) }],
@@ -47,19 +47,19 @@ const verifyPosts = (requestUrl, body) => {
   })
 }
 
-const verifyPut = requestUrl =>
+const verifyPut = (requestUrl: string) =>
   superagent.post(`${url}/requests/count`).send({
     method: 'PUT',
     url: requestUrl,
   })
 
-const verifyGet = requestUrl =>
+const verifyGet = (requestUrl: string) =>
   superagent.post(`${url}/requests/count`).send({
     method: 'GET',
     url: requestUrl,
   })
 
-const getFor = ({ body, urlPattern = undefined, urlPath }) =>
+const getFor = ({ body, urlPattern = undefined, urlPath }: { body: object; urlPattern?: string; urlPath?: string }) =>
   stubFor({
     request: {
       method: 'GET',
@@ -75,7 +75,7 @@ const getFor = ({ body, urlPattern = undefined, urlPath }) =>
     },
   })
 
-const postFor = ({ body, urlPattern, urlPath }) =>
+const postFor = ({ body, urlPattern, urlPath }: { body: object; urlPattern?: string; urlPath?: string }) =>
   stubFor({
     request: {
       method: 'POST',

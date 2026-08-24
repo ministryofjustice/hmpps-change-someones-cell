@@ -21,7 +21,7 @@ const receptionConfirmationPage: () => any = () =>
 
 export default {
   verifyOnPage: receptionConfirmationPage,
-  goTo: offenderNo => {
+  goTo: (offenderNo: string) => {
     cy.visit(`/prisoner/${offenderNo}/reception-move/confirmation`, { failOnStatusCode: false })
     return receptionConfirmationPage()
   },

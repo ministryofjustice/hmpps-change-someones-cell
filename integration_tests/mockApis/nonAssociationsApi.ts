@@ -15,7 +15,7 @@ export const stubHealth = (status = 200) =>
     },
   })
 
-export const stubGetPrisonerNonAssociations = response =>
+export const stubGetPrisonerNonAssociations = (response: object) =>
   stubFor({
     request: {
       method: 'GET',

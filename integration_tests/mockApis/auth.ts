@@ -3,7 +3,7 @@ import { stubUser, stubUserMe } from './users'
 import { getMatchingRequests, stubFor } from './wiremock'
 import { stubStaffRoles, stubUserLocations } from './prisonApi'
 
-const createToken = roles => {
+const createToken = (roles: string[]) => {
   const payload = {
     user_name: 'ITAG_USER',
     scope: ['read', 'write'],
@@ -68,7 +68,7 @@ const signOut = () =>
     },
   })
 
-const token = roles =>
+const token = (roles: string[]) =>
   stubFor({
     request: {
       method: 'POST',
@@ -126,7 +126,7 @@ const stubClientCredentialsRequest = () =>
 export default {
   stubHealth,
   getSignInUrl,
-  stubSignIn: (username, caseloadId, roles = []) =>
+  stubSignIn: (username: string, caseloadId: string, roles: string[] = []) =>
     Promise.all([
       favicon(),
       redirect(),

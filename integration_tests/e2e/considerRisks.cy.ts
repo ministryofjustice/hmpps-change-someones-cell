@@ -326,9 +326,9 @@ context('A user can see conflicts in cell', () => {
     stubPrisonDetails()
     const page = ConsiderRisksPage.goTo(offenderNo, 'MDI-1-1-1')
     page.nonAssociationsSubTitle().contains('Test User has a non-association with a prisoner on this wing:')
-    page.nonAssociationsSummary().then($summary => {
-      cy.get($summary).find('dt').its('length').should('eq', 6)
-      cy.get($summary)
+    page.nonAssociationsSummary().then(($summary: JQuery<HTMLElement>) => {
+      cy.wrap($summary).find('dt').its('length').should('eq', 6)
+      cy.wrap($summary)
         .find('dt')
         .then($summaryLabels => {
           expect($summaryLabels.get(0).innerText).to.contain('Name')
@@ -339,8 +339,8 @@ context('A user can see conflicts in cell', () => {
           expect($summaryLabels.get(5).innerText).to.contain('Comment')
         })
 
-      cy.get($summary).find('dd').its('length').should('eq', 6)
-      cy.get($summary)
+      cy.wrap($summary).find('dd').its('length').should('eq', 6)
+      cy.wrap($summary)
         .find('dd')
         .then($summaryContent => {
           expect($summaryContent.get(0).innerText).to.contain('Doe1, Bob1')
@@ -354,14 +354,14 @@ context('A user can see conflicts in cell', () => {
     page
       .csraMessages()
       .find('li')
-      .then($messages => {
-        cy.get($messages).its('length').should('eq', 2)
+      .then(($messages: JQuery<HTMLElement>) => {
+        cy.wrap($messages).its('length').should('eq', 2)
         expect($messages.get(0).innerText).to.contain('Test User is CSRA High')
         expect($messages.get(1).innerText).to.contain('Occupant User is CSRA High')
       })
     page.offenderAlertsHeading().contains('Test User has:')
-    page.offenderAlertMessages().then($messages => {
-      cy.get($messages).its('length').should('eq', 6)
+    page.offenderAlertMessages().then(($messages: JQuery<HTMLElement>) => {
+      cy.wrap($messages).its('length').should('eq', 6)
       expect($messages.get(0)).to.contain(
         'a Risk to LGB alert and Occupant User has a sexual orientation of Homosexual',
       )
@@ -373,13 +373,13 @@ context('A user can see conflicts in cell', () => {
     })
     page.categoryWarning().contains('a Cat A rating and Occupant User is a Cat B')
     page.occupantAlertsHeading().contains('Occupant User has:')
-    page.occupantAlertMessages().then($messages => {
-      cy.get($messages).its('length').should('eq', 2)
+    page.occupantAlertMessages().then(($messages: JQuery<HTMLElement>) => {
+      cy.wrap($messages).its('length').should('eq', 2)
       expect($messages.get(0)).to.contain('a Gang member alert')
       expect($messages.get(1)).to.contain('an Isolated Prisoner alert')
     })
-    page.alertsComments().then($messages => {
-      cy.get($messages).its('length').should('eq', 8)
+    page.alertsComments().then(($messages: JQuery<HTMLElement>) => {
+      cy.wrap($messages).its('length').should('eq', 8)
       expect($messages.get(0)).to.contain('has a large poster on cell wall')
       expect($messages.get(1)).to.contain('has a large poster on cell wall')
       expect($messages.get(2)).to.contain('No details entered')
@@ -387,8 +387,8 @@ context('A user can see conflicts in cell', () => {
       expect($messages.get(4)).to.contain('Test comment')
       expect($messages.get(5)).to.contain('No details entered')
     })
-    page.alertsDates().then($dates => {
-      cy.get($dates).its('length').should('eq', 8)
+    page.alertsDates().then(($dates: JQuery<HTMLElement>) => {
+      cy.wrap($dates).its('length').should('eq', 8)
       expect($dates.get(0)).to.contain('Date added: 20 August 2019')
       expect($dates.get(1)).to.contain('Date added: 20 August 2019')
       expect($dates.get(2)).to.contain('Date added: 20 August 2019')

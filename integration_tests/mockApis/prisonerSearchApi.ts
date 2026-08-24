@@ -14,7 +14,7 @@ export const stubHealth = (status = 200) =>
     },
   })
 
-export const stubGetPrisoner = prisoner => {
+export const stubGetPrisoner = (prisoner: { prisonerNumber: string }) => {
   return stubFor({
     request: {
       method: 'GET',
@@ -30,7 +30,7 @@ export const stubGetPrisoner = prisoner => {
   })
 }
 
-export const stubGetPrisoners = prisoners => {
+export const stubGetPrisoners = (prisoners: object[]) => {
   return stubFor({
     request: {
       method: 'POST',

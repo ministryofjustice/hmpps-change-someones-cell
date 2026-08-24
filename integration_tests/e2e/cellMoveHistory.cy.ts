@@ -1,4 +1,4 @@
-const toCellMove = $cell => ({
+const toCellMove = ($cell: HTMLCollectionOf<HTMLTableCellElement>) => ({
   name: $cell[0]?.textContent,
   movedFrom: $cell[1]?.textContent,
   movedTo: $cell[2]?.textContent,

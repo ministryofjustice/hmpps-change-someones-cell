@@ -14,7 +14,7 @@ const confirmCellMovePage = (name: string, cell: string): any =>
 
 export default {
   verifyOnPage: (name: string, cell: string) => confirmCellMovePage(name, cell),
-  goTo: (offenderNo, cellId, name, cell) => {
+  goTo: (offenderNo: string, cellId: string, name: string, cell: string) => {
     cy.visit(`/prisoner/${offenderNo}/cell-move/confirm-cell-move?cellId=${cellId}`)
     return confirmCellMovePage(name, cell)
   },

@@ -80,7 +80,7 @@ describe('view offender details', () => {
     const error = new Error('Network error')
     prisonerDetailsService.getDetails.mockImplementation(() => Promise.reject(error))
 
-    await expect(controller(req, res)).rejects.toThrowError(error)
+    await expect(controller(req, res)).rejects.toThrow(error)
 
     expect(res.locals.redirectUrl).toBe('/prisoner/ABC123/cell-move/search-for-cell')
     expect(res.locals.homeUrl).toBe(`${config.prisonerProfileUrl}/prisoner/ABC123`)

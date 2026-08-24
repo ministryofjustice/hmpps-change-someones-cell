@@ -96,7 +96,7 @@ export default class LocationsInsidePrisonApiClient {
     })
   }
 
-  getCellsWithCapacity(token: string, agencyId: string, groupName: string = null): Promise<CellLocation[]> {
+  getCellsWithCapacity(token: string, agencyId: string, groupName: string | null = null): Promise<CellLocation[]> {
     return this.restClient(token).get<CellLocation[]>({
       path: `/location-occupancy/cells-with-capacity/${agencyId}?includePrisonerInformation=true${
         groupName ? `&groupName=${groupName}` : ''
