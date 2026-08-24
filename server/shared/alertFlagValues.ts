@@ -140,6 +140,16 @@ export const alertFlagLabels = [
     classes: 'alert-status alert-status--security',
     label: 'Potential corruptor',
   },
+  {
+    alertCodes: ['XNR'],
+    classes: 'alert-status alert-status--security',
+    label: 'Not for release',
+  },
+  {
+    alertCodes: ['HPI'],
+    classes: 'alert-status alert-status--security',
+    label: 'High public interest',
+  },
 ].sort((a, b) => a.label.localeCompare(b.label))
 
 export const cellMoveAlertCodes = [
@@ -182,6 +192,8 @@ export const cellMoveAlertCodes = [
   'RCDR',
   'RNO121',
   'RSS',
+  'XNR',
+  'HPI',
 ]
 
 export const profileAlertCodes = [
@@ -217,6 +229,8 @@ export const profileAlertCodes = [
   'RKS',
   'VIP',
   'XCDO',
+  'XNR',
+  'HPI',
 ]
 
 export type AlertLabelFlag = {
