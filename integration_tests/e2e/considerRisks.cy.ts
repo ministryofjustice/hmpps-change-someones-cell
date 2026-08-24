@@ -306,7 +306,6 @@ context('A user can see conflicts in cell', () => {
     ])
     cy.task('stubGroups', { id: 'MDI' })
     cy.task('stubActivePrisons')
-    cy.task('stubGetAlerts', { agencyId: 'MDI', alerts: [{ offenderNo: 'A12345', alertCode: 'PEEP' }] })
     cy.task('stubCsraAssessments', {
       offenderNumbers: ['A12345'],
       assessments: [
@@ -422,17 +421,9 @@ context('A user can see conflicts in cell', () => {
     const page = ConsiderRisksPage.goTo(offenderNo, 'MDI-1-1-1')
 
     cy.task('stubBookingDetails', { firstName: 'Bob', lastName: 'Doe' })
-    cy.task('stubCellMoveTypes', [
-      {
-        code: 'ADM',
-        activeFlag: 'Y',
-        description: 'Administrative',
-      },
-      {
-        code: 'BEH',
-        activeFlag: 'Y',
-        description: 'Behaviour',
-      },
+    cy.task('stubCellMoveReasons', [
+      { code: 'ADM', description: 'Administrative', active: true },
+      { code: 'BEH', description: 'Behaviour', active: true },
     ])
 
     page.form().confirmationYes().click()
@@ -474,17 +465,9 @@ context('A user can see conflicts in cell', () => {
       bookingId: 1234,
       alerts: [],
     })
-    cy.task('stubCellMoveTypes', [
-      {
-        code: 'ADM',
-        activeFlag: 'Y',
-        description: 'Administrative',
-      },
-      {
-        code: 'BEH',
-        activeFlag: 'Y',
-        description: 'Behaviour',
-      },
+    cy.task('stubCellMoveReasons', [
+      { code: 'ADM', description: 'Administrative', active: true },
+      { code: 'BEH', description: 'Behaviour', active: true },
     ])
 
     cy.visit(`/prisoner/${offenderNo}/cell-move/consider-risks?cellId=MDI-1-1-1`)
@@ -549,7 +532,6 @@ context('A user can see conflicts in cell', () => {
           ],
         },
       ])
-      cy.task('stubGetAlerts', { agencyId: 'MDI', alerts: [{ offenderNo: 'A12345', alertCode: 'PEEP' }] })
       cy.task('stubCsraAssessments', {
         offenderNumbers: ['A12345'],
         assessments: [

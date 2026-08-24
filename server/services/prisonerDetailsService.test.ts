@@ -1,7 +1,7 @@
 import { Readable } from 'stream'
 import { PrisonApiClient } from '../data'
 import PrisonerDetailsService from './prisonerDetailsService'
-import { Alert, Assessment, OffenceDetail, OffenderDetails } from '../data/prisonApiClient'
+import { Assessment, OffenceDetail, OffenderDetails } from '../data/prisonApiClient'
 import PrisonerSearchApiClient, { Prisoner } from '../data/prisonerSearchApiClient'
 
 jest.mock('../data/prisonApiClient')
@@ -109,45 +109,6 @@ describe('Prisoner details service', () => {
       prisonApiClient.getDetails.mockRejectedValue(new Error('some error'))
 
       await expect(prisonerDetailsService.getDetails(token, 'A1234', true)).rejects.toEqual(new Error('some error'))
-    })
-  })
-
-  describe('getAlerts', () => {
-    const alerts: Alert[] = [
-      {
-        active: true,
-        addedByFirstName: 'John',
-        addedByLastName: 'Smith',
-        alertCode: 'XGANG',
-        alertCodeDescription: 'Gang member',
-        alertId: 1,
-        alertType: 'X',
-        alertTypeDescription: 'Security',
-        bookingId: 14,
-        comment: 'silly',
-        dateCreated: '2019-08-25',
-        dateExpires: '2019-09-20',
-        expired: false,
-        expiredByFirstName: 'Jane',
-        expiredByLastName: 'Smith',
-        modifiedDateTime: '2021-07-05T10:35:17',
-        offenderNo: 'G3878UK',
-      },
-    ]
-
-    it('retrieves alerts', async () => {
-      prisonApiClient.getAlerts.mockResolvedValue(alerts)
-
-      const results = await prisonerDetailsService.getAlerts(token, 'BXI', ['A1234'])
-
-      expect(prisonApiClient.getAlerts).toHaveBeenCalledWith(token, 'BXI', ['A1234'])
-      expect(results).toEqual(alerts)
-    })
-
-    it('propagates error', async () => {
-      prisonApiClient.getAlerts.mockRejectedValue(new Error('some error'))
-
-      await expect(prisonerDetailsService.getAlerts(token, 'BXI', ['A1234'])).rejects.toEqual(new Error('some error'))
     })
   })
 

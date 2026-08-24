@@ -98,7 +98,8 @@ services:
       - PRISON_API_URL=http://localhost:8081
       - PRISONER_PROFILE_URL=http://localhost:3002
       - NON_ASSOCIATIONS_API_URL=http://localhost:8082
-      - WHEREABOUTS_API_URL=http://localhost:8083
+      - CELL_MOVEMENTS_API_URL=http://localhost:8086
+      - PRISON_REGISTER_API_URL=https://prison-register-dev.hmpps.service.justice.gov.uk
       - LOCATIONS_INSIDE_PRISON_API_URL=http://localhost:8084
       - PRISONER_SEARCH_API_URL=http://localhost:8085
 

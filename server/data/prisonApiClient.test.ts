@@ -129,21 +129,6 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('getAlerts', () => {
-    it('should query the API for alerts', async () => {
-      const response = { data: 'data' }
-      const offenderNumbers = ['A1234', 'B4321']
-
-      fakePrisonApiClient
-        .post('/api/bookings/offenderNo/BXI/alerts', offenderNumbers)
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .reply(200, response)
-
-      const output = await prisonApiClient.getAlerts(accessToken, 'BXI', offenderNumbers)
-      expect(output).toEqual(response)
-    })
-  })
-
   describe('getCsraAssessments', () => {
     it('should query the API for alerts', async () => {
       const response = { data: 'data' }
@@ -159,36 +144,6 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('getCellMoveReasonTypes', () => {
-    it('should return data from api', async () => {
-      const response = { data: 'data' }
-
-      fakePrisonApiClient
-        .get('/api/reference-domains/domains/CHG_HOUS_RSN')
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .matchHeader('Page-Limit', '1000')
-        .reply(200, response)
-
-      const output = await prisonApiClient.getCellMoveReasonTypes(accessToken)
-      expect(output).toEqual(response)
-    })
-  })
-
-  describe('moveToCellSwap', () => {
-    it('should request the move to cell swap', async () => {
-      const response = { data: 'data' }
-      const bookingId = 432
-
-      fakePrisonApiClient
-        .put(`/api/bookings/${bookingId}/move-to-cell-swap`, {})
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .reply(200, response)
-
-      const output = await prisonApiClient.moveToCellSwap(accessToken, bookingId)
-      expect(output).toEqual(response)
-    })
-  })
-
   describe('getMainOffence', () => {
     it('should return data from api', async () => {
       const response = { data: 'data' }
@@ -199,20 +154,6 @@ describe('prisonApiClient', () => {
         .reply(200, response)
 
       const output = await prisonApiClient.getMainOffence(accessToken, 456)
-      expect(output).toEqual(response)
-    })
-  })
-
-  describe('getAgencyDetails', () => {
-    it('should return data from api', async () => {
-      const response = { data: 'data' }
-
-      fakePrisonApiClient
-        .get('/api/agencies/BXI?activeOnly=false')
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .reply(200, response)
-
-      const output = await prisonApiClient.getAgencyDetails(accessToken, 'BXI')
       expect(output).toEqual(response)
     })
   })
@@ -256,34 +197,6 @@ describe('prisonApiClient', () => {
         .reply(200, response)
 
       const output = await prisonApiClient.getOffenderCellHistory(accessToken, 1234)
-      expect(output).toEqual(response)
-    })
-  })
-
-  describe('getReceptionsWithCapacity', () => {
-    it('should return data from api', async () => {
-      const response = { data: 'data' }
-
-      fakePrisonApiClient
-        .get('/api/agencies/BXI/receptionsWithCapacity')
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .reply(200, response)
-
-      const output = await prisonApiClient.getReceptionsWithCapacity(accessToken, 'BXI')
-      expect(output).toEqual(response)
-    })
-  })
-
-  describe('getOffendersInReception', () => {
-    it('should return data from api', async () => {
-      const response = { data: 'data' }
-
-      fakePrisonApiClient
-        .get('/api/movements/rollcount/BXI/in-reception')
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .reply(200, response)
-
-      const output = await prisonApiClient.getOffendersInReception(accessToken, 'BXI')
       expect(output).toEqual(response)
     })
   })

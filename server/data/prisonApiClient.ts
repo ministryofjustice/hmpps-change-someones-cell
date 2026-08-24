@@ -123,83 +123,11 @@ export interface Location {
   subLocations: boolean
 }
 
-export interface OffenderCell {
-  id: number
-  description: string
-  userDescription?: string
-  capacity: number
-  noOfOccupants: number
-  attributes: {
-    code: string
-    description: string
-  }[]
-}
-
-export interface ReferenceCode {
-  domain: string
-  code: string
-  description: string
-  parentDomain?: string
-  parentCode?: string
-  activeFlag: 'Y' | 'N'
-  listSeq?: number
-  systemDataFlag?: 'Y' | 'N'
-  expiredDate?: string
-  subCodes?: ReferenceCode[]
-}
-
 export interface OffenceDetail {
   bookingId: number
   offenceDescription: string
   offenceCode: string
   statuteCode: string
-}
-
-export interface Telephone {
-  phoneId?: number
-  number: string
-  type: string
-  ext?: string
-}
-
-export interface Address {
-  addressId?: number
-  addressType?: string
-  flat?: string
-  premise?: string
-  street?: string
-  locality?: string
-  town?: string
-  postalCode?: string
-  county?: string
-  country?: string
-  comment?: string
-  primary: boolean
-  noFixedAddress: boolean
-  startDate?: string
-  endDate?: string
-  phones?: Telephone[]
-  addressUsages?: {
-    addressId?: number
-    addressUsage?: string
-    addressUsageDescription?: string
-    activeFlag?: boolean
-  }[]
-}
-
-export interface Agency {
-  agencyId: string
-  description: string
-  longDescription?: string
-  agencyType: string
-  active: boolean
-  courtType?: string
-  deactivationDate?: string
-  addresses?: Address[]
-  phones?: Telephone[]
-  emails?: {
-    email: string
-  }[]
 }
 
 export interface BedAssignment {
@@ -314,19 +242,11 @@ export interface Page<T> {
   empty: boolean
 }
 
-export interface OffenderInReception {
-  offenderNo: string
-  bookingId: number
-  dateOfBirth: string
-  firstName: string
-  lastName: string
-}
-
 export default class PrisonApiClient {
   constructor() {}
 
-  private static restClient(token: string, extraConfig: object = {}): RestClient {
-    return new RestClient('Prison Api Client', { ...config.apis.prisonApi, ...extraConfig }, token)
+  private static restClient(token: string): RestClient {
+    return new RestClient('Prison Api Client', config.apis.prisonApi, token)
   }
 
   /**
@@ -378,35 +298,10 @@ export default class PrisonApiClient {
     })
   }
 
-  getAlerts(token: string, agencyId: string, offenderNumbers: string[]) {
-    return PrisonApiClient.restClient(token).post<Alert[]>({
-      path: `/api/bookings/offenderNo/${agencyId}/alerts`,
-      data: offenderNumbers,
-    })
-  }
-
   getCsraAssessments(token: string, offenderNumbers: string[]) {
     return PrisonApiClient.restClient(token).post<Assessment[]>({
       path: '/api/offender-assessments/csra/list',
       data: offenderNumbers,
-    })
-  }
-
-  getCellMoveReasonTypes(token: string) {
-    const headers = { 'Page-Limit': '1000' }
-
-    return PrisonApiClient.restClient(token).get<ReferenceCode[]>({
-      path: '/api/reference-domains/domains/CHG_HOUS_RSN',
-      headers,
-    })
-  }
-
-  /**
-   * @deprecated NOT USED REMOVE
-   */
-  moveToCellSwap(token: string, bookingId: number) {
-    return PrisonApiClient.restClient(token).put<OffenderDetails>({
-      path: `/api/bookings/${bookingId}/move-to-cell-swap`,
     })
   }
 
@@ -416,12 +311,6 @@ export default class PrisonApiClient {
   getMainOffence(token: string, bookingId: number) {
     return PrisonApiClient.restClient(token).get<OffenceDetail[]>({
       path: `/api/bookings/${bookingId}/mainOffence`,
-    })
-  }
-
-  getAgencyDetails(token: string, agencyId: string) {
-    return PrisonApiClient.restClient(token).get<Agency>({
-      path: `/api/agencies/${agencyId}?activeOnly=false`,
     })
   }
 
@@ -441,24 +330,6 @@ export default class PrisonApiClient {
     return PrisonApiClient.restClient(token).get<Page<BedAssignment>>({
       path: `/api/bookings/${bookingId}/cell-history`,
       query: { page: 0, size: 20 },
-    })
-  }
-
-  /**
-   * @todo Move functionality to location API
-   */
-  getReceptionsWithCapacity(token: string, agencyId: string) {
-    return PrisonApiClient.restClient(token, { timeout: { deadline: 30000 } }).get<OffenderCell[]>({
-      path: `/api/agencies/${agencyId}/receptionsWithCapacity`,
-    })
-  }
-
-  /**
-   * @todo Reception roll count should be obtainable from prisoner search
-   */
-  getOffendersInReception(token: string, agencyId: string) {
-    return PrisonApiClient.restClient(token).get<OffenderInReception[]>({
-      path: `/api/movements/rollcount/${agencyId}/in-reception`,
     })
   }
 }

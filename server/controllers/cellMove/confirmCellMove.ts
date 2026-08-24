@@ -5,31 +5,18 @@ import LocationService from '../../services/locationService'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import { properCaseName, putLastNameFirst } from '../../utils'
-import { getConfirmBackLinkData } from './cellMoveUtils'
-import { ReferenceCode } from '../../data/prisonApiClient'
+import { getConfirmBackLinkData, toReasonRadioItems } from './cellMoveUtils'
 import { getActualCapacity } from '../../data/locationsInsidePrisonApiClient'
 import MetricsEvent from '../../data/metricsEvent'
 import MetricsService from '../../services/metricsService'
 
 const CSWAP = 'C-SWAP'
 
-const sortOnListSeq = (a: ReferenceCode, b: ReferenceCode) => a.listSeq - b.listSeq
-
 const cellMoveReasons = async (
   token,
   prisonerCellAllocationService: PrisonerCellAllocationService,
   selectedReason: string,
-) => {
-  const cellMoveReasonTypes = await prisonerCellAllocationService.getCellMoveReasonTypes(token)
-  return cellMoveReasonTypes
-    .filter(type => type.activeFlag === 'Y')
-    .sort(sortOnListSeq)
-    .map(type => ({
-      value: type.code,
-      text: type.description,
-      checked: type.code === selectedReason,
-    }))
-}
+) => toReasonRadioItems(await prisonerCellAllocationService.getCellMoveReasonTypes(token), selectedReason)
 
 type Params = {
   analyticsService: AnalyticsService
@@ -108,19 +95,12 @@ export default ({
     metricsService.trackEvent(event)
   }
 
-  const makeCellMove = async (req, res, { cellId, bookingId, agencyId, offenderNo, reasonCode, commentText }) => {
+  const makeCellMove = async (req, res, { cellId, agencyId, offenderNo, reasonCode, commentText }) => {
     const { systemClientToken } = res.locals
     const { capacity, key, pathHierarchy } = await locationService.getLocation(systemClientToken, cellId)
     const actualCapacity = getActualCapacity(capacity)
     try {
-      await prisonerCellAllocationService.moveToCell(
-        systemClientToken,
-        bookingId,
-        offenderNo,
-        key,
-        reasonCode,
-        commentText,
-      )
+      await prisonerCellAllocationService.moveToCell(systemClientToken, offenderNo, key, reasonCode, commentText)
     } catch (error) {
       if (error.status === 400)
         return res.redirect(`/prisoner/${offenderNo}/cell-move/cell-not-available?cellDescription=${pathHierarchy}`)
@@ -145,10 +125,25 @@ export default ({
     return res.redirect(`/prisoner/${offenderNo}/cell-move/confirmation?cellId=${cellId}`)
   }
 
-  const makeCSwap = async (req, res, { bookingId, agencyId, offenderNo }) => {
+  const makeCSwap = async (req, res, { agencyId, offenderNo }) => {
     const { systemClientToken } = res.locals
 
-    await prisonerCellAllocationService.moveToCellSwap(systemClientToken, bookingId)
+    try {
+      await prisonerCellAllocationService.moveToCellSwap(systemClientToken, offenderNo)
+    } catch (error) {
+      // The same P-NOMIS lock handling the cell move journey has always had, which this journey
+      // lacked - there was no way to get a 423 out of the old prison-api swap endpoint.
+      if (error.status === 423) {
+        const error423: any[] = [
+          {
+            text: 'This cell move cannot be carried out because a user currently has this prisoner open in P-Nomis, please try later',
+          },
+        ]
+        req.flash('errors', error423)
+        return res.redirect(`/prisoner/${offenderNo}/cell-move/confirm-cell-move?cellId=${CSWAP}`)
+      }
+      throw error
+    }
 
     sendCellMoveAnalyticsEvent(req, agencyId, 'C-SWAP')
 
@@ -197,11 +192,10 @@ export default ({
     try {
       const { bookingId, prisonId } = await prisonerDetailsService.getPrisoner(systemClientToken, offenderNo)
       const agencyId = prisonId
-      if (cellId === CSWAP) return await makeCSwap(req, res, { agencyId, bookingId, offenderNo })
+      if (cellId === CSWAP) return await makeCSwap(req, res, { agencyId, offenderNo })
       logger.info(`Move offender ${offenderNo} with booking id of ${bookingId}`)
       return await makeCellMove(req, res, {
         cellId,
-        bookingId,
         agencyId,
         offenderNo,
         reasonCode: reason,

@@ -1,10 +1,9 @@
-import { PrisonApiClient, LocationsInsidePrisonApiClient } from '../data'
-import { Agency } from '../data/prisonApiClient'
+import { PrisonRegisterApiClient, LocationsInsidePrisonApiClient } from '../data'
 import { Location, LocationGroup, LocationPrefix } from '../data/locationsInsidePrisonApiClient'
 
 export default class LocationService {
   constructor(
-    private readonly prisonApiClient: PrisonApiClient,
+    private readonly prisonRegisterApiClient: PrisonRegisterApiClient,
     private readonly locationsInsidePrisonApiClient: LocationsInsidePrisonApiClient,
   ) {}
 
@@ -35,7 +34,10 @@ export default class LocationService {
     }
   }
 
-  async getAgencyDetails(token: string, agencyId: string): Promise<Agency> {
-    return this.prisonApiClient.getAgencyDetails(token, agencyId)
+  // Sourced from prison-register rather than prison-api: the caller only needs the prison's
+  // name, and the register is the source of truth for prisons with no role required.
+  async getAgencyDetails(token: string, agencyId: string): Promise<{ agencyId: string; description: string }> {
+    const prison = await this.prisonRegisterApiClient.getPrisonById(token, agencyId)
+    return { agencyId: prison.prisonId, description: prison.prisonName }
   }
 }

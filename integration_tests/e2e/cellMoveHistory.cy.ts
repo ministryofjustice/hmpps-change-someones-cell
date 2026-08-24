@@ -77,25 +77,9 @@ context('Cell move history', () => {
     })
     cy.task('stubGroups', { id: 'MDI' })
     cy.task('stubActivePrisons')
-    cy.task('stubCellMoveTypes', [
-      {
-        domain: 'CHG_HOUS_RSN',
-        code: 'ADM',
-        description: 'Administrative',
-        activeFlag: 'N',
-        listSeq: 1,
-        systemDataFlag: 'N',
-        subCodes: [],
-      },
-      {
-        domain: 'CHG_HOUS_RSN',
-        code: 'BEH',
-        description: 'Behaviour',
-        activeFlag: 'N',
-        listSeq: 2,
-        systemDataFlag: 'N',
-        subCodes: [],
-      },
+    cy.task('stubCellMoveReasons', [
+      { code: 'ADM', description: 'Administrative', active: false },
+      { code: 'BEH', description: 'Behaviour', active: false },
     ])
     cy.task('stubGetPrisoners', [{ prisonerNumber: 'A12345', firstName: 'BOB', lastName: 'DOE', bookingId: 1234 }])
     cy.task('stubStaff', { staffId: 'SA', firstName: 'Pow', lastName: 'Now' })

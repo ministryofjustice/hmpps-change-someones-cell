@@ -6,10 +6,11 @@ import components from './integration_tests/mockApis/components'
 import prisonApi from './integration_tests/mockApis/prisonApi'
 import alertsApi from './integration_tests/mockApis/alertsApi'
 import users from './integration_tests/mockApis/users'
-import whereabouts from './integration_tests/mockApis/whereabouts'
+import cellMovementsApi from './integration_tests/mockApis/cellMovementsApi'
 import locationsInsidePrisonApi from './integration_tests/mockApis/locationsInsidePrisonApi'
 import nonAssociationsApi from './integration_tests/mockApis/nonAssociationsApi'
 import prisonerSearchApi from './integration_tests/mockApis/prisonerSearchApi'
+import prisonRegister from './integration_tests/mockApis/prisonRegister'
 
 export default defineConfig({
   chromeWebSecurity: false,
@@ -44,7 +45,8 @@ export default defineConfig({
             auth.stubHealth(),
             users.stubHealth(),
             prisonApi.stubHealth(),
-            whereabouts.stubHealth(),
+            cellMovementsApi.stubHealth(),
+            prisonRegister.stubHealth(),
             locationsInsidePrisonApi.stubHealth(),
             tokenVerification.stubHealth(),
             prisonerSearchApi.stubHealth(),
@@ -60,7 +62,6 @@ export default defineConfig({
         stubInmatesAtLocation: inmates => locationsInsidePrisonApi.stubInmatesAtLocation(inmates),
         stubActivePrisons: activeAgencies => locationsInsidePrisonApi.stubActivePrisons(activeAgencies),
         stubOffenderCellHistory: ({ history }) => prisonApi.stubOffenderCellHistory(history),
-        stubGetAlerts: ({ agencyId, alerts }) => prisonApi.stubGetAlerts({ agencyId, alerts }),
         stubCsraAssessments: ({ offenderNumbers, assessments }) =>
           prisonApi.stubCsraAssessments(offenderNumbers, assessments),
         stubLocation: location => locationsInsidePrisonApi.stubLocation(location),
@@ -68,12 +69,12 @@ export default defineConfig({
         stubPrisonerFullDetail: ({ prisonerDetail, offenderNo, fullInfo }) =>
           prisonApi.stubPrisonerFullDetail(prisonerDetail, offenderNo, fullInfo),
         stubBookingDetails: details => prisonApi.stubBookingDetails(details),
-        stubCellMoveTypes: type => prisonApi.stubCellMoveTypes(type),
-        stubMoveToCell: (status: number) => whereabouts.stubMoveToCell(status),
-        stubMoveToCellSwap: () => prisonApi.stubMoveToCellSwap(),
-        verifyMoveToCell: body => whereabouts.verifyMoveToCell(body),
-        verifyMoveToCellSwap: ({ bookingId }) => prisonApi.verifyMoveToCellSwap({ bookingId }),
-        stubAgencyDetails: ({ agencyId, details }) => Promise.all([prisonApi.stubAgencyDetails(agencyId, details)]),
+        stubCellMoveReasons: reasons => cellMovementsApi.stubCellMoveReasons(reasons),
+        stubMoveToCell: (status: number) => cellMovementsApi.stubMoveToCell(status),
+        stubMoveToCellSwap: (status: number) => cellMovementsApi.stubMoveToCellSwap(status),
+        verifyMoveToCell: body => cellMovementsApi.verifyMoveToCell(body),
+        verifyMoveToCellSwap: body => cellMovementsApi.verifyMoveToCellSwap(body),
+        stubPrisonById: ({ prisonId, prisonName }) => prisonRegister.stubPrisonById({ prisonId, prisonName }),
         stubCellMoveHistory: ({ assignmentDate, agencyId, cellMoves }) =>
           prisonApi.stubCellMoveHistory({ assignmentDate, agencyId, cellMoves }),
         stubGetPrisoners: prisoners => Promise.all([prisonerSearchApi.stubGetPrisoners(prisoners)]),
@@ -84,10 +85,7 @@ export default defineConfig({
           locationsInsidePrisonApi.stubCellsWithCapacityByGroupName({ prisonId, groupName, response }),
         stubStaff: ({ staffId, details }) => Promise.all([prisonApi.stubStaff(staffId, details)]),
         stubGlobalAlerts: alertsApi.stubGlobalAlerts,
-        stubReceptionWithCapacity: ({ agencyId, reception }) =>
-          prisonApi.stubReceptionWithCapacity(agencyId, reception),
-        stubOffendersInReception: ({ agencyId, inReception }) =>
-          prisonApi.stubOffendersInReception(agencyId, inReception),
+        stubAttributeSearch: prisoners => prisonerSearchApi.stubAttributeSearch(prisoners),
       })
     },
     baseUrl: 'http://localhost:3007',

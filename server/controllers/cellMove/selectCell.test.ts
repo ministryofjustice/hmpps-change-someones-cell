@@ -4,10 +4,9 @@ import NonAssociationsService from '../../services/nonAssociationsService'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import { Alert } from '../../data/prisonApiClient'
-import { LocationGroup } from '../../data/whereaboutsApiClient'
+import { LocationGroup, CellLocation } from '../../data/locationsInsidePrisonApiClient'
 import { Prisoner } from '../../data/prisonerSearchApiClient'
 import { PrisonerNonAssociation } from '../../data/nonAssociationsApiClient'
-import { CellLocation } from '../../data/locationsInsidePrisonApiClient'
 
 jest.mock('../../services/locationService')
 jest.mock('../../services/nonAssociationsService')
@@ -22,7 +21,7 @@ describe('Select a cell', () => {
   const locationService = jest.mocked(new LocationService(undefined, undefined))
   const nonAssociationsService = jest.mocked(new NonAssociationsService(undefined))
   const prisonerCellAllocationService = jest.mocked(
-    new PrisonerCellAllocationService(undefined, undefined, undefined, undefined),
+    new PrisonerCellAllocationService(undefined, undefined, undefined, undefined, undefined),
   )
   const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
 

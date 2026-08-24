@@ -70,73 +70,21 @@ before(() => {
   })
   cy.task('stubOffenderBasicDetails', offenderBasicDetails)
   cy.task('stubGetPrisoner', prisonerFullDetails)
-  cy.task('stubReceptionWithCapacity', {
-    agencyId: 'MDI',
-    reception: [
-      {
-        id: 4007,
-        description: 'MDI-RECP',
-        capacity: 100,
-        noOfOccupants: 100,
-        attributes: [],
-      },
-    ],
+  // The real MDI-RECP shape: workingCapacity 0 must fall back to maxCapacity.
+  cy.task('stubLocation', {
+    prisonId: 'MDI',
+    key: 'MDI-RECP',
+    pathHierarchy: 'RECP',
+    capacity: { maxCapacity: 99, workingCapacity: 0 },
   })
-  cy.task('stubCellMoveTypes', [
-    {
-      domain: 'CHG_HOUS_RSN',
-      code: 'RAIM',
-      description: 'Reception and induction moves',
-      activeFlag: 'Y',
-      listSeq: 1,
-      systemDataFlag: 'N',
-      subCodes: [],
-    },
-    {
-      domain: 'CHG_HOUS_RSN',
-      code: 'SS',
-      description: 'Someone’s safety',
-      activeFlag: 'Y',
-      listSeq: 2,
-      systemDataFlag: 'N',
-      subCodes: [],
-    },
-    {
-      domain: 'CHG_HOUS_RSN',
-      code: 'SPP',
-      description: 'Security of the prison or other people',
-      activeFlag: 'Y',
-      listSeq: 2,
-      systemDataFlag: 'N',
-      subCodes: [],
-    },
-    {
-      domain: 'CHG_HOUS_RSN',
-      code: 'HOSP',
-      description: 'Healthcare',
-      activeFlag: 'Y',
-      listSeq: 2,
-      systemDataFlag: 'N',
-      subCodes: [],
-    },
-    {
-      domain: 'CHG_HOUS_RSN',
-      code: 'PCM',
-      description: 'Maintenance of the prison or cell',
-      activeFlag: 'Y',
-      listSeq: 2,
-      systemDataFlag: 'N',
-      subCodes: [],
-    },
-    {
-      domain: 'CHG_HOUS_RSN',
-      code: 'PCGMM',
-      description: 'General moves',
-      activeFlag: 'Y',
-      listSeq: 2,
-      systemDataFlag: 'N',
-      subCodes: [],
-    },
+  cy.task('stubAttributeSearch', [])
+  cy.task('stubCellMoveReasons', [
+    { code: 'RAIM', description: 'Reception and induction moves', active: true },
+    { code: 'SS', description: 'Someone’s safety', active: true },
+    { code: 'SPP', description: 'Security of the prison or other people', active: true },
+    { code: 'HOSP', description: 'Healthcare', active: true },
+    { code: 'PCM', description: 'Maintenance of the prison or cell', active: true },
+    { code: 'GM', description: 'General moves', active: true },
   ])
 })
 
@@ -152,10 +100,16 @@ describe('Reception confirm move page ', () => {
 
 describe('Reception full journey', () => {
   it('should redirect to reception full page', () => {
-    cy.task('stubReceptionWithCapacity', {
-      agencyId: 'MDI',
-      reception: [],
+    // One occupant against a capacity of one: reception is full.
+    cy.task('stubLocation', {
+      prisonId: 'MDI',
+      key: 'MDI-RECP',
+      pathHierarchy: 'RECP',
+      capacity: { maxCapacity: 1, workingCapacity: 0 },
     })
+    cy.task('stubAttributeSearch', [
+      { prisonerNumber: 'A1111AA', firstName: 'Full', lastName: 'House', prisonId: 'MDI', cellLocation: 'RECP' },
+    ])
 
     const page = receptionConfirmMovePage.goTo(offenderNo)
     page.form().selectReceptionReason().click()
@@ -176,18 +130,14 @@ describe('Reception full journey', () => {
   })
 
   it('A user is presented with locked message when 423 error', () => {
-    cy.task('stubReceptionWithCapacity', {
-      agencyId: 'MDI',
-      reception: [
-        {
-          id: 4007,
-          description: 'MDI-RECP',
-          capacity: 100,
-          noOfOccupants: 100,
-          attributes: [],
-        },
-      ],
+    // The real MDI-RECP shape: workingCapacity 0 must fall back to maxCapacity.
+    cy.task('stubLocation', {
+      prisonId: 'MDI',
+      key: 'MDI-RECP',
+      pathHierarchy: 'RECP',
+      capacity: { maxCapacity: 99, workingCapacity: 0 },
     })
+    cy.task('stubAttributeSearch', [])
     cy.task('stubMoveToCell', 423)
 
     const page = receptionConfirmMovePage.goTo(offenderNo)

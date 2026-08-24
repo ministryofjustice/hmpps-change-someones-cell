@@ -1,4 +1,4 @@
-import { stubFor, verifyPut } from './wiremock'
+import { stubFor } from './wiremock'
 
 export const stubUserCaseloads = (caseloads?: object[]) =>
   stubFor({
@@ -193,22 +193,7 @@ export const stubOffenderCellHistory = (history?: object) =>
     },
   })
 
-export const stubGetAlerts = ({ agencyId, alerts }: { agencyId: string; alerts?: object[] }) =>
-  stubFor({
-    request: {
-      method: 'POST',
-      urlPathPattern: `/api/bookings/offenderNo/${agencyId}/alerts`,
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: alerts || [],
-    },
-  })
-
-export const stubCsraAssessments = (offenderNumbers: string[], assessments: object[] = []) =>
+export const stubCsraAssessments = (offenderNumbers, assessments = []) =>
   stubFor({
     request: {
       method: 'POST',
@@ -268,63 +253,7 @@ export const stubBookingDetails = (details?: object) =>
     },
   })
 
-export const stubCellMoveTypes = (types: object) =>
-  stubFor({
-    request: {
-      method: 'GET',
-      urlPattern: '/api/reference-domains/domains/CHG_HOUS_RSN',
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: types,
-    },
-  })
-
-export const stubMoveToCellSwap = () =>
-  stubFor({
-    request: {
-      method: 'PUT',
-      urlPathPattern: '/api/bookings/[0-9]+?/move-to-cell-swap',
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: {},
-    },
-  })
-
-export const verifyMoveToCellSwap = ({ bookingId }: { bookingId: string | number }) =>
-  verifyPut(`/api/bookings/${bookingId}/move-to-cell-swap`)
-
-export const stubAgencyDetails = (agencyId: string, details?: object, status = 200) =>
-  stubFor({
-    request: {
-      method: 'GET',
-      url: `/api/agencies/${agencyId}?activeOnly=false`,
-    },
-    response: {
-      status,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: details || {},
-    },
-  })
-
-export const stubCellMoveHistory = ({
-  assignmentDate,
-  agencyId,
-  cellMoves,
-}: {
-  assignmentDate: string
-  agencyId: string
-  cellMoves: object
-}) =>
+export const stubCellMoveHistory = ({ assignmentDate, agencyId, cellMoves }) =>
   stubFor({
     request: {
       method: 'GET',
@@ -358,36 +287,6 @@ export const stubStaff = (staffId: string | number, details?: object) =>
     },
   })
 
-export const stubReceptionWithCapacity = (agencyId: string, reception?: object) =>
-  stubFor({
-    request: {
-      method: 'GET',
-      urlPathPattern: `/api/agencies/${agencyId}/receptionsWithCapacity`,
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: reception || {},
-    },
-  })
-
-export const stubOffendersInReception = (agencyId: string, inReception?: object) =>
-  stubFor({
-    request: {
-      method: 'GET',
-      urlPathPattern: `/api/movements/rollcount/${agencyId}/in-reception`,
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: inReception || {},
-    },
-  })
-
 export default {
   stubUserCaseloads,
   stubUpdateCaseload,
@@ -399,17 +298,10 @@ export default {
   stubMainOffence,
   stubOffenderBasicDetails,
   stubOffenderCellHistory,
-  stubGetAlerts,
   stubCsraAssessments,
   stubSpecificOffenderFullDetails,
   stubPrisonerFullDetail,
   stubBookingDetails,
-  stubCellMoveTypes,
-  stubMoveToCellSwap,
-  verifyMoveToCellSwap,
-  stubAgencyDetails,
   stubCellMoveHistory,
   stubStaff,
-  stubReceptionWithCapacity,
-  stubOffendersInReception,
 }

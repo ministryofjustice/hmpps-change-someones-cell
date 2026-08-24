@@ -1,15 +1,12 @@
-import { PrisonApiClient, LocationsInsidePrisonApiClient } from '../data'
-import { Agency } from '../data/prisonApiClient'
-import { LocationGroup, LocationPrefix } from '../data/whereaboutsApiClient'
-import { Location, LocationInfo } from '../data/locationsInsidePrisonApiClient'
+import { PrisonRegisterApiClient, LocationsInsidePrisonApiClient } from '../data'
+import { LocationGroup, LocationPrefix, Location, LocationInfo } from '../data/locationsInsidePrisonApiClient'
 import LocationService from './locationService'
 import { SanitisedError } from '../sanitisedError'
 
-jest.mock('../data/prisonApiClient')
-jest.mock('../data/whereaboutsApiClient')
+jest.mock('../data/prisonRegisterApiClient')
 jest.mock('../data/locationsInsidePrisonApiClient')
 
-const prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
+const prisonRegisterApiClient = new PrisonRegisterApiClient() as jest.Mocked<PrisonRegisterApiClient>
 const locationsInsidePrisonApiClient =
   new LocationsInsidePrisonApiClient() as jest.Mocked<LocationsInsidePrisonApiClient>
 
@@ -21,7 +18,7 @@ describe('Location service', () => {
   beforeEach(() => {
     jest.resetAllMocks()
 
-    locationService = new LocationService(prisonApiClient, locationsInsidePrisonApiClient)
+    locationService = new LocationService(prisonRegisterApiClient, locationsInsidePrisonApiClient)
   })
 
   describe('searchGroups', () => {
@@ -167,74 +164,21 @@ describe('Location service', () => {
   })
 
   describe('getAgencyDetails', () => {
-    const agency: Agency = {
-      agencyId: 'MDI',
-      description: 'Moorland (HMP & YOI)',
-      longDescription: 'Moorland (HMP & YOI)',
-      agencyType: 'INST',
-      active: true,
-      courtType: 'CC',
-      deactivationDate: '2012-01-12',
-      addresses: [
-        {
-          addressId: 543524,
-          addressType: 'BUS',
-          flat: '3B',
-          premise: 'Liverpool Prison',
-          street: 'Slinn Street',
-          locality: 'Brincliffe',
-          town: 'Liverpool',
-          postalCode: 'LI1 5TH',
-          county: 'HEREFORD',
-          country: 'ENG',
-          comment: 'This is a comment text',
-          primary: false,
-          noFixedAddress: false,
-          startDate: '2005-05-12',
-          endDate: '2021-02-12',
-          phones: [
-            {
-              phoneId: 2234232,
-              number: '0114 2345678',
-              type: 'TEL',
-              ext: '123',
-            },
-          ],
-          addressUsages: [
-            {
-              addressId: 23422313,
-              addressUsage: 'HDC',
-              addressUsageDescription: 'HDC Address',
-              activeFlag: true,
-            },
-          ],
-        },
-      ],
-      phones: [
-        {
-          phoneId: 2234232,
-          number: '0114 2345678',
-          type: 'TEL',
-          ext: '123',
-        },
-      ],
-      emails: [
-        {
-          email: 'string',
-        },
-      ],
-    }
-
-    it('retrieves the agency', async () => {
-      prisonApiClient.getAgencyDetails.mockResolvedValue(agency)
+    it('retrieves the prison from prison-register and maps it to the agency shape', async () => {
+      prisonRegisterApiClient.getPrisonById.mockResolvedValue({
+        prisonId: 'MDI',
+        prisonName: 'Moorland (HMP & YOI)',
+        active: true,
+      })
 
       const results = await locationService.getAgencyDetails(token, 'MDI')
 
-      expect(results).toEqual(agency)
+      expect(prisonRegisterApiClient.getPrisonById).toHaveBeenCalledWith(token, 'MDI')
+      expect(results).toEqual({ agencyId: 'MDI', description: 'Moorland (HMP & YOI)' })
     })
 
     it('Propagates error', async () => {
-      prisonApiClient.getAgencyDetails.mockRejectedValue(new Error('some error'))
+      prisonRegisterApiClient.getPrisonById.mockRejectedValue(new Error('some error'))
 
       await expect(locationService.getAgencyDetails(token, 'MDI')).rejects.toEqual(new Error('some error'))
     })

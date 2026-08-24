@@ -17,7 +17,7 @@ describe('Change cell play back details', () => {
   const analyticsService = jest.mocked(new AnalyticsService(undefined))
   const locationService = jest.mocked(new LocationService(undefined, undefined))
   const prisonerCellAllocationService = jest.mocked(
-    new PrisonerCellAllocationService(undefined, undefined, undefined, undefined),
+    new PrisonerCellAllocationService(undefined, undefined, undefined, undefined, undefined),
   )
   const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
   const metricsService = jest.mocked(new MetricsService(undefined))
@@ -178,24 +178,9 @@ describe('Change cell play back details', () => {
 
     it('should make a request to retrieve all cell move case note types for none c-swap moves', async () => {
       prisonerCellAllocationService.getCellMoveReasonTypes.mockResolvedValue([
-        {
-          domain: 'CHG_HOUS_RSN',
-          code: 'ADM',
-          description: 'Admin',
-          activeFlag: 'Y',
-        },
-        {
-          domain: 'CHG_HOUS_RSN',
-          code: 'SA',
-          description: 'Safety',
-          activeFlag: 'Y',
-        },
-        {
-          domain: 'CHG_HOUS_RSN',
-          code: 'UNUSED',
-          description: 'Unused value',
-          activeFlag: 'N',
-        },
+        { code: 'ADM', description: 'Admin', active: true },
+        { code: 'SA', description: 'Safety', active: true },
+        { code: 'UNUSED', description: 'Unused value', active: false },
       ])
 
       await controller.index(req, res)
@@ -231,18 +216,8 @@ describe('Change cell play back details', () => {
 
     it('should unpack form values out of req.flash', async () => {
       prisonerCellAllocationService.getCellMoveReasonTypes.mockResolvedValue([
-        {
-          domain: 'CHG_HOUS_RSN',
-          code: 'ADM',
-          description: 'Admin',
-          activeFlag: 'Y',
-        },
-        {
-          domain: 'CHG_HOUS_RSN',
-          code: 'SA',
-          description: 'Safety',
-          activeFlag: 'Y',
-        },
+        { code: 'ADM', description: 'Admin', active: true },
+        { code: 'SA', description: 'Safety', active: true },
       ])
       req.flash.mockImplementation(() => [
         {
@@ -267,22 +242,10 @@ describe('Change cell play back details', () => {
       )
     })
 
-    it('should show cell move reasons in Db order', async () => {
+    it("should render cell move reasons in the API's order, without re-sorting", async () => {
       prisonerCellAllocationService.getCellMoveReasonTypes.mockResolvedValue([
-        {
-          domain: 'CHG_HOUS_RSN',
-          code: 'ADM',
-          description: 'Admin',
-          listSeq: 2,
-          activeFlag: 'Y',
-        },
-        {
-          domain: 'CHG_HOUS_RSN',
-          code: 'SA',
-          description: 'Safety',
-          listSeq: 1,
-          activeFlag: 'Y',
-        },
+        { code: 'ADM', description: 'Admin', active: true },
+        { code: 'SA', description: 'Safety', active: true },
       ])
       req.flash.mockImplementation(() => [
         {
@@ -296,9 +259,11 @@ describe('Change cell play back details', () => {
       expect(res.render).toHaveBeenCalledWith(
         'cellMove/confirmCellMove.njk',
         expect.objectContaining({
+          // The API's order, preserved. This fixture used to carry listSeq values that the
+          // controller sorted on; the API now returns the list ready to render.
           cellMoveReasonRadioValues: [
-            { checked: false, text: 'Safety', value: 'SA' },
             { checked: true, text: 'Admin', value: 'ADM' },
+            { checked: false, text: 'Safety', value: 'SA' },
           ],
           formValues: {
             comment: 'Hello',
@@ -415,8 +380,7 @@ describe('Change cell play back details', () => {
       expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/cell-move/select-cell')
     })
 
-    it('should call whereabouts api to make the cell move', async () => {
-      prisonerDetailsService.getDetails = jest.fn().mockResolvedValue({ bookingId: 1 })
+    it('should call the cell movements API to make the cell move', async () => {
       req.body = { reason: 'BEH', cellId, comment: 'Hello world' }
 
       await controller.post(req, res)
@@ -424,7 +388,6 @@ describe('Change cell play back details', () => {
       expect(prisonerDetailsService.getPrisoner).toHaveBeenCalledWith(systemClientToken, 'A12345')
       expect(prisonerCellAllocationService.moveToCell).toHaveBeenCalledWith(
         systemClientToken,
-        1,
         'A12345',
         'MDI-A-1-1',
         'BEH',
@@ -490,7 +453,7 @@ describe('Change cell play back details', () => {
   })
 
   describe('Post handle C-SWAP cell move', () => {
-    it('should call elite api to make the C-SWAP cell move', async () => {
+    it('should call the cell movements API to make the C-SWAP cell move', async () => {
       req.body = { cellId: 'C-SWAP' }
       res.locals = {
         user: {
@@ -506,7 +469,7 @@ describe('Change cell play back details', () => {
       await controller.post(req, res)
 
       expect(prisonerDetailsService.getPrisoner).toHaveBeenCalledWith(systemClientToken, 'A12345')
-      expect(prisonerCellAllocationService.moveToCellSwap).toHaveBeenCalledWith(systemClientToken, 1)
+      expect(prisonerCellAllocationService.moveToCellSwap).toHaveBeenCalledWith(systemClientToken, 'A12345')
       expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/cell-move/space-created')
     })
 
@@ -536,6 +499,21 @@ describe('Change cell play back details', () => {
 
       expect(analyticsService.sendEvents.mock.calls.length).toBe(0)
       expect(metricsService.trackEvent.mock.calls.length).toBe(0)
+    })
+
+    it('should flash an error and redirect back on a http 423 locked response', async () => {
+      prisonerCellAllocationService.moveToCellSwap.mockRejectedValue(makeError('status', 423))
+      req.body = { cellId: 'C-SWAP' }
+
+      await controller.post(req, res)
+
+      expect(req.flash).toHaveBeenCalledWith('errors', [
+        {
+          text: 'This cell move cannot be carried out because a user currently has this prisoner open in P-Nomis, please try later',
+        },
+      ])
+      expect(res.redirect).toHaveBeenCalledWith('/prisoner/A12345/cell-move/confirm-cell-move?cellId=C-SWAP')
+      expect(analyticsService.sendEvents.mock.calls.length).toBe(0)
     })
   })
 })

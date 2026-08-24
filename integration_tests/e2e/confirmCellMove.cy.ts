@@ -35,17 +35,9 @@ context('A user can confirm the cell move', () => {
     })
     cy.task('stubMoveToCell')
     cy.task('stubMoveToCellSwap')
-    cy.task('stubCellMoveTypes', [
-      {
-        code: 'ADM',
-        activeFlag: 'Y',
-        description: 'Administrative',
-      },
-      {
-        code: 'BEH',
-        activeFlag: 'Y',
-        description: 'Behaviour',
-      },
+    cy.task('stubCellMoveReasons', [
+      { code: 'ADM', description: 'Administrative', active: true },
+      { code: 'BEH', description: 'Behaviour', active: true },
     ])
     cy.task('stubOffenderBasicDetails', offenderBasicDetails)
   })
@@ -64,10 +56,9 @@ context('A user can confirm the cell move', () => {
     page.form().submitButton().click()
 
     cy.task('verifyMoveToCell', {
-      bookingId,
-      offenderNo,
-      cellMoveReasonCode: 'ADM',
-      internalLocationDescriptionDestination: 'MDI-1-1-1',
+      prisonerNumber: offenderNo,
+      toLocationKey: 'MDI-1-1-1',
+      reasonCode: 'ADM',
       commentText: comment,
     }).then(assertHasRequestCount(1))
 
@@ -102,7 +93,7 @@ context('A user can confirm the cell move', () => {
 
     page.form().submitButton().click()
 
-    cy.task('verifyMoveToCellSwap', { bookingId: 1234 }).then(assertHasRequestCount(1))
+    cy.task('verifyMoveToCellSwap', { prisonerNumber: offenderNo }).then(assertHasRequestCount(1))
 
     cy.location('pathname').should('eq', '/prisoner/A12345/cell-move/space-created')
   })
@@ -117,10 +108,9 @@ context('A user can confirm the cell move', () => {
     page.form().submitButton().click()
 
     cy.task('verifyMoveToCell', {
-      bookingId,
-      offenderNo,
-      cellMoveReasonCode: 'ADM',
-      internalLocationDescriptionDestination: 'MDI-1-1-1',
+      prisonerNumber: offenderNo,
+      toLocationKey: 'MDI-1-1-1',
+      reasonCode: 'ADM',
       commentText: comment,
     }).then(assertHasRequestCount(1))
 
