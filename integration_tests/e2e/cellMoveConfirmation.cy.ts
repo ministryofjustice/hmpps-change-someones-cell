@@ -13,11 +13,10 @@ context('A user get confirmation of a cell move', () => {
     cy.signIn()
   })
   beforeEach(() => {
-    cy.task('stubBookingDetails', {
+    cy.task('stubGetPrisoner', {
+      prisonerNumber: offenderNo,
       firstName: 'Bob',
       lastName: 'Doe',
-      offenderNo,
-      bookingId: 1234,
     })
     cy.task('stubLocation', {
       prisonId: 'MDI',

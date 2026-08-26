@@ -86,4 +86,63 @@ describe('prisonerSearchApiClient', () => {
       expect(output).toEqual([])
     })
   })
+
+  describe('findPrisonersInPrison', () => {
+    const prisoner = { prisonerNumber: 'A1234BC', firstName: 'JOHN', lastName: 'SMITH' }
+
+    it('should search a prison by name or number', async () => {
+      fakePrisonerSearchApiClient
+        .get('/prison/MDI/prisoners')
+        .query({ size: 500, page: 0, term: 'Smith' })
+        .matchHeader('authorization', `Bearer ${accessToken}`)
+        .reply(200, { content: [prisoner], totalElements: 1, totalPages: 1 })
+
+      const output = await prisonerSearchApiClient.findPrisonersInPrison(accessToken, 'MDI', { term: 'Smith' })
+
+      expect(output).toEqual([prisoner])
+    })
+
+    it('should search a prison by residential location prefix', async () => {
+      fakePrisonerSearchApiClient
+        .get('/prison/MDI/prisoners')
+        .query({ size: 500, page: 0, cellLocationPrefix: 'MDI-1' })
+        .reply(200, { content: [prisoner], totalElements: 1, totalPages: 1 })
+
+      const output = await prisonerSearchApiClient.findPrisonersInPrison(accessToken, 'MDI', {
+        cellLocationPrefix: 'MDI-1',
+      })
+
+      expect(output).toEqual([prisoner])
+    })
+
+    // A whole prison runs to thousands, so truncating at the first page would silently drop people
+    // from a roll list - the reason this pages and the attribute search does not.
+    it('should follow every page rather than truncating', async () => {
+      const second = { prisonerNumber: 'B4567CD', firstName: 'STEVE', lastName: 'SMITH' }
+
+      fakePrisonerSearchApiClient
+        .get('/prison/MDI/prisoners')
+        .query({ size: 500, page: 0 })
+        .reply(200, { content: [prisoner], totalElements: 2, totalPages: 2 })
+      fakePrisonerSearchApiClient
+        .get('/prison/MDI/prisoners')
+        .query({ size: 500, page: 1 })
+        .reply(200, { content: [second], totalElements: 2, totalPages: 2 })
+
+      const output = await prisonerSearchApiClient.findPrisonersInPrison(accessToken, 'MDI', {})
+
+      expect(output).toEqual([prisoner, second])
+    })
+
+    it('should return an empty list when nobody matches', async () => {
+      fakePrisonerSearchApiClient
+        .get('/prison/MDI/prisoners')
+        .query({ size: 500, page: 0, term: 'Nobody' })
+        .reply(200, { content: [], totalElements: 0, totalPages: 0 })
+
+      const output = await prisonerSearchApiClient.findPrisonersInPrison(accessToken, 'MDI', { term: 'Nobody' })
+
+      expect(output).toEqual([])
+    })
+  })
 })

@@ -8,66 +8,31 @@ context('Cell move view residential location', () => {
     changeCellText: $cell[6]?.textContent,
   })
 
-  const inmate1 = {
-    bookingId: 1,
-    offenderNo: 'A1234BC',
-    firstName: 'JOHN',
-    lastName: 'SMITH',
-    dateOfBirth: '1990-10-12',
-    age: 29,
-    agencyId: 'MDI',
-    assignedLivingUnitId: 1,
-    assignedLivingUnitDesc: 'UNIT-1',
-    alertsDetails: ['XA', 'XVL'],
-  }
-  const inmate2 = {
-    bookingId: 2,
-    offenderNo: 'B4567CD',
-    firstName: 'STEVE',
-    lastName: 'SMITH',
-    dateOfBirth: '1989-11-12',
-    age: 30,
-    agencyId: 'MDI',
-    assignedLivingUnitId: 2,
-    assignedLivingUnitDesc: 'UNIT-2',
-    alertsDetails: ['RSS', 'XC'],
-  }
-
-  // prisoner1 and prisoner2 are data returned by prisonerDetailsService.getPrisoners
+  // Returned by prisonerCellAllocationService.searchInmates, which is prisoner-search now: alerts and
+  // category come back on the same record, so there is no second lookup to stub.
   const prisoner1 = {
     prisonerNumber: 'A1234BC',
+    firstName: 'JOHN',
+    lastName: 'SMITH',
+    cellLocation: 'UNIT-1',
+    category: 'C',
     alerts: [
-      {
-        alertType: 'X',
-        alertCode: 'XA',
-        active: true,
-        expired: false,
-      },
-      {
-        alertType: 'X',
-        alertCode: 'XVL',
-        active: true,
-        expired: false,
-      },
+      { alertType: 'X', alertCode: 'XA', active: true, expired: false },
+      { alertType: 'X', alertCode: 'XVL', active: true, expired: false },
     ],
   }
   const prisoner2 = {
     prisonerNumber: 'B4567CD',
+    firstName: 'STEVE',
+    lastName: 'SMITH',
+    cellLocation: 'UNIT-2',
+    category: 'C',
     alerts: [
-      {
-        alertType: 'X',
-        alertCode: 'RSS',
-        active: true,
-        expired: false,
-      },
-      {
-        alertType: 'X',
-        alertCode: 'XC',
-        active: true,
-        expired: false,
-      },
+      { alertType: 'R', alertCode: 'RSS', active: true, expired: false },
+      { alertType: 'X', alertCode: 'XC', active: true, expired: false },
     ],
   }
+
   before(() => {
     cy.clearCookies()
     cy.task('reset')
@@ -105,12 +70,7 @@ context('Cell move view residential location', () => {
     })
 
     it('should have correct data pre filled from search query', () => {
-      cy.task('stubInmates', {
-        locationId: 'MDI-1',
-        count: 2,
-        data: [inmate1, inmate2],
-      })
-      cy.task('stubGetPrisoners', [prisoner1, prisoner2])
+      cy.task('stubPrisonersInPrison', [prisoner1, prisoner2])
 
       cy.visit('/view-residential-location?location=1')
 
@@ -136,13 +96,7 @@ context('Cell move view residential location', () => {
     })
 
     it('should have the correct link to the cell history and select cell links', () => {
-      cy.task('stubInmates', {
-        locationId: 'MDI-2',
-        count: 1,
-        data: [inmate1],
-      })
-
-      cy.task('stubGetPrisoners', [prisoner1, prisoner2])
+      cy.task('stubPrisonersInPrison', [prisoner1])
 
       cy.visit('/view-residential-location?location=2')
 

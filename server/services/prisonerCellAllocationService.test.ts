@@ -5,7 +5,7 @@ import {
   AlertsApiClient,
   PrisonerSearchApiClient,
 } from '../data'
-import { BedAssignment, Offender, Page } from '../data/prisonApiClient'
+import { BedAssignment, Page } from '../data/prisonApiClient'
 import { CellMovement, CellMoveReason } from '../data/cellMovementsApiClient'
 import PrisonerCellAllocationService from './prisonerCellAllocationService'
 import { CellLocation, Location, Occupant, getActualCapacity } from '../data/locationsInsidePrisonApiClient'
@@ -47,36 +47,44 @@ describe('Prisoner cell allocation service', () => {
     )
   })
 
-  describe('getInmates', () => {
-    const offenders: Offender[] = [
+  describe('searchInmates', () => {
+    const prisoners: Prisoner[] = [
       {
-        bookingId: 1,
-        offenderNo: 'A1234BC',
+        prisonerNumber: 'A1234BC',
         firstName: 'JOHN',
         lastName: 'SMITH',
-        dateOfBirth: '1990-10-12',
-        age: 29,
-        agencyId: 'MDI',
-        assignedLivingUnitId: 1,
-        assignedLivingUnitDesc: 'UNIT-1',
-        categoryCode: 'C',
-        alertsDetails: ['XA', 'XVL'],
-        alertsCodes: ['XA', 'XVL'],
+        gender: 'Male',
+        prisonId: 'BXI',
+        prisonName: 'Brixton',
+        cellLocation: '1-1-001',
+        category: 'C',
+        alerts: [],
       },
     ]
 
-    it('Retrieves inmates', async () => {
-      prisonApiClient.getInmates.mockResolvedValue(offenders)
+    it('searches by name or number', async () => {
+      prisonerSearchApiClient.findPrisonersInPrison.mockResolvedValue(prisoners)
 
-      const result = await prisonerCellAllocationService.getInmates(token, 'BXI', 'Smith', true)
+      const result = await prisonerCellAllocationService.searchInmates(token, 'BXI', { term: 'Smith' })
 
-      expect(result[0].offenderNo).toEqual('A1234BC')
+      expect(prisonerSearchApiClient.findPrisonersInPrison).toHaveBeenCalledWith(token, 'BXI', { term: 'Smith' })
+      expect(result[0].prisonerNumber).toEqual('A1234BC')
+    })
+
+    it('searches by residential location prefix', async () => {
+      prisonerSearchApiClient.findPrisonersInPrison.mockResolvedValue(prisoners)
+
+      await prisonerCellAllocationService.searchInmates(token, 'BXI', { cellLocationPrefix: 'BXI-1' })
+
+      expect(prisonerSearchApiClient.findPrisonersInPrison).toHaveBeenCalledWith(token, 'BXI', {
+        cellLocationPrefix: 'BXI-1',
+      })
     })
 
     it('Propagates error', async () => {
-      prisonApiClient.getInmates.mockRejectedValue(new Error('some error'))
+      prisonerSearchApiClient.findPrisonersInPrison.mockRejectedValue(new Error('some error'))
 
-      await expect(prisonerCellAllocationService.getInmates(token, 'BXI', 'Smith', true)).rejects.toEqual(
+      await expect(prisonerCellAllocationService.searchInmates(token, 'BXI', { term: 'Smith' })).rejects.toEqual(
         new Error('some error'),
       )
     })

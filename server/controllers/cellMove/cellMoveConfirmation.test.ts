@@ -25,7 +25,7 @@ describe('Cell move confirmation', () => {
   }
 
   beforeEach(() => {
-    prisonerDetailsService.getDetails = jest
+    prisonerDetailsService.getPrisoner = jest
       .fn()
       .mockResolvedValue({ firstName: 'Bob', lastName: 'Doe', agencyId: 'MDI' })
     locationService.getLocation = jest.fn().mockResolvedValue(location)
@@ -48,7 +48,7 @@ describe('Cell move confirmation', () => {
   it('should make a call to retrieve an offenders details', async () => {
     await controller(req, res)
 
-    expect(prisonerDetailsService.getDetails).toHaveBeenCalledWith(systemClientToken, 'A12345')
+    expect(prisonerDetailsService.getPrisoner).toHaveBeenCalledWith(systemClientToken, 'A12345')
   })
 
   it('should make call to retrieve location details', async () => {
@@ -73,7 +73,7 @@ describe('Cell move confirmation', () => {
     const offenderNo = 'A12345'
     const error = new Error('network error')
 
-    prisonerDetailsService.getDetails = jest.fn().mockRejectedValue(error)
+    prisonerDetailsService.getPrisoner = jest.fn().mockRejectedValue(error)
 
     await expect(controller(req, res)).rejects.toThrow(error)
 

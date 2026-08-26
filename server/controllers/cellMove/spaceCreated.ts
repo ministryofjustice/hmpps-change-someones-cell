@@ -12,7 +12,7 @@ export default ({ prisonerDetailsService }: Params) =>
     const { systemClientToken } = res.locals
 
     try {
-      const { firstName, lastName } = await prisonerDetailsService.getDetails(systemClientToken, offenderNo)
+      const { firstName, lastName } = await prisonerDetailsService.getPrisoner(systemClientToken, offenderNo)
 
       return res.render('cellMove/spaceCreated.njk', {
         title: `${properCaseName(firstName)} ${properCaseName(lastName)} has been moved`,

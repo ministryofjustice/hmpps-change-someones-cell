@@ -106,33 +106,6 @@ export const stubHealth = (status = 200) =>
     },
   })
 
-export const stubInmates = ({
-  locationId,
-  params,
-  count,
-  data = [],
-}: {
-  locationId: string
-  params?: Record<string, string>
-  count: number
-  data?: object[]
-}) =>
-  stubFor({
-    request: {
-      method: 'GET',
-      urlPathPattern: `/api/locations/description/${locationId}/inmates`,
-      queryParameters: params,
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-        'total-records': `${count}`,
-      },
-      jsonBody: data,
-    },
-  })
-
 export const stubOffenderFullDetails = (details?: object) =>
   stubFor({
     request: {
@@ -293,7 +266,6 @@ export default {
   stubStaffRoles,
   stubUserLocations,
   stubHealth,
-  stubInmates,
   stubOffenderFullDetails,
   stubMainOffence,
   stubOffenderBasicDetails,

@@ -1,5 +1,5 @@
 import spaceCreatedController from './spaceCreated'
-import { OffenderDetails } from '../../data/prisonApiClient'
+import { Prisoner } from '../../data/prisonerSearchApiClient'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import config from '../../config'
 
@@ -15,28 +15,15 @@ describe('Space created', () => {
   const systemClientToken = 'system_token'
   const offenderNo = 'ABC123'
 
-  const details: OffenderDetails = {
-    bookingId: 1234,
-    offenderNo: 'A1234',
+  const details: Prisoner = {
+    prisonerNumber: 'A1234',
     firstName: 'Barry',
     lastName: 'Jones',
-    csraClassificationCode: 'HI',
-    agencyId: 'MDI',
-    assignedLivingUnit: {
-      agencyId: 'BXI',
-      locationId: 5432,
-      description: '1-1-001',
-      agencyName: 'Brixton (HMP)',
-    },
+    gender: 'Male',
+    prisonId: 'MDI',
+    prisonName: 'Moorland (HMP)',
+    cellLocation: '1-1-001',
     alerts: [],
-    dateOfBirth: '1990-10-12',
-    age: 29,
-    assignedLivingUnitId: 5432,
-    assignedLivingUnitDesc: '1-1-001',
-    categoryCode: 'C',
-    alertsDetails: ['XA', 'XVL'],
-    alertsCodes: ['XA', 'XVL'],
-    assessments: [],
   }
 
   beforeEach(() => {
@@ -61,7 +48,7 @@ describe('Space created', () => {
 
   describe('with data', () => {
     beforeEach(() => {
-      prisonerDetailsService.getDetails.mockResolvedValue(details)
+      prisonerDetailsService.getPrisoner.mockResolvedValue(details)
     })
 
     it('should render the correct template with the correct values', async () => {
@@ -78,7 +65,7 @@ describe('Space created', () => {
   describe('when there are errors', () => {
     it('set the redirect and home urls and throw the error', async () => {
       const error = new Error('Network error')
-      prisonerDetailsService.getDetails.mockRejectedValue(error)
+      prisonerDetailsService.getPrisoner.mockRejectedValue(error)
 
       await expect(controller(req, res)).rejects.toThrow(error)
       expect(res.locals.redirectUrl).toBe(`/prisoner/${offenderNo}/cell-move/search-for-cell`)

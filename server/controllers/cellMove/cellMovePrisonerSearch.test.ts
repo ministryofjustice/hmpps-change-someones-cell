@@ -1,18 +1,13 @@
-import { Offender } from '../../data/prisonApiClient'
 import { Prisoner } from '../../data/prisonerSearchApiClient'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
-import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import prisonerSearchController from './cellMovePrisonerSearch'
 
 jest.mock('../../services/prisonerCellAllocationService')
-jest.mock('../../services/prisonerDetailsService')
 
 describe('Prisoner search', () => {
   const prisonerCellAllocationService = jest.mocked(
     new PrisonerCellAllocationService(undefined, undefined, undefined, undefined, undefined),
   )
-  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
-  prisonerDetailsService.getPrisoners = jest.fn()
   let req
   let res
   let controller
@@ -40,94 +35,54 @@ describe('Prisoner search', () => {
       status: jest.fn(),
     }
 
-    const offenders: Promise<Offender[]> = Promise.resolve([])
-    prisonerCellAllocationService.getInmates.mockReturnValue(offenders)
+    prisonerCellAllocationService.searchInmates = jest.fn().mockResolvedValue([])
 
-    controller = prisonerSearchController({ prisonerCellAllocationService, prisonerDetailsService })
+    controller = prisonerSearchController({ prisonerCellAllocationService })
   })
 
   describe('index', () => {
-    it('should make make a call to get inmates using current active caseload and the specified search terms', async () => {
+    it('should search the current active caseload for the specified search terms', async () => {
       req.query = {
         keywords: 'Smith',
       }
 
       await controller(req, res)
 
-      expect(prisonerCellAllocationService.getInmates).toHaveBeenCalledWith('system_client_token', 'MDI', 'Smith', true)
+      expect(prisonerCellAllocationService.searchInmates).toHaveBeenCalledWith('system_client_token', 'MDI', {
+        term: 'Smith',
+      })
     })
 
     it('should render template with correct data when searched', async () => {
-      const inmates: Offender[] = [
-        {
-          bookingId: 1,
-          offenderNo: 'A1234BC',
-          firstName: 'JOHN',
-          lastName: 'SMITH',
-          dateOfBirth: '1990-10-12',
-          age: 29,
-          agencyId: 'MDI',
-          assignedLivingUnitId: 1,
-          assignedLivingUnitDesc: 'UNIT-1',
-          categoryCode: 'C',
-          alertsDetails: ['XA', 'HID'],
-          alertsCodes: ['XA', 'HID'],
-        },
-        {
-          bookingId: 2,
-          offenderNo: 'B4567CD',
-          firstName: 'STEVE',
-          lastName: 'SMITH',
-          dateOfBirth: '1989-11-12',
-          age: 30,
-          agencyId: 'MDI',
-          assignedLivingUnitId: 2,
-          assignedLivingUnitDesc: 'CSWAP',
-          categoryCode: 'C',
-          alertsDetails: ['XSA', 'SA'],
-          alertsCodes: ['XSA', 'SA'],
-        },
-      ]
-
-      prisonerCellAllocationService.getInmates.mockReturnValue(Promise.resolve(inmates))
-
-      const prisonersDetailsFromPrisonerDetailsService = [
+      const inmates = [
         {
           prisonerNumber: 'A1234BC',
+          firstName: 'JOHN',
+          lastName: 'SMITH',
+          cellLocation: 'UNIT-1',
+          category: 'C',
           alerts: [
-            {
-              alertCode: 'XA',
-              active: true,
-              expired: false,
-            },
-            {
-              alertCode: 'HID',
-              active: true,
-              expired: false,
-            },
+            { alertCode: 'XA', active: true, expired: false },
+            { alertCode: 'HID', active: true, expired: false },
           ],
         },
         {
           prisonerNumber: 'B4567CD',
-          alerts: [
-            {
-              alertCode: 'XSA',
-              active: true,
-              expired: false,
-            },
-          ],
+          firstName: 'STEVE',
+          lastName: 'SMITH',
+          cellLocation: 'CSWAP',
+          category: 'B',
+          alerts: [{ alertCode: 'XSA', active: true, expired: false }],
         },
       ] as Prisoner[]
 
-      prisonerDetailsService.getPrisoners.mockResolvedValue(prisonersDetailsFromPrisonerDetailsService)
+      prisonerCellAllocationService.searchInmates = jest.fn().mockResolvedValue(inmates)
 
       req.query = {
         keywords: 'Smith',
       }
 
       await controller(req, res)
-
-      expect(prisonerDetailsService.getPrisoners).toHaveBeenCalledWith('system_client_token', ['A1234BC', 'B4567CD'])
 
       expect(res.render).toHaveBeenCalledWith(
         'cellMove/cellMovePrisonerSearch.njk',
@@ -135,45 +90,27 @@ describe('Prisoner search', () => {
           showResults: true,
           results: [
             {
-              age: 29,
-              agencyId: 'MDI',
+              offenderNo: 'A1234BC',
+              assignedLivingUnitDesc: 'UNIT-1',
+              categoryCode: 'C',
               alerts: [
                 { alertCodes: ['XA'], classes: 'alert-status alert-status--security', label: 'Arsonist' },
                 { alertCodes: ['HID'], classes: 'alert-status alert-status--medical', label: 'Hidden disability' },
               ],
-              alertsCodes: ['XA', 'HID'],
-              alertsDetails: ['XA', 'HID'],
-              assignedLivingUnitDesc: 'UNIT-1',
-              assignedLivingUnitId: 1,
-              bookingId: 1,
-              categoryCode: '',
-              dateOfBirth: '1990-10-12',
-              firstName: 'JOHN',
-              lastName: 'SMITH',
               name: 'Smith, John',
               formattedName: 'John Smith',
-              offenderNo: 'A1234BC',
               cellHistoryUrl: 'http://localhost:3000/prisoner/A1234BC/location-details',
               cellSearchUrl: '/prisoner/A1234BC/cell-move/search-for-cell?returnToService=default',
             },
             {
-              age: 30,
-              agencyId: 'MDI',
+              offenderNo: 'B4567CD',
+              assignedLivingUnitDesc: 'No cell allocated',
+              categoryCode: 'B',
               alerts: [
                 { alertCodes: ['XSA', 'SA'], classes: 'alert-status alert-status--security', label: 'Staff assaulter' },
               ],
-              alertsCodes: ['XSA', 'SA'],
-              alertsDetails: ['XSA', 'SA'],
-              assignedLivingUnitDesc: 'No cell allocated',
-              assignedLivingUnitId: 2,
-              bookingId: 2,
-              categoryCode: '',
-              dateOfBirth: '1989-11-12',
-              firstName: 'STEVE',
-              lastName: 'SMITH',
               name: 'Smith, Steve',
               formattedName: 'Steve Smith',
-              offenderNo: 'B4567CD',
               cellHistoryUrl: 'http://localhost:3000/prisoner/B4567CD/location-details',
               cellSearchUrl: '/prisoner/B4567CD/cell-move/search-for-cell?returnToService=default',
             },

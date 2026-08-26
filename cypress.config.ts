@@ -53,7 +53,7 @@ export default defineConfig({
           ]),
         stubSignInPage: auth.redirect,
         stubUserMe: ({ username, staffId, name }) => users.stubUserMe(username, staffId, name),
-        stubInmates: prisonApi.stubInmates,
+        stubPrisonersInPrison: prisonerSearchApi.stubPrisonersInPrison,
         stubOffenderFullDetails: fullDetails => Promise.all([prisonApi.stubOffenderFullDetails(fullDetails)]),
         stubGetPrisonerNonAssociations: response => nonAssociationsApi.stubGetPrisonerNonAssociations(response),
         stubGroups: caseload => locationsInsidePrisonApi.stubGroups(caseload),

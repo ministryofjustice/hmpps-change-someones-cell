@@ -1,19 +1,17 @@
 import config from '../../config'
 import LocationService from '../../services/locationService'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
-import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import { alertFlagLabels, cellMoveAlertCodes } from '../../shared/alertFlagValues'
 import { putLastNameFirst, formatLocation, formatName } from '../../utils'
 
 type Params = {
   locationService: LocationService
   prisonerCellAllocationService: PrisonerCellAllocationService
-  prisonerDetailsService: PrisonerDetailsService
 }
 
-export default ({ locationService, prisonerCellAllocationService, prisonerDetailsService }: Params) =>
+export default ({ locationService, prisonerCellAllocationService }: Params) =>
   async (req, res) => {
-    const prisonApiLocationDescription = async (systemClientToken: string, locationKey, userCaseLoad) => {
+    const residentialLocationPrefix = async (systemClientToken: string, locationKey, userCaseLoad) => {
       const fullLocationPrefix = await locationService.getAgencyGroupLocationPrefix(
         systemClientToken,
         userCaseLoad,
@@ -61,38 +59,31 @@ export default ({ locationService, prisonerCellAllocationService, prisonerDetail
       })
     }
 
-    const locationDesc = await prisonApiLocationDescription(systemClientToken, location, currentUserCaseLoad)
+    const locationPrefix = await residentialLocationPrefix(systemClientToken, location, currentUserCaseLoad)
 
-    const prisoners = await prisonerCellAllocationService.getInmates(systemClientToken, locationDesc, null, true)
-
-    const prisonersAlerts = await prisonerDetailsService.getPrisoners(
-      res.locals.systemClientToken,
-      prisoners.map(p => p.offenderNo),
-    )
-
-    const prisonersWithEnhancedAlertData = prisoners.map(prisoner => {
-      const offender = prisonersAlerts.find(p => p.prisonerNumber === prisoner.offenderNo)
-      return {
-        ...prisoner,
-        alerts: offender?.alerts || [],
-        categoryCode: offender?.category || '',
-      }
+    // One call now: prisoner-search matches every cell beneath the location prefix and returns the
+    // alerts and category prison-api did not, so the second lookup that topped them up has gone
+    // (MAPA-318).
+    const prisoners = await prisonerCellAllocationService.searchInmates(systemClientToken, currentUserCaseLoad, {
+      cellLocationPrefix: locationPrefix,
     })
 
-    const results = prisonersWithEnhancedAlertData?.map(prisoner => ({
-      ...prisoner,
-      assignedLivingUnitDesc: formatLocation(prisoner.assignedLivingUnitDesc),
-      name: putLastNameFirst(prisoner.firstName, prisoner.lastName),
-      formattedName: formatName(prisoner.firstName, prisoner.lastName),
-      alerts: alertFlagLabels.filter(alertFlag =>
-        alertFlag.alertCodes.some(
-          alert => prisoner.alertsDetails?.includes(alert) && cellMoveAlertCodes.includes(alert),
+    const results = prisoners.map(prisoner => {
+      const alertCodes = prisoner.alerts?.map(alert => alert.alertCode) || []
+      return {
+        offenderNo: prisoner.prisonerNumber,
+        assignedLivingUnitDesc: formatLocation(prisoner.cellLocation),
+        name: putLastNameFirst(prisoner.firstName, prisoner.lastName),
+        formattedName: formatName(prisoner.firstName, prisoner.lastName),
+        categoryCode: prisoner.category || '',
+        alerts: alertFlagLabels.filter(alertFlag =>
+          alertFlag.alertCodes.some(alert => alertCodes.includes(alert) && cellMoveAlertCodes.includes(alert)),
         ),
-      ),
-      cellHistoryUrl: `${config.prisonerProfileUrl}/prisoner/${prisoner.offenderNo}/location-details`,
-      cellSearchUrl: `/prisoner/${prisoner.offenderNo}/cell-move/search-for-cell?returnToService=default`,
-      profileUrl: `${config.prisonerProfileUrl}/prisoner/${prisoner.offenderNo}`,
-    }))
+        cellHistoryUrl: `${config.prisonerProfileUrl}/prisoner/${prisoner.prisonerNumber}/location-details`,
+        cellSearchUrl: `/prisoner/${prisoner.prisonerNumber}/cell-move/search-for-cell?returnToService=default`,
+        profileUrl: `${config.prisonerProfileUrl}/prisoner/${prisoner.prisonerNumber}`,
+      }
+    })
 
     return res.render('cellMove/cellMoveViewResidentialLocation.njk', {
       showResults: true,
