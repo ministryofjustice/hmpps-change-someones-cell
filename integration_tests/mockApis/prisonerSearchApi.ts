@@ -66,9 +66,30 @@ export const stubAttributeSearch = prisoners => {
   })
 }
 
+export const stubPrisonersInPrison = prisoners => {
+  return stubFor({
+    request: {
+      method: 'GET',
+      urlPathPattern: `/prisoner-search/prison/[^/]+/prisoners`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {
+        content: prisoners || [],
+        totalElements: (prisoners || []).length,
+        totalPages: 1,
+      },
+    },
+  })
+}
+
 export default {
   stubHealth,
   stubGetPrisoner,
   stubGetPrisoners,
   stubAttributeSearch,
+  stubPrisonersInPrison,
 }

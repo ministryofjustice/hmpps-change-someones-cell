@@ -252,24 +252,6 @@ export default class PrisonApiClient {
   /**
    * @deprecated Use prisoner search to find prisoners
    */
-  getInmates(token: string, locationId: string, keywords?: string, returnAlerts: boolean = false): Promise<Offender[]> {
-    const query: Record<string, string> = { returnAlerts: returnAlerts ? 'true' : 'false' }
-    if (keywords) {
-      query.keywords = keywords
-    }
-    const headers = {
-      'Page-Limit': '5000',
-      'Sort-Fields': 'lastName,firstName',
-      'Sort-Order': 'ASC',
-    }
-
-    return PrisonApiClient.restClient(token).get<Offender[]>({
-      path: `/api/locations/description/${locationId}/inmates`,
-      query,
-      headers,
-    })
-  }
-
   getImage(token: string, imageId: string) {
     return PrisonApiClient.restClient(token).stream({ path: `/api/images/${imageId}/data` })
   }

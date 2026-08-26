@@ -34,6 +34,9 @@ export interface AttributeSearchPage<T> {
 // Reception holds tens of people, not thousands; the size only exists so a single page is certain.
 const ATTRIBUTE_SEARCH_PAGE_SIZE = 2000
 
+// A whole-prison search really does run to thousands, so this one pages rather than truncating.
+const PRISON_SEARCH_PAGE_SIZE = 500
+
 export default class PrisonerSearchApiClient {
   constructor() {}
 
@@ -91,5 +94,43 @@ export default class PrisonerSearchApiClient {
     }
 
     return page?.content || []
+  }
+
+  /**
+   * Prisoners inside one prison, optionally narrowed by a search term or a cell location prefix.
+   *
+   * Replaces prison-api's `getInmates`. `term` matches against name or prisoner number;
+   * `cellLocationPrefix` takes a residential location such as `MDI-1` and covers every cell beneath
+   * it - which [findPrisonersInCellLocations] cannot do, because its `IN` condition needs exact cell
+   * locations rather than a prefix.
+   *
+   * Unlike the attribute search this endpoint is paged and defaults to ten per page, so it pages to
+   * the end. Truncating here would silently drop people from a roll list.
+   */
+  async findPrisonersInPrison(
+    token: string,
+    prisonId: string,
+    { term, cellLocationPrefix }: { term?: string; cellLocationPrefix?: string },
+  ): Promise<Prisoner[]> {
+    const query: Record<string, string | number> = { size: PRISON_SEARCH_PAGE_SIZE }
+    if (term) query.term = term
+    if (cellLocationPrefix) query.cellLocationPrefix = cellLocationPrefix
+
+    const fetchPage = (page: number) =>
+      PrisonerSearchApiClient.restClient(token).get<AttributeSearchPage<Prisoner>>({
+        path: `/prison/${prisonId}/prisoners`,
+        query: { ...query, page },
+      })
+
+    const firstPage = await fetchPage(0)
+    const prisoners = [...(firstPage?.content || [])]
+
+    for (let page = 1; page < (firstPage?.totalPages || 0); page += 1) {
+      // eslint-disable-next-line no-await-in-loop -- pages must be requested in order
+      const nextPage = await fetchPage(page)
+      prisoners.push(...(nextPage?.content || []))
+    }
+
+    return prisoners
   }
 }

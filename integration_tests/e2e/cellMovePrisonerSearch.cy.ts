@@ -8,48 +8,17 @@ context('Cell move prisoner search', () => {
     changeCellText: $cell[6]?.textContent,
   })
 
-  // inmate1 and inmate2 are data returned by prisonerCellAllocationService.getInmates
-  const inmate1 = {
-    bookingId: 1,
-    offenderNo: 'A1234BC',
-    firstName: 'JOHN',
-    lastName: 'SMITH',
-    dateOfBirth: '1990-10-12',
-    age: 29,
-    agencyId: 'MDI',
-    assignedLivingUnitId: 1,
-    assignedLivingUnitDesc: 'UNIT-1',
-    alertsDetails: ['XA', 'XVL'],
-  }
-  const inmate2 = {
-    bookingId: 2,
-    offenderNo: 'B4567CD',
-    firstName: 'STEVE',
-    lastName: 'SMITH',
-    dateOfBirth: '1989-11-12',
-    age: 30,
-    agencyId: 'MDI',
-    assignedLivingUnitId: 2,
-    assignedLivingUnitDesc: 'UNIT-2',
-    alertsDetails: ['RSS', 'XC'],
-  }
-
-  // prisoner1 and prisoner2 are data redturned by prisonerDetailsService.getPrisoners
+  // Returned by prisonerCellAllocationService.searchInmates - prisoner-search shape, so alerts and
+  // category arrive on the same record and there is no second lookup to stub.
   const prisoner1 = {
     prisonerNumber: 'A1234BC',
+    firstName: 'JOHN',
+    lastName: 'SMITH',
+    cellLocation: 'UNIT-1',
+    category: 'C',
     alerts: [
-      {
-        alertType: 'X',
-        alertCode: 'XA',
-        active: true,
-        expired: false,
-      },
-      {
-        alertType: 'X',
-        alertCode: 'XVL',
-        active: true,
-        expired: false,
-      },
+      { alertType: 'X', alertCode: 'XA', active: true, expired: false },
+      { alertType: 'X', alertCode: 'XVL', active: true, expired: false },
     ],
   }
 
@@ -57,22 +26,14 @@ context('Cell move prisoner search', () => {
     prisonerNumber: 'B4567CD',
     firstName: 'STEVE',
     lastName: 'SMITH',
-    bookingId: 2,
+    cellLocation: 'UNIT-2',
+    category: 'C',
     alerts: [
-      {
-        alertType: 'R',
-        alertCode: 'RSS',
-        active: true,
-        expired: false,
-      },
-      {
-        alertType: 'X',
-        alertCode: 'XC',
-        active: true,
-        expired: false,
-      },
+      { alertType: 'R', alertCode: 'RSS', active: true, expired: false },
+      { alertType: 'X', alertCode: 'XC', active: true, expired: false },
     ],
   }
+
   before(() => {
     cy.clearCookies()
     cy.task('reset')
@@ -96,15 +57,10 @@ context('Cell move prisoner search', () => {
   context('When there are search values', () => {
     beforeEach(() => {
       cy.task('stubUserLocations')
-      cy.task('stubGetPrisoners', [prisoner1, prisoner2])
     })
 
     it('should have correct data pre filled from search query', () => {
-      cy.task('stubInmates', {
-        locationId: 'MDI',
-        count: 2,
-        data: [inmate1, inmate2],
-      })
+      cy.task('stubPrisonersInPrison', [prisoner1, prisoner2])
       cy.visit('/prisoner-search?keywords=SMITH')
 
       cy.get<HTMLTableElement>('[data-test="prisoner-search-results-table"]')
@@ -130,11 +86,7 @@ context('Cell move prisoner search', () => {
     })
 
     it('should have the correct link to the cell history and select cell links', () => {
-      cy.task('stubInmates', {
-        locationId: 'MDI',
-        count: 1,
-        data: [inmate1],
-      })
+      cy.task('stubPrisonersInPrison', [prisoner1])
       cy.visit('/prisoner-search?keywords=A1234BC')
 
       cy.get('[data-test="prisoner-cell-history-link"]').its('length').should('eq', 1)

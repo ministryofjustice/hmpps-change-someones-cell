@@ -5,7 +5,6 @@ import {
   AlertsApiClient,
   PrisonerSearchApiClient,
 } from '../data'
-import { Offender } from '../data/prisonApiClient'
 import { CellMoveReason } from '../data/cellMovementsApiClient'
 import { Alert } from '../data/alertsApiClient'
 import { Prisoner } from '../data/prisonerSearchApiClient'
@@ -55,8 +54,19 @@ export default class PrisonerCellAllocationService {
     private readonly prisonerSearchApiClient: PrisonerSearchApiClient,
   ) {}
 
-  async getInmates(token: string, locationId: string, keywords?: string, returnAlerts?: boolean): Promise<Offender[]> {
-    return this.prisonApiClient.getInmates(token, locationId, keywords, returnAlerts)
+  /**
+   * Prisoners in one prison, narrowed either by a name/number term or by a residential location
+   * prefix such as `MDI-1`.
+   *
+   * Replaced prison-api's `getInmates` (MAPA-318). The response already carries alerts and category,
+   * so callers no longer make a second prisoner-search call to top those up.
+   */
+  async searchInmates(
+    token: string,
+    prisonId: string,
+    filters: { term?: string; cellLocationPrefix?: string },
+  ): Promise<Prisoner[]> {
+    return this.prisonerSearchApiClient.findPrisonersInPrison(token, prisonId, filters)
   }
 
   async getInmatesAtLocation(token: string, locationId: string): Promise<Occupant[]> {

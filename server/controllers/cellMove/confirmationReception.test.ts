@@ -1,4 +1,4 @@
-import { OffenderDetails } from '../../data/prisonApiClient'
+import { Prisoner } from '../../data/prisonerSearchApiClient'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import confirmation from './confirmationReception'
 
@@ -10,28 +10,15 @@ let res
 let req
 let controller
 
-const details: OffenderDetails = {
-  bookingId: 1234,
-  offenderNo: 'A1234',
+const details: Prisoner = {
+  prisonerNumber: 'A1234',
   firstName: 'Barry',
   lastName: 'Jones',
-  csraClassificationCode: 'HI',
-  agencyId: 'MDI',
-  assignedLivingUnit: {
-    agencyId: 'BXI',
-    locationId: 5432,
-    description: '1-1-001',
-    agencyName: 'Brixton (HMP)',
-  },
+  gender: 'Male',
+  prisonId: 'MDI',
+  prisonName: 'Moorland (HMP)',
+  cellLocation: '1-1-001',
   alerts: [],
-  dateOfBirth: '1990-10-12',
-  age: 29,
-  assignedLivingUnitId: 5432,
-  assignedLivingUnitDesc: '1-1-001',
-  categoryCode: 'C',
-  alertsDetails: ['XA', 'XVL'],
-  alertsCodes: ['XA', 'XVL'],
-  assessments: [],
 }
 
 const systemClientToken = 'system_token'
@@ -40,7 +27,7 @@ describe('Reception move confirmation', () => {
   const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
 
   beforeEach(() => {
-    prisonerDetailsService.getDetails.mockResolvedValue(details)
+    prisonerDetailsService.getPrisoner.mockResolvedValue(details)
 
     req = {
       params: {
@@ -70,7 +57,7 @@ describe('Reception move confirmation', () => {
   describe('page', () => {
     it('should make the correct api calls', async () => {
       await controller(req, res)
-      expect(prisonerDetailsService.getDetails).toHaveBeenCalledWith(systemClientToken, someOffenderNumber, false)
+      expect(prisonerDetailsService.getPrisoner).toHaveBeenCalledWith(systemClientToken, someOffenderNumber)
     })
 
     it('should render with correct data', async () => {

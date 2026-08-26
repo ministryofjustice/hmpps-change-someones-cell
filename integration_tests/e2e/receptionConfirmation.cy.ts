@@ -68,6 +68,8 @@ before(() => {
     ],
   })
   cy.task('stubOffenderBasicDetails', offenderBasicDetails)
+  // The confirmation page reads the name from prisoner-search now, not prison-api (MAPA-318).
+  cy.task('stubGetPrisoner', { prisonerNumber: offenderNo, firstName: 'John', lastName: 'Smith' })
 })
 
 describe('Reception move confirmation page ', () => {

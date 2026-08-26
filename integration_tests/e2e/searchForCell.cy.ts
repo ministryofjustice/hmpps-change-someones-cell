@@ -189,48 +189,16 @@ context('A user can search for a cell', () => {
   })
 
   describe('back button', () => {
-    // inmate1 and inmate2 are data returned by prisonerCellAllocationService.getInmates
-    const inmate1 = {
-      bookingId: 1,
-      offenderNo: 'A1234BC',
-      firstName: 'JOHN',
-      lastName: 'SMITH',
-      dateOfBirth: '1990-10-12',
-      age: 29,
-      agencyId: 'MDI',
-      assignedLivingUnitId: 1,
-      assignedLivingUnitDesc: 'UNIT-1',
-      alertsDetails: ['XA', 'XVL'],
-    }
-    const inmate2 = {
-      bookingId: 2,
-      offenderNo: 'B4567CD',
-      firstName: 'STEVE',
-      lastName: 'SMITH',
-      dateOfBirth: '1989-11-12',
-      age: 30,
-      agencyId: 'MDI',
-      assignedLivingUnitId: 2,
-      assignedLivingUnitDesc: 'UNIT-2',
-      alertsDetails: ['RSS', 'XC'],
-    }
-
-    // prisoner1 and prisoner2 are data returned by prisonerDetailsService.getPrisoners
+    // Returned by prisonerCellAllocationService.searchInmates - prisoner-search shape, so alerts
+    // arrive on the same record and there is no second lookup to stub.
     const prisoner1 = {
       prisonerNumber: 'A1234BC',
+      firstName: 'JOHN',
+      lastName: 'SMITH',
+      cellLocation: 'UNIT-1',
       alerts: [
-        {
-          alertType: 'X',
-          alertCode: 'XA',
-          active: true,
-          expired: false,
-        },
-        {
-          alertType: 'X',
-          alertCode: 'XVL',
-          active: true,
-          expired: false,
-        },
+        { alertType: 'X', alertCode: 'XA', active: true, expired: false },
+        { alertType: 'X', alertCode: 'XVL', active: true, expired: false },
       ],
     }
 
@@ -238,31 +206,16 @@ context('A user can search for a cell', () => {
       prisonerNumber: 'B4567CD',
       firstName: 'STEVE',
       lastName: 'SMITH',
-      bookingId: 2,
+      cellLocation: 'UNIT-2',
       alerts: [
-        {
-          alertType: 'R',
-          alertCode: 'RSS',
-          active: true,
-          expired: false,
-        },
-        {
-          alertType: 'X',
-          alertCode: 'XC',
-          active: true,
-          expired: false,
-        },
+        { alertType: 'R', alertCode: 'RSS', active: true, expired: false },
+        { alertType: 'X', alertCode: 'XC', active: true, expired: false },
       ],
     }
 
     context('When referred from the prisoner search page', () => {
       beforeEach(() => {
-        cy.task('stubInmates', {
-          locationId: 'MDI',
-          count: 2,
-          data: [inmate1, inmate2],
-        })
-        cy.task('stubGetPrisoners', [prisoner1, prisoner2])
+        cy.task('stubPrisonersInPrison', [prisoner1, prisoner2])
         cy.visit(`/prisoner-search?keywords=SMITH`)
         cy.task('stubGetPrisoner', {
           ...prisonerFullDetails,
@@ -284,11 +237,7 @@ context('A user can search for a cell', () => {
 
     context('When referred from the view residential location page', () => {
       beforeEach(() => {
-        cy.task('stubInmates', {
-          locationId: 'MDI-1',
-          count: 2,
-          data: [inmate1, inmate2],
-        })
+        cy.task('stubPrisonersInPrison', [prisoner1, prisoner2])
 
         cy.task('stubGetPrisoner', {
           ...prisonerFullDetails,
@@ -339,11 +288,7 @@ context('A user can search for a cell', () => {
       ]
 
       beforeEach(() => {
-        cy.task('stubInmates', {
-          locationId: 'MDI',
-          count: 2,
-          data: [inmate1, inmate2],
-        })
+        cy.task('stubPrisonersInPrison', [prisoner1, prisoner2])
         cy.task('stubGetPrisoner', {
           ...prisonerFullDetails,
           prisonerNumber: 'A1234BC',
@@ -386,7 +331,7 @@ context('A user can search for a cell', () => {
         cy.task('stubCellsWithCapacity', { prisonId: 'MDI', response })
         cy.task('stubCellsWithCapacityByGroupName', { prisonId: 'MDI', groupName: 1, response })
 
-        SelectCellPage.goTo(inmate1.offenderNo)
+        SelectCellPage.goTo(prisoner1.prisonerNumber)
         cy.contains('Select an available cell')
         cy.contains('Back').click()
         cy.contains('Search for a cell')

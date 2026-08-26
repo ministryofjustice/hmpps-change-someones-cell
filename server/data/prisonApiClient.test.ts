@@ -21,40 +21,6 @@ describe('prisonApiClient', () => {
     nock.cleanAll()
   })
 
-  describe('getInmates', () => {
-    it('should return inmates', async () => {
-      const response = { data: 'data' }
-
-      fakePrisonApiClient
-        .get('/api/locations/description/BXI/inmates')
-        .query({ returnAlerts: 'true' })
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .matchHeader('Page-Limit', '5000')
-        .matchHeader('Sort-Fields', 'lastName,firstName')
-        .matchHeader('Sort-Order', 'ASC')
-        .reply(200, response)
-
-      const output = await prisonApiClient.getInmates(accessToken, 'BXI', null, true)
-      expect(output).toEqual(response)
-    })
-
-    it('should search for inmates by name', async () => {
-      const response = { data: 'data' }
-
-      fakePrisonApiClient
-        .get('/api/locations/description/BXI/inmates')
-        .query({ keywords: 'Smith', returnAlerts: 'true' })
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .matchHeader('Page-Limit', '5000')
-        .matchHeader('Sort-Fields', 'lastName,firstName')
-        .matchHeader('Sort-Order', 'ASC')
-        .reply(200, response)
-
-      const output = await prisonApiClient.getInmates(accessToken, 'BXI', 'Smith', true)
-      expect(output).toEqual(response)
-    })
-  })
-
   describe('userCaseLoads', () => {
     it('should return data from api', async () => {
       const response = { data: 'data' }

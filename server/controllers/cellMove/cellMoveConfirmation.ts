@@ -15,7 +15,7 @@ export default ({ locationService, prisonerDetailsService }: Params) =>
 
     try {
       const { cellId } = req.query
-      const { firstName, lastName } = await prisonerDetailsService.getDetails(systemClientToken, offenderNo)
+      const { firstName, lastName } = await prisonerDetailsService.getPrisoner(systemClientToken, offenderNo)
       const { pathHierarchy } = await locationService.getLocation(systemClientToken, cellId)
 
       return res.render('cellMove/confirmation.njk', {

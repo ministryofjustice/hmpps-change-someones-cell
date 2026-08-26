@@ -1,7 +1,6 @@
 import viewResidentialLocationController from './cellMoveViewResidentialLocation'
 import LocationService from '../../services/locationService'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
-import PrisonerDetailsService from '../../services/prisonerDetailsService'
 import { Prisoner } from '../../data/prisonerSearchApiClient'
 
 jest.mock('../../services/locationService')
@@ -12,8 +11,6 @@ describe('View Residential Location', () => {
   const prisonerCellAllocationService = jest.mocked(
     new PrisonerCellAllocationService(undefined, undefined, undefined, undefined, undefined),
   )
-  const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
-  prisonerDetailsService.getPrisoners = jest.fn()
 
   let req
   let res
@@ -62,12 +59,11 @@ describe('View Residential Location', () => {
       locationPrefix: '1',
     })
 
-    prisonerCellAllocationService.getInmates = jest.fn().mockReturnValue([])
+    prisonerCellAllocationService.searchInmates = jest.fn().mockResolvedValue([])
 
     controller = viewResidentialLocationController({
       locationService,
       prisonerCellAllocationService,
-      prisonerDetailsService,
     })
   })
 
@@ -102,7 +98,9 @@ describe('View Residential Location', () => {
 
       await controller(req, res)
 
-      expect(prisonerCellAllocationService.getInmates).toHaveBeenCalledWith(systemClientToken, 'MDI-1', null, true)
+      expect(prisonerCellAllocationService.searchInmates).toHaveBeenCalledWith(systemClientToken, 'MDI', {
+        cellLocationPrefix: 'MDI-1',
+      })
     })
 
     it('should make a call to get inmates using location id built from case load and location key if location prefix not present', async () => {
@@ -114,73 +112,36 @@ describe('View Residential Location', () => {
 
       await controller(req, res)
 
-      expect(prisonerCellAllocationService.getInmates).toHaveBeenCalledWith(systemClientToken, 'MDI-1', null, true)
+      expect(prisonerCellAllocationService.searchInmates).toHaveBeenCalledWith(systemClientToken, 'MDI', {
+        cellLocationPrefix: 'MDI-1',
+      })
     })
 
     it('should render template with correct data when searched', async () => {
       const inmates = [
         {
-          bookingId: 1,
-          offenderNo: 'A1234BC',
+          prisonerNumber: 'A1234BC',
           firstName: 'JOHN',
           lastName: 'SMITH',
-          dateOfBirth: '1990-10-12',
-          age: 29,
-          agencyId: 'MDI',
-          assignedLivingUnitId: 1,
-          assignedLivingUnitDesc: 'UNIT-1',
-          iepLevel: 'Standard',
-          categoryCode: 'A',
-          alertsDetails: ['XA', 'XGANG'],
-        },
-        {
-          bookingId: 2,
-          offenderNo: 'B4567CD',
-          firstName: 'STEVE',
-          lastName: 'SMITH',
-          dateOfBirth: '1989-11-12',
-          age: 30,
-          agencyId: 'MDI',
-          assignedLivingUnitId: 2,
-          assignedLivingUnitDesc: 'CSWAP',
-          iepLevel: 'Standard',
-          categoryCode: 'C',
-          alertsDetails: ['XCU'],
-        },
-      ]
-      prisonerCellAllocationService.getInmates = jest.fn().mockReturnValue(inmates)
-
-      const prisonersDetailsFromPrisonerDetailsService = [
-        {
-          prisonerNumber: 'A1234BC',
+          cellLocation: 'UNIT-1',
           category: 'A',
           alerts: [
-            {
-              alertCode: 'XA',
-              active: true,
-              expired: false,
-            },
-            {
-              alertCode: 'XGANG',
-              active: true,
-              expired: false,
-            },
+            { alertCode: 'XA', active: true, expired: false },
+            { alertCode: 'XGANG', active: true, expired: false },
           ],
         },
         {
           prisonerNumber: 'B4567CD',
+          firstName: 'STEVE',
+          lastName: 'SMITH',
+          cellLocation: 'CSWAP',
           category: 'C',
-          alerts: [
-            {
-              alertCode: 'XCU',
-              active: true,
-              expired: false,
-            },
-          ],
+          alerts: [{ alertCode: 'XCU', active: true, expired: false }],
         },
       ] as Prisoner[]
 
-      prisonerDetailsService.getPrisoners.mockResolvedValue(prisonersDetailsFromPrisonerDetailsService)
+      prisonerCellAllocationService.searchInmates = jest.fn().mockResolvedValue(inmates)
+
       req.query = {
         location: 'H 1',
       }
@@ -207,8 +168,9 @@ describe('View Residential Location', () => {
           ],
           results: [
             {
-              age: 29,
-              agencyId: 'MDI',
+              offenderNo: 'A1234BC',
+              assignedLivingUnitDesc: 'UNIT-1',
+              categoryCode: 'A',
               alerts: [
                 {
                   alertCodes: ['XA'],
@@ -221,25 +183,16 @@ describe('View Residential Location', () => {
                   label: 'Gang member',
                 },
               ],
-              alertsDetails: ['XA', 'XGANG'],
-              assignedLivingUnitDesc: 'UNIT-1',
-              assignedLivingUnitId: 1,
-              bookingId: 1,
-              categoryCode: 'A',
-              dateOfBirth: '1990-10-12',
-              firstName: 'JOHN',
-              iepLevel: 'Standard',
-              lastName: 'SMITH',
               name: 'Smith, John',
               formattedName: 'John Smith',
-              offenderNo: 'A1234BC',
               cellHistoryUrl: 'http://localhost:3000/prisoner/A1234BC/location-details',
               cellSearchUrl: '/prisoner/A1234BC/cell-move/search-for-cell?returnToService=default',
               profileUrl: 'http://localhost:3000/prisoner/A1234BC',
             },
             {
-              age: 30,
-              agencyId: 'MDI',
+              offenderNo: 'B4567CD',
+              assignedLivingUnitDesc: 'No cell allocated',
+              categoryCode: 'C',
               alerts: [
                 {
                   alertCodes: ['XCU'],
@@ -247,18 +200,8 @@ describe('View Residential Location', () => {
                   label: 'Controlled unlock',
                 },
               ],
-              alertsDetails: ['XCU'],
-              assignedLivingUnitDesc: 'No cell allocated',
-              assignedLivingUnitId: 2,
-              bookingId: 2,
-              categoryCode: 'C',
-              dateOfBirth: '1989-11-12',
-              firstName: 'STEVE',
-              iepLevel: 'Standard',
-              lastName: 'SMITH',
               name: 'Smith, Steve',
               formattedName: 'Steve Smith',
-              offenderNo: 'B4567CD',
               cellHistoryUrl: 'http://localhost:3000/prisoner/B4567CD/location-details',
               cellSearchUrl: '/prisoner/B4567CD/cell-move/search-for-cell?returnToService=default',
               profileUrl: 'http://localhost:3000/prisoner/B4567CD',

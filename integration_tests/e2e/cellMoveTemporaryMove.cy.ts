@@ -7,29 +7,20 @@ const toOffender = ($cell: HTMLCollectionOf<HTMLTableCellElement>) => ({
 })
 
 context('Move someone temporarily out of a cell', () => {
-  const inmate1 = {
-    bookingId: 1,
-    offenderNo: 'A1234BC',
+  // Returned by prisonerCellAllocationService.searchInmates - prisoner-search shape.
+  const prisoner1 = {
+    prisonerNumber: 'A1234BC',
     firstName: 'JOHN',
     lastName: 'SMITH',
-    dateOfBirth: '1990-10-12',
-    age: 29,
-    agencyId: 'MDI',
-    assignedLivingUnitId: 1,
-    assignedLivingUnitDesc: 'UNIT-1',
-    alertsDetails: ['XA', 'XVL'],
+    cellLocation: 'UNIT-1',
+    alerts: [{ alertType: 'X', alertCode: 'XA', active: true, expired: false }],
   }
-  const inmate2 = {
-    bookingId: 2,
-    offenderNo: 'B4567CD',
+  const prisoner2 = {
+    prisonerNumber: 'B4567CD',
     firstName: 'STEVE',
     lastName: 'SMITH',
-    dateOfBirth: '1989-11-12',
-    age: 30,
-    agencyId: 'MDI',
-    assignedLivingUnitId: 2,
-    assignedLivingUnitDesc: 'UNIT-2',
-    alertsDetails: ['RSS', 'XC'],
+    cellLocation: 'UNIT-2',
+    alerts: [{ alertType: 'R', alertCode: 'RSS', active: true, expired: false }],
   }
 
   before(() => {
@@ -60,11 +51,7 @@ context('Move someone temporarily out of a cell', () => {
     })
 
     it('should have correct data pre filled from search query', () => {
-      cy.task('stubInmates', {
-        locationId: 'MDI',
-        count: 2,
-        data: [inmate1, inmate2],
-      })
+      cy.task('stubPrisonersInPrison', [prisoner1, prisoner2])
       cy.visit('/temporary-move?keywords=SMITH')
 
       cy.get('[data-test="prisoner-search-help-text"]').should('not.exist')
@@ -89,11 +76,7 @@ context('Move someone temporarily out of a cell', () => {
     })
 
     it('should have the correct link to the cell history and cell move links', () => {
-      cy.task('stubInmates', {
-        locationId: 'MDI',
-        count: 1,
-        data: [inmate1],
-      })
+      cy.task('stubPrisonersInPrison', [prisoner1])
       cy.visit('/temporary-move?keywords=A1234BC')
 
       cy.get('[data-test="prisoner-cell-history-link"]').its('length').should('eq', 1)

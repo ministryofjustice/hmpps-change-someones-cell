@@ -12,7 +12,7 @@ export default ({ prisonerDetailsService }: Params) => {
     const { offenderNo } = req.params
     const { systemClientToken } = res.locals
 
-    const { firstName, lastName } = await prisonerDetailsService.getDetails(systemClientToken, offenderNo, false)
+    const { firstName, lastName } = await prisonerDetailsService.getPrisoner(systemClientToken, offenderNo)
     const profileUrl = `${config.prisonerProfileUrl}/prisoner/${offenderNo}`
     const data = {
       confirmationMessage: `${formatName(firstName, lastName)} has been moved to reception`,

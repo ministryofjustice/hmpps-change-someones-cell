@@ -30,23 +30,19 @@ export default ({ prisonerCellAllocationService }: Params) =>
 
     const currentUserCaseLoad = activeCaseLoad && activeCaseLoad.caseLoadId
 
-    const prisoners = await prisonerCellAllocationService.getInmates(
-      systemClientToken,
-      currentUserCaseLoad,
-      keywords as string,
-    )
+    const prisoners = await prisonerCellAllocationService.searchInmates(systemClientToken, currentUserCaseLoad, {
+      term: keywords as string,
+    })
 
-    const results =
-      prisoners &&
-      prisoners.map(prisoner => ({
-        ...prisoner,
-        assignedLivingUnitDesc: formatLocation(prisoner.assignedLivingUnitDesc),
-        name: putLastNameFirst(prisoner.firstName, prisoner.lastName),
-        formattedName: formatName(prisoner.firstName, prisoner.lastName),
-        cellHistoryUrl: `${config.prisonerProfileUrl}/prisoner/${prisoner.offenderNo}/location-details`,
-        cellMoveUrl: `/prisoner/${prisoner.offenderNo}/cell-move/confirm-cell-move?cellId=C-SWAP`,
-        profileUrl: `${config.prisonerProfileUrl}/prisoner/${prisoner.offenderNo}`,
-      }))
+    const results = prisoners.map(prisoner => ({
+      offenderNo: prisoner.prisonerNumber,
+      assignedLivingUnitDesc: formatLocation(prisoner.cellLocation),
+      name: putLastNameFirst(prisoner.firstName, prisoner.lastName),
+      formattedName: formatName(prisoner.firstName, prisoner.lastName),
+      cellHistoryUrl: `${config.prisonerProfileUrl}/prisoner/${prisoner.prisonerNumber}/location-details`,
+      cellMoveUrl: `/prisoner/${prisoner.prisonerNumber}/cell-move/confirm-cell-move?cellId=C-SWAP`,
+      profileUrl: `${config.prisonerProfileUrl}/prisoner/${prisoner.prisonerNumber}`,
+    }))
 
     return res.render('cellMove/cellMoveTemporaryMove.njk', {
       showResults: true,

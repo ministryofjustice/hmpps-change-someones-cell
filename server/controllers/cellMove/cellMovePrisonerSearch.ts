@@ -2,14 +2,12 @@ import { alertFlagLabels, cellMoveAlertCodes } from '../../shared/alertFlagValue
 import { putLastNameFirst, formatLocation, formatName } from '../../utils'
 import config from '../../config'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
-import PrisonerDetailsService from '../../services/prisonerDetailsService'
 
 type Params = {
   prisonerCellAllocationService: PrisonerCellAllocationService
-  prisonerDetailsService: PrisonerDetailsService
 }
 
-export default ({ prisonerCellAllocationService, prisonerDetailsService }: Params) =>
+export default ({ prisonerCellAllocationService }: Params) =>
   async (req, res) => {
     const {
       user: { activeCaseLoad },
@@ -30,43 +28,29 @@ export default ({ prisonerCellAllocationService, prisonerDetailsService }: Param
 
     const currentUserCaseLoad = activeCaseLoad && activeCaseLoad.caseLoadId
 
-    const prisoners = await prisonerCellAllocationService.getInmates(
+    // One call now: prisoner-search returns the alerts and category that prison-api did not, so the
+    // second lookup this screen used to make to top them up has gone (MAPA-318).
+    const prisoners = await prisonerCellAllocationService.searchInmates(
       res.locals.systemClientToken,
       currentUserCaseLoad,
-      keywords,
-      true,
+      { term: keywords as string },
     )
 
-    const prisonersAlerts = await prisonerDetailsService.getPrisoners(
-      res.locals.systemClientToken,
-      prisoners.map(p => p.offenderNo),
-    )
-
-    const prisonersWithEnhancedAlertData = prisoners.map(prisoner => {
-      const offender = prisonersAlerts.find(p => p.prisonerNumber === prisoner.offenderNo)
+    const results = prisoners.map(prisoner => {
+      const alertCodes = prisoner.alerts?.map(alert => alert.alertCode) || []
       return {
-        ...prisoner,
-        alerts: offender?.alerts || [],
-        categoryCode: offender?.category || '',
-      }
-    })
-
-    const results =
-      prisonersWithEnhancedAlertData &&
-      prisonersWithEnhancedAlertData.map(prisoner => ({
-        ...prisoner,
-        assignedLivingUnitDesc: formatLocation(prisoner.assignedLivingUnitDesc),
+        offenderNo: prisoner.prisonerNumber,
+        assignedLivingUnitDesc: formatLocation(prisoner.cellLocation),
         name: putLastNameFirst(prisoner.firstName, prisoner.lastName),
         formattedName: formatName(prisoner.firstName, prisoner.lastName),
+        categoryCode: prisoner.category || '',
         alerts: alertFlagLabels.filter(alertFlag =>
-          alertFlag.alertCodes.some(alert => {
-            const alertsDetails = prisoner.alerts.map((a: { alertCode: string }) => a.alertCode)
-            return alertsDetails && alertsDetails.includes(alert) && cellMoveAlertCodes.includes(alert)
-          }),
+          alertFlag.alertCodes.some(alert => alertCodes.includes(alert) && cellMoveAlertCodes.includes(alert)),
         ),
-        cellHistoryUrl: `${config.prisonerProfileUrl}/prisoner/${prisoner.offenderNo}/location-details`,
-        cellSearchUrl: `/prisoner/${prisoner.offenderNo}/cell-move/search-for-cell?returnToService=default`,
-      }))
+        cellHistoryUrl: `${config.prisonerProfileUrl}/prisoner/${prisoner.prisonerNumber}/location-details`,
+        cellSearchUrl: `/prisoner/${prisoner.prisonerNumber}/cell-move/search-for-cell?returnToService=default`,
+      }
+    })
 
     return res.render('cellMove/cellMovePrisonerSearch.njk', {
       showResults: true,
