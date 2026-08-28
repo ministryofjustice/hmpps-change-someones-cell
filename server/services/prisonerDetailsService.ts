@@ -36,11 +36,4 @@ export default class PrisonerDetailsService {
   async getCsraAssessments(token: string, offenderNumbers: string[]) {
     return this.prisonApiClient.getCsraAssessments(token, offenderNumbers)
   }
-
-  /**
-   * @deprecated Main offence can be obtained from prisoner search
-   */
-  async getMainOffence(token: string, bookingId: number) {
-    return this.prisonApiClient.getMainOffence(token, bookingId)
-  }
 }

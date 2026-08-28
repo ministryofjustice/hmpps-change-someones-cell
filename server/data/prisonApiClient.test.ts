@@ -110,20 +110,6 @@ describe('prisonApiClient', () => {
     })
   })
 
-  describe('getMainOffence', () => {
-    it('should return data from api', async () => {
-      const response = { data: 'data' }
-
-      fakePrisonApiClient
-        .get('/api/bookings/456/mainOffence')
-        .matchHeader('authorization', `Bearer ${accessToken}`)
-        .reply(200, response)
-
-      const output = await prisonApiClient.getMainOffence(accessToken, 456)
-      expect(output).toEqual(response)
-    })
-  })
-
   describe('getHistoryByDate', () => {
     it('should return data from api', async () => {
       const response = { data: 'data' }

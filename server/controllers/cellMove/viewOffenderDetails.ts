@@ -14,17 +14,16 @@ export default ({ prisonerDetailsService }: Params) =>
     const { systemClientToken } = res.locals
 
     try {
-      const {
-        bookingId,
-        firstName,
-        lastName,
-        age,
-        religion,
-        profileInformation,
-        physicalAttributes,
-        assignedLivingUnit,
-      } = await prisonerDetailsService.getDetails(systemClientToken, offenderNo, true)
-      const mainOffence = await prisonerDetailsService.getMainOffence(systemClientToken, bookingId)
+      // getDetails is still prison-api: the religion, profile information and physical attributes
+      // this page shows have no prisoner-search equivalent. The main offence does, so it is read
+      // from there and the two are fetched together rather than in sequence.
+      const [
+        { firstName, lastName, age, religion, profileInformation, physicalAttributes, assignedLivingUnit },
+        prisoner,
+      ] = await Promise.all([
+        prisonerDetailsService.getDetails(systemClientToken, offenderNo, true),
+        prisonerDetailsService.getPrisoner(systemClientToken, offenderNo),
+      ])
       const { ethnicity, raceCode } = physicalAttributes || {}
 
       return res.render('cellMove/offenderDetails.njk', {
@@ -36,7 +35,7 @@ export default ({ prisonerDetailsService }: Params) =>
         ethnicity: (ethnicity && raceCode && `${ethnicity} (${raceCode})`) || 'Not entered',
         sexualOrientation: getValueByType('SEXO', profileInformation, 'resultValue') || 'Not entered',
         smokerOrVaper: getValueByType('SMOKE', profileInformation, 'resultValue') || 'Not entered',
-        mainOffence: (mainOffence && mainOffence[0] && mainOffence[0].offenceDescription) || 'Not entered',
+        mainOffence: prisoner?.mainOffence?.offenceDescription || 'Not entered',
         ...getBackLinkData(req.session?.referrerUrl, offenderNo),
         profileUrl: `${config.prisonerProfileUrl}/prisoner/${offenderNo}`,
       })

@@ -15,7 +15,21 @@ export interface Prisoner {
   csra?: string
   category?: string
   mostSeriousOffence?: string
+  mainOffence?: MainOffence
   alerts: Alert[]
+}
+
+/**
+ * The most serious active charge, whether or not it resulted in a conviction.
+ *
+ * Not the same fact as `mostSeriousOffence`, which prisoner-search derives from the sentence and so
+ * cannot supply for anyone unsentenced - it was empty for every remand prisoner and every
+ * immigration detainee in a 160-prisoner production sample. This one comes from the booking's
+ * charges, so it is populated for them too.
+ */
+export interface MainOffence {
+  offenceCode: string
+  offenceDescription: string
 }
 
 export interface Alert {

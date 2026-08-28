@@ -60,11 +60,9 @@ describe('view offender details', () => {
     }
 
     prisonerDetailsService.getDetails = jest.fn().mockResolvedValue(getDetailsResponse)
-    prisonerDetailsService.getMainOffence = jest.fn().mockResolvedValue([
-      {
-        offenceDescription: '13 hours over work',
-      },
-    ])
+    prisonerDetailsService.getPrisoner = jest.fn().mockResolvedValue({
+      mainOffence: { offenceCode: 'OW13', offenceDescription: '13 hours over work' },
+    })
 
     controller = viewOffenderDetails({ prisonerDetailsService })
   })
@@ -73,7 +71,7 @@ describe('view offender details', () => {
     await controller(req, res)
 
     expect(prisonerDetailsService.getDetails).toHaveBeenCalledWith(systemClientToken, offenderNo, true)
-    expect(prisonerDetailsService.getMainOffence).toHaveBeenCalledWith(systemClientToken, 1234)
+    expect(prisonerDetailsService.getPrisoner).toHaveBeenCalledWith(systemClientToken, offenderNo)
   })
 
   it('Should render error template when there is an API error', async () => {
@@ -116,7 +114,9 @@ describe('view offender details', () => {
       physicalAttributes: {},
       religion: undefined,
     })
-    prisonerDetailsService.getMainOffence = jest.fn().mockResolvedValue([])
+    // A prisoner-search record with no mainOffence - the shape returned for anyone whose booking
+    // has no active most-serious charge.
+    prisonerDetailsService.getPrisoner = jest.fn().mockResolvedValue({})
     await controller(req, res)
 
     expect(res.render).toHaveBeenCalledWith(
