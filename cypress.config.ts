@@ -57,7 +57,6 @@ export default defineConfig({
         stubOffenderFullDetails: fullDetails => Promise.all([prisonApi.stubOffenderFullDetails(fullDetails)]),
         stubGetPrisonerNonAssociations: response => nonAssociationsApi.stubGetPrisonerNonAssociations(response),
         stubGroups: caseload => locationsInsidePrisonApi.stubGroups(caseload),
-        stubMainOffence: offence => prisonApi.stubMainOffence(offence),
         stubOffenderBasicDetails: basicDetails => Promise.all([prisonApi.stubOffenderBasicDetails(basicDetails)]),
         stubInmatesAtLocation: inmates => locationsInsidePrisonApi.stubInmatesAtLocation(inmates),
         stubActivePrisons: activeAgencies => locationsInsidePrisonApi.stubActivePrisons(activeAgencies),

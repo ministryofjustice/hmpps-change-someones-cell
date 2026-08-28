@@ -123,13 +123,6 @@ export interface Location {
   subLocations: boolean
 }
 
-export interface OffenceDetail {
-  bookingId: number
-  offenceDescription: string
-  offenceCode: string
-  statuteCode: string
-}
-
 export interface BedAssignment {
   bookingId: number
   livingUnitId: number
@@ -284,15 +277,6 @@ export default class PrisonApiClient {
     return PrisonApiClient.restClient(token).post<Assessment[]>({
       path: '/api/offender-assessments/csra/list',
       data: offenderNumbers,
-    })
-  }
-
-  /**
-   * @deprecated Main offence can be obtained from prisoner search
-   */
-  getMainOffence(token: string, bookingId: number) {
-    return PrisonApiClient.restClient(token).get<OffenceDetail[]>({
-      path: `/api/bookings/${bookingId}/mainOffence`,
     })
   }
 

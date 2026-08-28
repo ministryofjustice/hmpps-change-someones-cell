@@ -25,7 +25,10 @@ context('A user can view non associations', () => {
         { type: 'SMOKE', resultValue: 'No' },
       ],
     })
-    cy.task('stubMainOffence', [{ offenceDescription: '13 hours overwork' }])
+    cy.task('stubGetPrisoner', {
+      prisonerNumber: offenderNo,
+      mainOffence: { offenceCode: 'OW13', offenceDescription: '13 hours overwork' },
+    })
   })
 
   it('Shows the correct data for non-associations', () => {
