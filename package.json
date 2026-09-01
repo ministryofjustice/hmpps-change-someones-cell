@@ -93,7 +93,7 @@
     ]
   },
   "dependencies": {
-    "@ministryofjustice/frontend": "^10.0.1",
+    "@ministryofjustice/frontend": "^11.0.0",
     "agentkeepalive": "^4.6.0",
     "applicationinsights": "^2.9.8",
     "axios": "1.19.0",
