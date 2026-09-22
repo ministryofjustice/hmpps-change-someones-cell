@@ -172,7 +172,7 @@
     "typescript": "^6.0.3"
   },
   "overrides": {
-    "@babel/core": "8.0.5",
+    "@babel/core": "8.0.6",
     "@babel/helpers": "8.0.5",
     "@babel/runtime": "8.0.5",
     "@opentelemetry/core": "2.11.0",
