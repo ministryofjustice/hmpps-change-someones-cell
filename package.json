@@ -181,6 +181,7 @@
     "js-yaml": "5.4.2",
     "qs": "6.16.0",
     "serialize-javascript": ">=7.1.2",
-    "tmp": "0.2.7"
+    "tmp": "0.2.7",
+    "proxy-addr": "2.0.8"
   }
 }
