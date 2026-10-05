@@ -37,6 +37,25 @@ export interface CellLocation {
   prisonersInCell?: Prisoner[]
 }
 
+/**
+ * Reception space and roll from `GET /location-occupancy/reception/{prisonId}` (MAPA-311).
+ *
+ * Capacity, `noOfOccupants` and `hasSpace` are for RECP alone; `hasSpace` is false when RECP is
+ * missing or inactive. `prisoners` is everyone in the prison at RECP, COURT or TAP.
+ */
+export interface ReceptionOccupancy {
+  id?: string
+  prisonId: string
+  pathHierarchy: string
+  key: string
+  maxCapacity: number
+  workingCapacity: number
+  active: boolean
+  noOfOccupants: number
+  hasSpace: boolean
+  prisoners: Prisoner[]
+}
+
 export interface LocationGroup {
   name: string
   key: string
@@ -88,6 +107,10 @@ export default class LocationsInsidePrisonApiClient {
     return this.restClient(token).get<Occupant[]>({
       path: `/prisoner-locations/key/${key}`,
     })
+  }
+
+  getReceptionOccupancy(token: string, prisonId: string): Promise<ReceptionOccupancy> {
+    return this.restClient(token).get<ReceptionOccupancy>({ path: `/location-occupancy/reception/${prisonId}` })
   }
 
   getAgencyGroupLocationPrefix(token: string, agencyId: string, groupName: string): Promise<LocationPrefix> {

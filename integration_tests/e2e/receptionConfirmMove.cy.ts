@@ -70,14 +70,7 @@ before(() => {
   })
   cy.task('stubOffenderBasicDetails', offenderBasicDetails)
   cy.task('stubGetPrisoner', prisonerFullDetails)
-  // The real MDI-RECP shape: workingCapacity 0 must fall back to maxCapacity.
-  cy.task('stubLocation', {
-    prisonId: 'MDI',
-    key: 'MDI-RECP',
-    pathHierarchy: 'RECP',
-    capacity: { maxCapacity: 99, workingCapacity: 0 },
-  })
-  cy.task('stubAttributeSearch', [])
+  cy.task('stubReceptionOccupancy', {})
   cy.task('stubCellMoveReasons', [
     { code: 'RAIM', description: 'Reception and induction moves', active: true },
     { code: 'SS', description: 'Someone’s safety', active: true },
@@ -100,16 +93,14 @@ describe('Reception confirm move page ', () => {
 
 describe('Reception full journey', () => {
   it('should redirect to reception full page', () => {
-    // One occupant against a capacity of one: reception is full.
-    cy.task('stubLocation', {
-      prisonId: 'MDI',
-      key: 'MDI-RECP',
-      pathHierarchy: 'RECP',
-      capacity: { maxCapacity: 1, workingCapacity: 0 },
+    cy.task('stubReceptionOccupancy', {
+      maxCapacity: 1,
+      noOfOccupants: 1,
+      hasSpace: false,
+      prisoners: [
+        { prisonerNumber: 'A1111AA', firstName: 'Full', lastName: 'House', prisonId: 'MDI', cellLocation: 'RECP' },
+      ],
     })
-    cy.task('stubAttributeSearch', [
-      { prisonerNumber: 'A1111AA', firstName: 'Full', lastName: 'House', prisonId: 'MDI', cellLocation: 'RECP' },
-    ])
 
     const page = receptionConfirmMovePage.goTo(offenderNo)
     page.form().selectReceptionReason().click()
@@ -130,14 +121,7 @@ describe('Reception full journey', () => {
   })
 
   it('A user is presented with locked message when 423 error', () => {
-    // The real MDI-RECP shape: workingCapacity 0 must fall back to maxCapacity.
-    cy.task('stubLocation', {
-      prisonId: 'MDI',
-      key: 'MDI-RECP',
-      pathHierarchy: 'RECP',
-      capacity: { maxCapacity: 99, workingCapacity: 0 },
-    })
-    cy.task('stubAttributeSearch', [])
+    cy.task('stubReceptionOccupancy', {})
     cy.task('stubMoveToCell', 423)
 
     const page = receptionConfirmMovePage.goTo(offenderNo)

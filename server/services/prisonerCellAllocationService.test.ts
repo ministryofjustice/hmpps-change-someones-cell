@@ -8,7 +8,7 @@ import {
 import { BedAssignment, Page } from '../data/prisonApiClient'
 import { CellMovement, CellMoveReason } from '../data/cellMovementsApiClient'
 import PrisonerCellAllocationService from './prisonerCellAllocationService'
-import { CellLocation, Location, Occupant, getActualCapacity } from '../data/locationsInsidePrisonApiClient'
+import { CellLocation, Occupant, ReceptionOccupancy, getActualCapacity } from '../data/locationsInsidePrisonApiClient'
 import { Prisoner } from '../data/prisonerSearchApiClient'
 
 jest.mock('../data/alertsApiClient')
@@ -385,14 +385,20 @@ describe('Prisoner cell allocation service', () => {
   })
 
   describe('reception', () => {
-    // The real MDI-RECP shape: workingCapacity 0 must fall through to maxCapacity, or reception
-    // would read as permanently full.
-    const receptionLocation = {
+    // The real MDI-RECP shape: workingCapacity 0 falls through to maxCapacity for display.
+    const reception = (overrides: Partial<ReceptionOccupancy> = {}): ReceptionOccupancy => ({
+      id: 'abc',
       prisonId: 'LEI',
-      key: 'LEI-RECP',
       pathHierarchy: 'RECP',
-      capacity: { maxCapacity: 99, workingCapacity: 0 },
-    } as Location
+      key: 'LEI-RECP',
+      maxCapacity: 99,
+      workingCapacity: 0,
+      active: true,
+      noOfOccupants: 0,
+      hasSpace: true,
+      prisoners: [],
+      ...overrides,
+    })
 
     const prisonerInReception = (prisonerNumber: string, cellLocation = 'RECP') =>
       ({
@@ -403,57 +409,48 @@ describe('Prisoner cell allocation service', () => {
       }) as Prisoner
 
     describe('getReceptionCapacity', () => {
-      it('reports space when occupants are below the actual capacity', async () => {
-        locationsInsidePrisonApiClient.getLocation.mockResolvedValue(receptionLocation)
-        prisonerSearchApiClient.findPrisonersInCellLocations.mockResolvedValue([prisonerInReception('G3878UK')])
+      it('maps the reception from locations-inside-prison', async () => {
+        locationsInsidePrisonApiClient.getReceptionOccupancy.mockResolvedValue(reception({ noOfOccupants: 1 }))
 
         const result = await prisonerCellAllocationService.getReceptionCapacity(token, 'LEI')
 
         expect(result).toEqual({ locationKey: 'LEI-RECP', capacity: 99, occupants: 1, hasSpace: true })
-        expect(locationsInsidePrisonApiClient.getLocation).toHaveBeenCalledWith(token, 'LEI-RECP')
-        expect(prisonerSearchApiClient.findPrisonersInCellLocations).toHaveBeenCalledWith(token, 'LEI', ['RECP'])
-      })
-
-      it('reports no space when reception is exactly full', async () => {
-        locationsInsidePrisonApiClient.getLocation.mockResolvedValue({
-          ...receptionLocation,
-          capacity: { maxCapacity: 2, workingCapacity: 0 },
-        } as Location)
-        prisonerSearchApiClient.findPrisonersInCellLocations.mockResolvedValue([
-          prisonerInReception('G3878UK'),
-          prisonerInReception('A1234BC'),
-        ])
-
-        const result = await prisonerCellAllocationService.getReceptionCapacity(token, 'LEI')
-
-        expect(result).toEqual({ locationKey: 'LEI-RECP', capacity: 2, occupants: 2, hasSpace: false })
+        expect(locationsInsidePrisonApiClient.getReceptionOccupancy).toHaveBeenCalledWith(token, 'LEI')
       })
 
       it('prefers working capacity when it is set', async () => {
-        locationsInsidePrisonApiClient.getLocation.mockResolvedValue({
-          ...receptionLocation,
-          capacity: { maxCapacity: 99, workingCapacity: 1 },
-        } as Location)
-        prisonerSearchApiClient.findPrisonersInCellLocations.mockResolvedValue([prisonerInReception('G3878UK')])
+        locationsInsidePrisonApiClient.getReceptionOccupancy.mockResolvedValue(
+          reception({ workingCapacity: 1, noOfOccupants: 1, hasSpace: false }),
+        )
 
         const result = await prisonerCellAllocationService.getReceptionCapacity(token, 'LEI')
 
         expect(result).toEqual({ locationKey: 'LEI-RECP', capacity: 1, occupants: 1, hasSpace: false })
       })
 
-      // A prison with no reception used to surface as prison-api's empty list, i.e. "no space".
+      // The API decides space: an inactive reception keeps its max capacity but must never be offered.
+      it('takes space from the api rather than working it out from capacity', async () => {
+        locationsInsidePrisonApiClient.getReceptionOccupancy.mockResolvedValue(
+          reception({ active: false, hasSpace: false }),
+        )
+
+        const result = await prisonerCellAllocationService.getReceptionCapacity(token, 'LEI')
+
+        expect(result).toEqual({ locationKey: 'LEI-RECP', capacity: 99, occupants: 0, hasSpace: false })
+      })
+
       it('reports no space when the prison has no reception location', async () => {
-        locationsInsidePrisonApiClient.getLocation.mockRejectedValue({ status: 404 })
-        prisonerSearchApiClient.findPrisonersInCellLocations.mockResolvedValue([])
+        locationsInsidePrisonApiClient.getReceptionOccupancy.mockResolvedValue(
+          reception({ id: undefined, maxCapacity: 0, active: false, hasSpace: false }),
+        )
 
         const result = await prisonerCellAllocationService.getReceptionCapacity(token, 'LEI')
 
         expect(result).toEqual({ locationKey: 'LEI-RECP', capacity: 0, occupants: 0, hasSpace: false })
       })
 
-      it('propagates errors other than a missing reception', async () => {
-        locationsInsidePrisonApiClient.getLocation.mockRejectedValue(new Error('some error'))
-        prisonerSearchApiClient.findPrisonersInCellLocations.mockResolvedValue([])
+      it('propagates error', async () => {
+        locationsInsidePrisonApiClient.getReceptionOccupancy.mockRejectedValue(new Error('some error'))
 
         await expect(prisonerCellAllocationService.getReceptionCapacity(token, 'LEI')).rejects.toEqual(
           new Error('some error'),
@@ -463,57 +460,49 @@ describe('Prisoner cell allocation service', () => {
 
     describe('getReceptionOccupancy', () => {
       it('returns those in reception with their active alert codes', async () => {
-        locationsInsidePrisonApiClient.getLocation.mockResolvedValue(receptionLocation)
-        prisonerSearchApiClient.findPrisonersInCellLocations.mockResolvedValue([prisonerInReception('G3878UK')])
+        locationsInsidePrisonApiClient.getReceptionOccupancy.mockResolvedValue(
+          reception({ noOfOccupants: 1, prisoners: [prisonerInReception('G3878UK')] }),
+        )
         alertsApiClient.getAlertsGlobal.mockResolvedValue({
           content: [{ isActive: true, prisonNumber: 'G3878UK', alertCode: { code: 'XGANG' } }],
         })
 
         const result = await prisonerCellAllocationService.getReceptionOccupancy(token, 'LEI')
 
-        expect(result.offenders).toEqual([
-          { offenderNo: 'G3878UK', firstName: 'Garry', lastName: 'Kasparov', alerts: ['XGANG'] },
-        ])
+        expect(result).toEqual({
+          locationKey: 'LEI-RECP',
+          capacity: 99,
+          occupants: 1,
+          hasSpace: true,
+          offenders: [{ offenderNo: 'G3878UK', firstName: 'Garry', lastName: 'Kasparov', alerts: ['XGANG'] }],
+        })
       })
 
-      // prison-api matched every virtual location, not just RECP, so the roll must too.
-      it('searches the whole virtual location set for the roll', async () => {
-        locationsInsidePrisonApiClient.getLocation.mockResolvedValue(receptionLocation)
-        prisonerSearchApiClient.findPrisonersInCellLocations.mockResolvedValue([])
-
-        await prisonerCellAllocationService.getReceptionOccupancy(token, 'LEI')
-
-        expect(prisonerSearchApiClient.findPrisonersInCellLocations).toHaveBeenCalledWith(token, 'LEI', [
-          'RECP',
-          'COURT',
-          'TAP',
-        ])
-      })
-
-      // Capacity is a RECP-only question, so those at COURT or on TAP must not count against it.
-      it('counts only RECP towards capacity, from the single search', async () => {
-        locationsInsidePrisonApiClient.getLocation.mockResolvedValue({
-          ...receptionLocation,
-          capacity: { maxCapacity: 2, workingCapacity: 0 },
-        } as Location)
-        prisonerSearchApiClient.findPrisonersInCellLocations.mockResolvedValue([
-          prisonerInReception('G3878UK', 'RECP'),
-          prisonerInReception('A1234BC', 'COURT'),
-          prisonerInReception('B1234CD', 'TAP'),
-        ])
+      // The roll covers COURT and TAP as well as RECP; only RECP counts towards space, which the API reports.
+      it('lists everyone the api returns, without recounting occupancy', async () => {
+        locationsInsidePrisonApiClient.getReceptionOccupancy.mockResolvedValue(
+          reception({
+            noOfOccupants: 1,
+            prisoners: [
+              prisonerInReception('G3878UK', 'RECP'),
+              prisonerInReception('A1234BC', 'COURT'),
+              prisonerInReception('B1234CD', 'TAP'),
+            ],
+          }),
+        )
         alertsApiClient.getAlertsGlobal.mockResolvedValue({ content: [] })
 
         const result = await prisonerCellAllocationService.getReceptionOccupancy(token, 'LEI')
 
         expect(result.occupants).toEqual(1)
-        expect(result.hasSpace).toEqual(true)
-        expect(result.offenders).toHaveLength(3)
-        expect(prisonerSearchApiClient.findPrisonersInCellLocations).toHaveBeenCalledTimes(1)
+        expect(result.offenders.map(offender => offender.offenderNo)).toEqual(['G3878UK', 'A1234BC', 'B1234CD'])
+        expect(locationsInsidePrisonApiClient.getReceptionOccupancy).toHaveBeenCalledTimes(1)
       })
 
       it('defaults alerts to an empty list when none are returned', async () => {
-        locationsInsidePrisonApiClient.getLocation.mockResolvedValue(receptionLocation)
-        prisonerSearchApiClient.findPrisonersInCellLocations.mockResolvedValue([prisonerInReception('G3878UK')])
+        locationsInsidePrisonApiClient.getReceptionOccupancy.mockResolvedValue(
+          reception({ noOfOccupants: 1, prisoners: [prisonerInReception('G3878UK')] }),
+        )
         alertsApiClient.getAlertsGlobal.mockResolvedValue(undefined)
 
         const result = await prisonerCellAllocationService.getReceptionOccupancy(token, 'LEI')
@@ -522,8 +511,7 @@ describe('Prisoner cell allocation service', () => {
       })
 
       it('does not call for alerts when reception is empty', async () => {
-        locationsInsidePrisonApiClient.getLocation.mockResolvedValue(receptionLocation)
-        prisonerSearchApiClient.findPrisonersInCellLocations.mockResolvedValue([])
+        locationsInsidePrisonApiClient.getReceptionOccupancy.mockResolvedValue(reception())
 
         const result = await prisonerCellAllocationService.getReceptionOccupancy(token, 'LEI')
 
@@ -532,8 +520,7 @@ describe('Prisoner cell allocation service', () => {
       })
 
       it('propagates error', async () => {
-        locationsInsidePrisonApiClient.getLocation.mockResolvedValue(receptionLocation)
-        prisonerSearchApiClient.findPrisonersInCellLocations.mockRejectedValue(new Error('some error'))
+        locationsInsidePrisonApiClient.getReceptionOccupancy.mockRejectedValue(new Error('some error'))
 
         await expect(prisonerCellAllocationService.getReceptionOccupancy(token, 'LEI')).rejects.toEqual(
           new Error('some error'),

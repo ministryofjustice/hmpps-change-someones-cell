@@ -209,6 +209,36 @@ export const stubCellsWithCapacity = ({ prisonId, response }: { prisonId: string
     },
   })
 
+// Defaults to the real MDI-RECP shape: workingCapacity 0, so maxCapacity applies, with space and nobody in.
+export const stubReceptionOccupancy = (reception: Record<string, unknown> = {}) => {
+  const response = {
+    id: 'reception-uuid',
+    prisonId: 'MDI',
+    pathHierarchy: 'RECP',
+    key: 'MDI-RECP',
+    maxCapacity: 99,
+    workingCapacity: 0,
+    active: true,
+    noOfOccupants: 0,
+    hasSpace: true,
+    prisoners: [],
+    ...reception,
+  }
+  return stubFor({
+    request: {
+      method: 'GET',
+      url: `/locations-inside-prison-api/location-occupancy/reception/${response.prisonId}`,
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: response,
+    },
+  })
+}
+
 export default {
   stubHealth,
   stubGroups,
@@ -217,4 +247,5 @@ export default {
   stubCellsWithCapacity,
   stubCellsWithCapacityByGroupName,
   stubActivePrisons,
+  stubReceptionOccupancy,
 }
