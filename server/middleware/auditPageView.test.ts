@@ -75,8 +75,8 @@ describe('auditPageView', () => {
     await request(appWithAuditing()).get('/prisoner/A1234BC/cell-move/search-for-cell').expect(200).expect(renderedHtml)
 
     expect(loggedEvents()).toEqual([
-      { subject: forPrisoner, what: 'PAGE_VIEW' },
-      { subject: forPrisoner, what: 'PAGE_VIEW_ACCESS_ATTEMPT' },
+      { subject: forPrisoner, what: 'VIEW_PAGE' },
+      { subject: forPrisoner, what: 'VIEW_PAGE_ACCESS_ATTEMPT' },
     ])
   })
 
@@ -108,7 +108,7 @@ describe('auditPageView', () => {
   it('logs only an attempt when a request does not render a page', async () => {
     await request(appWithAuditing()).get('/prisoner/A1234BC/cell-move/missing').expect(404)
 
-    expect(loggedEvents()).toEqual([{ subject: forPrisoner, what: 'PAGE_VIEW_ACCESS_ATTEMPT' }])
+    expect(loggedEvents()).toEqual([{ subject: forPrisoner, what: 'VIEW_PAGE_ACCESS_ATTEMPT' }])
   })
 
   it('does not audit prisoner images', async () => {

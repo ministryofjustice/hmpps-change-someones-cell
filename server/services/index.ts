@@ -1,6 +1,5 @@
 import { AuditServiceFactory } from '@ministryofjustice/hmpps-audit-client'
 import { dataAccess } from '../data'
-import config from '../config'
 import logger from '../../logger'
 import UserService from './userService'
 import FeComponentsService from './feComponentsService'
@@ -28,7 +27,8 @@ export const services = () => {
   } = dataAccess()
 
   const userService = new UserService(manageUsersApiClient, prisonApiClient)
-  const auditService = AuditServiceFactory.createInstance(config.sqs.audit, logger)
+  // reads AUDIT_ENABLED, AUDIT_SQS_REGION, AUDIT_SQS_QUEUE_URL and AUDIT_SERVICE_NAME
+  const auditService = AuditServiceFactory.configureFromEnv(logger)
   const feComponentsService = new FeComponentsService(feComponentsClient)
   const prisonerCellAllocationService = new PrisonerCellAllocationService(
     alertsApiClient,

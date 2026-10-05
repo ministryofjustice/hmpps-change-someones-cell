@@ -20,8 +20,8 @@ type Subject = { subjectType: SubjectType; subjectId?: string }
 /**
  * Audits page views to HMPPS Audit.
  *
- * Emits PAGE_VIEW_ACCESS_ATTEMPT once the response closes – covering redirects, errors and
- * requests refused downstream by the authorisation middleware – and PAGE_VIEW when a page
+ * Emits VIEW_PAGE_ACCESS_ATTEMPT once the response closes – covering redirects, errors and
+ * requests refused downstream by the authorisation middleware – and VIEW_PAGE when a page
  * renders successfully.
  *
  * Mount after authentication but before authorisation, so that refused requests are still
@@ -78,10 +78,9 @@ function subjectOfRequest(req: Request): Subject {
 
 function logPageView(auditService: AuditService, auditEvent: Express.Locals['auditEvent'], isAttempt = false): void {
   if (!auditEvent) return
-  const event = { ...auditEvent, what: isAttempt ? 'PAGE_VIEW_ACCESS_ATTEMPT' : 'PAGE_VIEW' }
-  // TEMP: for local testing of audit events – remove before raising the PR
-  // eslint-disable-next-line no-console
-  console.log('AUDIT EVENT', JSON.stringify(event))
+
+  const event = { ...auditEvent, what: isAttempt ? 'VIEW_PAGE_ACCESS_ATTEMPT' : 'VIEW_PAGE' }
+
   // auditing must not be able to break page rendering, so never throw
   auditService.logAuditEvent(event, { throwOnError: false, logOnError: true }).catch(error => {
     logger.error(error, 'Failed to audit page view')
