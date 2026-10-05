@@ -72,12 +72,11 @@ consider-risks-reception → confirm-reception-move → [POST] → confirmation
 `moveToCell`, passing the `{prisonId}-RECP` location key as the destination — the same kind of
 locations-inside-prison key the cell journey uses, so both journeys now share one identifier.
 
-Reception capacity and the in-reception roll no longer come from prison-api (MAPA-288). Capacity
-is the locations-inside-prison location, and occupancy is a prisoner-search attribute search on
-`cellLocation` — locations-inside-prison cannot report it, because `RECP` is a
-`VirtualResidentialLocation` rather than a `Cell` and its occupancy endpoints filter it out.
-Note the two use different location sets, matching what prison-api did: capacity is `RECP` alone,
-while the roll matches every virtual location (`RECP`, `COURT`, `TAP`).
+Reception space and the in-reception roll come from one locations-inside-prison call,
+`GET /location-occupancy/reception/{prisonId}` (MAPA-311; prison-api was retired from this under
+MAPA-288). The API owns the rules, which match what prison-api did: space is for `RECP` alone and is
+never offered when `RECP` is missing or inactive, while the roll lists everyone in the prison at
+`RECP`, `COURT` or `TAP`. The service takes `hasSpace` as given rather than working it out.
 
 ### C-SWAP — note the asymmetry
 
