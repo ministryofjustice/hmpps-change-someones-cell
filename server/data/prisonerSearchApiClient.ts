@@ -1,6 +1,5 @@
 import config from '../config'
 import RestClient from './restClient'
-import logger from '../../logger'
 
 export interface Prisoner {
   prisonerNumber: string
@@ -45,10 +44,7 @@ export interface AttributeSearchPage<T> {
   totalPages: number
 }
 
-// Reception holds tens of people, not thousands; the size only exists so a single page is certain.
-const ATTRIBUTE_SEARCH_PAGE_SIZE = 2000
-
-// A whole-prison search really does run to thousands, so this one pages rather than truncating.
+// A whole-prison search runs to thousands, so it pages rather than truncating.
 const PRISON_SEARCH_PAGE_SIZE = 500
 
 export default class PrisonerSearchApiClient {
@@ -72,54 +68,14 @@ export default class PrisonerSearchApiClient {
   }
 
   /**
-   * Prisoners currently inside one of the given cell locations at a prison.
-   *
-   * `cellLocation` on the prisoner record is the path hierarchy without the prison prefix, so
-   * virtual locations are matched by their bare code - 'RECP', 'COURT', 'TAP'.
-   *
-   * Two details of the `IN` condition are load-bearing (prisoner-search's `StringMatcher.kt`):
-   * it splits `searchTerm` on commas to build the list, and unlike `IS` it compiles to a
-   * `termsQuery` with no `caseInsensitive(true)` - so the codes must match the indexed case.
-   */
-  async findPrisonersInCellLocations(token: string, prisonId: string, cellLocations: string[]): Promise<Prisoner[]> {
-    const page = await PrisonerSearchApiClient.restClient(token).post<AttributeSearchPage<Prisoner>>({
-      path: `/attribute-search`,
-      query: { size: ATTRIBUTE_SEARCH_PAGE_SIZE },
-      data: {
-        joinType: 'AND',
-        queries: [
-          {
-            joinType: 'AND',
-            matchers: [
-              { type: 'String', attribute: 'prisonId', condition: 'IS', searchTerm: prisonId },
-              { type: 'String', attribute: 'cellLocation', condition: 'IN', searchTerm: cellLocations.join(',') },
-              { type: 'String', attribute: 'inOutStatus', condition: 'IS', searchTerm: 'IN' },
-            ],
-          },
-        ],
-      },
-    })
-
-    // Truncation would silently under-report occupancy, so say so rather than hide it.
-    if (page?.totalPages > 1) {
-      logger.warn(
-        `Attribute search for ${cellLocations} at ${prisonId} matched ${page.totalElements} prisoners, using the first ${ATTRIBUTE_SEARCH_PAGE_SIZE}`,
-      )
-    }
-
-    return page?.content || []
-  }
-
-  /**
    * Prisoners inside one prison, optionally narrowed by a search term or a cell location prefix.
    *
    * Replaces prison-api's `getInmates`. `term` matches against name or prisoner number;
    * `cellLocationPrefix` takes a residential location such as `MDI-1` and covers every cell beneath
-   * it - which [findPrisonersInCellLocations] cannot do, because its `IN` condition needs exact cell
-   * locations rather than a prefix.
+   * it.
    *
-   * Unlike the attribute search this endpoint is paged and defaults to ten per page, so it pages to
-   * the end. Truncating here would silently drop people from a roll list.
+   * This endpoint is paged and defaults to ten per page, so it pages to the end. Truncating here
+   * would silently drop people from a roll list.
    */
   async findPrisonersInPrison(
     token: string,

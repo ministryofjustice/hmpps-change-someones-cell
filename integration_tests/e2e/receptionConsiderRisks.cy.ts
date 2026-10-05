@@ -95,14 +95,7 @@ before(() => {
   })
   cy.task('stubGetPrisoner', prisonerFullDetails)
   cy.task('stubOffenderBasicDetails', offenderBasicDetails)
-  // The real MDI-RECP shape: workingCapacity 0 must fall back to maxCapacity.
-  cy.task('stubLocation', {
-    prisonId: 'MDI',
-    key: 'MDI-RECP',
-    pathHierarchy: 'RECP',
-    capacity: { maxCapacity: 99, workingCapacity: 0 },
-  })
-  cy.task('stubAttributeSearch', [])
+  cy.task('stubReceptionOccupancy', {})
   cy.task('stubCsraAssessments', {
     offenderNumbers: [offenderNo, 'G0873UU', 'G6795VD'],
     assessments: [
@@ -184,20 +177,22 @@ before(() => {
       },
     ],
   })
-  // Reception occupancy and the roll are one search now, so this also drives "has space":
-  // four in RECP against the stubbed capacity of 99.
-  cy.task('stubAttributeSearch', [
-    { prisonerNumber: 'G0873UU', firstName: 'Daren', lastName: 'Wetch', prisonId: 'MDI', cellLocation: 'RECP' },
-    {
-      prisonerNumber: 'G6980GG',
-      firstName: 'Onshinthomasin',
-      lastName: 'Aisho',
-      prisonId: 'MDI',
-      cellLocation: 'RECP',
-    },
-    { prisonerNumber: 'G6795VD', firstName: 'Conrad', lastName: 'Nattrass', prisonId: 'MDI', cellLocation: 'RECP' },
-    { prisonerNumber: 'G2755UN', firstName: 'Okouston', lastName: 'Bradisha', prisonId: 'MDI', cellLocation: 'RECP' },
-  ])
+  // Four in RECP against a capacity of 99, so there is space, and the roll lists all four.
+  cy.task('stubReceptionOccupancy', {
+    noOfOccupants: 4,
+    prisoners: [
+      { prisonerNumber: 'G0873UU', firstName: 'Daren', lastName: 'Wetch', prisonId: 'MDI', cellLocation: 'RECP' },
+      {
+        prisonerNumber: 'G6980GG',
+        firstName: 'Onshinthomasin',
+        lastName: 'Aisho',
+        prisonId: 'MDI',
+        cellLocation: 'RECP',
+      },
+      { prisonerNumber: 'G6795VD', firstName: 'Conrad', lastName: 'Nattrass', prisonId: 'MDI', cellLocation: 'RECP' },
+      { prisonerNumber: 'G2755UN', firstName: 'Okouston', lastName: 'Bradisha', prisonId: 'MDI', cellLocation: 'RECP' },
+    ],
+  })
   cy.task('stubMoveToCell')
 })
 
@@ -230,16 +225,14 @@ context('Successful reception move journey', () => {
 
 context('Reception full journey', () => {
   it('should redirect to reception full page', () => {
-    // One occupant against a capacity of one: reception is full.
-    cy.task('stubLocation', {
-      prisonId: 'MDI',
-      key: 'MDI-RECP',
-      pathHierarchy: 'RECP',
-      capacity: { maxCapacity: 1, workingCapacity: 0 },
+    cy.task('stubReceptionOccupancy', {
+      maxCapacity: 1,
+      noOfOccupants: 1,
+      hasSpace: false,
+      prisoners: [
+        { prisonerNumber: 'A1111AA', firstName: 'Full', lastName: 'House', prisonId: 'MDI', cellLocation: 'RECP' },
+      ],
     })
-    cy.task('stubAttributeSearch', [
-      { prisonerNumber: 'A1111AA', firstName: 'Full', lastName: 'House', prisonId: 'MDI', cellLocation: 'RECP' },
-    ])
 
     cy.visit(`/prisoner/${offenderNo}/reception-move/consider-risks-reception`, { failOnStatusCode: false })
 

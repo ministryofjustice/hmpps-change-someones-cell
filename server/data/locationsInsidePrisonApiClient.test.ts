@@ -60,6 +60,20 @@ describe('LocationsInsidePrisonApiClient', () => {
     })
   })
 
+  describe('getReceptionOccupancy', () => {
+    it('should return reception space and roll from api', async () => {
+      const response = { key: 'MDI-RECP', hasSpace: true, noOfOccupants: 1, prisoners: [] }
+
+      fakeLocationsInsidePrisonApiClient
+        .get('/location-occupancy/reception/MDI')
+        .matchHeader('authorization', `Bearer ${accessToken}`)
+        .reply(200, response)
+
+      const output = await locationsInsidePrisonApiClient.getReceptionOccupancy(accessToken, 'MDI')
+      expect(output).toEqual(response)
+    })
+  })
+
   describe('getInmatesAtLocation', () => {
     it('should return occupants from api', async () => {
       const response = { data: 'data' }
