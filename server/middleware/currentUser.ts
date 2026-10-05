@@ -41,6 +41,8 @@ export default ({ userService }: Services) => {
       const user: User = {
         ...res.locals.user,
         username: userDetails.username,
+        userId: userDetails.userId ?? res.locals.user?.userId,
+        userUuid: userDetails.userUuid ?? userDetails.uuid ?? res.locals.user?.userUuid,
         userRoles,
         allCaseloads,
         displayName: forenameToInitial(userDetails.name as any),

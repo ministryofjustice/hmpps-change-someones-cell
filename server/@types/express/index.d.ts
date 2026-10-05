@@ -1,3 +1,5 @@
+import { UUID } from 'crypto'
+import type { AuditEvent } from '@ministryofjustice/hmpps-audit-client'
 import { CaseLoad } from '../../data/prisonApiClient'
 import type { UserDetails } from '../../services/userService'
 
@@ -18,6 +20,8 @@ export declare global {
     interface User extends Partial<UserDetails> {
       token: string
       authSource: string
+      userId?: string
+      userUuid?: UUID // This is a UUID created by HMPPS Auth upon first user login that is unique to the user across all
       activeCaseLoad?: CaseLoad
     }
 
@@ -28,6 +32,7 @@ export declare global {
     }
 
     interface Locals {
+      auditEvent?: Omit<AuditEvent, 'what'>
       user: Express.User
     }
   }

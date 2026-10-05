@@ -7,8 +7,9 @@ export interface User {
   name?: string
   active?: boolean
   authSource?: string
-  uuid?: string
   userId?: string
+  userUuid?: string // This is a UUID created by HMPPS Auth upon first user login that is unique to the user across all authSources
+  uuid?: string // deprecated alias for userUuid
   staffId?: number // deprecated, use userId
   activeCaseLoadId?: string // deprecated, use user roles api
 }
