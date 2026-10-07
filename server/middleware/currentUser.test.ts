@@ -45,6 +45,7 @@ describe('Current user', () => {
       name: 'Jim Smith',
       active: true,
       userId: '123456',
+      userUuid: '11111111-1111-1111-1111-111111111111',
       activeCaseLoadId: 'MDI',
     })
 
@@ -78,6 +79,8 @@ describe('Current user', () => {
       displayName: 'J. Smith',
       token: 'token-1',
       userRoles: null,
+      userId: '123456',
+      userUuid: '11111111-1111-1111-1111-111111111111',
       username: 'Some_username',
     })
   })
@@ -87,6 +90,7 @@ describe('Current user', () => {
       name: 'Jim Smith',
       active: true,
       userId: '123456',
+      userUuid: '11111111-1111-1111-1111-111111111111',
       activeCaseLoadId: 'MDI',
     })
 
@@ -109,6 +113,8 @@ describe('Current user', () => {
       displayName: 'J. Smith',
       token: 'token-1',
       userRoles: null,
+      userId: '123456',
+      userUuid: '11111111-1111-1111-1111-111111111111',
       username: 'Some_username',
     })
   })

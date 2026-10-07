@@ -11,6 +11,25 @@ context('Cell move homepage', () => {
       cy.signIn()
     })
 
+    it('sends page view events to HMPPS Audit', () => {
+      cy.verifyAuditEvents([
+        {
+          what: 'VIEW_PAGE',
+          who: 'TEST_USER',
+          service: 'hmpps-change-someones-cell',
+          subjectType: 'NOT_APPLICABLE',
+          details: JSON.stringify({ pageUrl: '/' }),
+        },
+        {
+          what: 'VIEW_PAGE_ACCESS_ATTEMPT',
+          who: 'TEST_USER',
+          service: 'hmpps-change-someones-cell',
+          subjectType: 'NOT_APPLICABLE',
+          details: JSON.stringify({ pageUrl: '/' }),
+        },
+      ])
+    })
+
     it('should show non role specific tasks', () => {
       cy.visit('/')
 

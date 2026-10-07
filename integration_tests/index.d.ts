@@ -7,5 +7,10 @@ declare namespace Cypress {
     signIn(options?: { failOnStatusCode: boolean }): Chainable<AUTWindow>
     setupComponentsStubs(): Chainable<AUTWindow>
     setupComponentsStubsFail(): Chainable<AUTWindow>
+
+    /**
+     * Asserts on the audit events sent to HMPPS Audit so far
+     */
+    verifyAuditEvents(events: object[]): Chainable<unknown>
   }
 }

@@ -1,4 +1,5 @@
 import jwt from 'jsonwebtoken'
+import type { SuperAgentRequest } from 'superagent'
 import { stubUser, stubUserMe } from './users'
 import { getMatchingRequests, stubFor } from './wiremock'
 import { stubStaffRoles, stubUserLocations } from './prisonApi'
@@ -123,7 +124,15 @@ const stubClientCredentialsRequest = () =>
     },
   })
 
+/** the audit SQS queue; the client posts SendMessage to the root path */
+const stubAuditSqs = (): SuperAgentRequest =>
+  stubFor({
+    request: { method: 'POST', url: '/' },
+    response: { status: 200, headers: { 'Content-Type': 'text/xml' }, body: '{}' },
+  })
+
 export default {
+  stubAuditSqs,
   stubHealth,
   getSignInUrl,
   stubSignIn: (username: string, caseloadId: string, roles: string[] = []) =>
@@ -136,6 +145,7 @@ export default {
       stubUser(username, caseloadId),
       stubUserLocations(),
       stubStaffRoles(),
+      stubAuditSqs(),
     ]),
   stubSignInCourt: () =>
     Promise.all([

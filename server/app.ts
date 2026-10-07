@@ -19,6 +19,7 @@ import setUpWebSecurity from './middleware/setUpWebSecurity'
 import setUpWebSession from './middleware/setUpWebSession'
 import getFrontendComponents from './middleware/getFeComponents'
 import populateClientToken from './middleware/populateClientToken'
+import auditPageView from './middleware/auditPageView'
 
 import routes from './routes'
 import type { Services } from './services'
@@ -42,6 +43,8 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpStaticResources())
   nunjucksSetup(app, services.applicationInfo)
   app.use(setUpAuthentication())
+  // before authorisation, so that refused requests are still audited as access attempts
+  app.get('*', auditPageView(services.auditService))
   app.use(authorisationMiddleware(['ROLE_CELL_MOVE']))
   app.use(setUpCsrf())
   app.get('*', getFrontendComponents(services))

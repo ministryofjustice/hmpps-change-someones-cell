@@ -2,6 +2,9 @@ generic-service:
   nameOverride: hmpps-change-someones-cell
   productId: "DPS059" # productId for the product that this belongs too, i.e. DPS001, see README.md for details
 
+  # IRSA service account with permission to send to the HMPPS Audit SQS queue
+  serviceAccountName: "hmpps-change-someones-cell-audit"
+
   replicaCount: 4
 
   image:
@@ -34,6 +37,9 @@ generic-service:
     REDIS_TLS_ENABLED: "true"
     TOKEN_VERIFICATION_ENABLED: "true"
     APPLICATIONINSIGHTS_CONNECTION_STRING: "InstrumentationKey=$(APPINSIGHTS_INSTRUMENTATIONKEY);IngestionEndpoint=https://northeurope-0.in.applicationinsights.azure.com/;LiveEndpoint=https://northeurope.livediagnostics.monitor.azure.com/"
+    AUDIT_ENABLED: "true"
+    AUDIT_SQS_REGION: "eu-west-2"
+    AUDIT_SERVICE_NAME: "hmpps-change-someones-cell"
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:
@@ -53,6 +59,9 @@ generic-service:
     csc-redis:
       REDIS_HOST: "REDIS_HOST"
       REDIS_AUTH_TOKEN: "REDIS_PASSWORD"
+    sqs-hmpps-audit-secret:
+      AUDIT_SQS_QUEUE_URL: "sqs_queue_url"
+      AUDIT_SQS_QUEUE_NAME: "sqs_queue_name"
 
   allowlist:
     groups:
