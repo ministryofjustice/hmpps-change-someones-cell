@@ -152,7 +152,7 @@
     "@types/superagent": "^8.1.11",
     "@types/supertest": "^7.2.1",
     "audit-ci": "^7.1.0",
-    "concurrently": "^10.0.5",
+    "concurrently": "10.0.6",
     "cookie-session": "^2.1.1",
     "cypress": "16.1.0",
     "cypress-multi-reporters": "^2.0.5",
@@ -181,7 +181,7 @@
     "brace-expansion": "5.0.12",
     "form-data": "4.0.6",
     "js-yaml": "5.4.2",
-    "qs": "6.16.0",
+    "qs": "6.16.1",
     "serialize-javascript": ">=7.1.2",
     "tmp": "0.2.7",
     "proxy-addr": "2.0.8"
