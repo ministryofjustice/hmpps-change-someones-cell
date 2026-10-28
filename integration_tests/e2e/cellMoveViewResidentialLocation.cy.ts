@@ -66,7 +66,6 @@ context('Cell move view residential location', () => {
   context('When there are search values submitted', () => {
     beforeEach(() => {
       cy.task('stubGroups', { id: 'MDI' })
-      cy.task('stubActivePrisons')
     })
 
     it('should have correct data pre filled from search query', () => {

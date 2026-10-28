@@ -169,10 +169,6 @@ export default ({
         },
       }
 
-      const useSpecialistCellTypes = await locationService.getActiveAgenciesInLocationService(
-        systemClientToken,
-        prisonerDetails.prisonId,
-      )
       return res.render('cellMove/selectCell.njk', {
         formValues: {
           location,
@@ -189,7 +185,7 @@ export default ({
           ?.filter(cell => cell.pathHierarchy !== prisonerDetails.cellLocation)
           .map(cell => {
             const actualCapacity = getActualCapacity(cell)
-            const cellTypes = useSpecialistCellTypes ? cell.specialistCellTypes : cell.legacyAttributes
+            const cellTypes = cell.specialistCellTypes
             return {
               key: cell.key,
               type: hasLength(cellTypes) && cellTypes.sort(),

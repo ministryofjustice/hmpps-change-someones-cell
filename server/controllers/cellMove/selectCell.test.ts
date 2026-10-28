@@ -152,7 +152,6 @@ describe('Select a cell', () => {
       expect(prisonerDetailsService.getPrisoner).toHaveBeenCalledWith(systemClientToken, someOffenderNumber)
       expect(nonAssociationsService.getNonAssociations).toHaveBeenCalledWith(systemClientToken, someOffenderNumber)
       expect(locationService.searchGroups).toHaveBeenCalledWith(systemClientToken, someAgency)
-      expect(locationService.getActiveAgenciesInLocationService).toHaveBeenCalledWith(systemClientToken, someAgency)
     })
 
     it('Redirects when offender not in user caseloads', async () => {
@@ -358,12 +357,6 @@ describe('Select a cell', () => {
           maxCapacity: 2,
           prisonId: 'MDI',
           workingCapacity: 1,
-          legacyAttributes: [
-            {
-              typeCode: 'LC',
-              typeDescription: 'Listener Cell',
-            },
-          ],
           specialistCellTypes: [
             {
               typeCode: 'CAT_A',
@@ -390,12 +383,6 @@ describe('Select a cell', () => {
           maxCapacity: 2,
           prisonId: 'MDI',
           workingCapacity: 1,
-          legacyAttributes: [
-            {
-              typeCode: 'LC',
-              typeDescription: 'Listener Cell',
-            },
-          ],
           specialistCellTypes: [
             {
               typeCode: 'CAT_A',
@@ -422,12 +409,6 @@ describe('Select a cell', () => {
           maxCapacity: 2,
           prisonId: 'MDI',
           workingCapacity: 1,
-          legacyAttributes: [
-            {
-              typeCode: 'LC',
-              typeDescription: 'Listener Cell',
-            },
-          ],
           specialistCellTypes: [
             {
               typeCode: 'CAT_A',
@@ -448,10 +429,6 @@ describe('Select a cell', () => {
           key: 'MDI-1-1',
           maxCapacity: 1,
           noOfOccupants: 0,
-          legacyAttributes: [
-            { typeDescription: 'Single occupancy', typeCode: 'SO' },
-            { typeDescription: 'Listener Cell', typeCode: 'LC' },
-          ],
           specialistCellTypes: [
             { typeDescription: 'Single occupancy', typeCode: 'SO' },
             { typeDescription: 'Listener Cell', typeCode: 'LC' },
@@ -462,10 +439,6 @@ describe('Select a cell', () => {
           key: 'MDI-1-2',
           maxCapacity: 2,
           noOfOccupants: 0,
-          legacyAttributes: [
-            { typeDescription: 'Special Cell', typeCode: 'SPC' },
-            { typeDescription: 'Gated Cell', typeCode: 'GC' },
-          ],
           specialistCellTypes: [
             { typeDescription: 'Special Cell', typeCode: 'SPC' },
             { typeDescription: 'Gated Cell', typeCode: 'GC' },
@@ -544,10 +517,6 @@ describe('Select a cell', () => {
           workingCapacity: 4,
           maxCapacity: 4,
           noOfOccupants: 1,
-          legacyAttributes: [
-            { typeDescription: 'Single occupancy', typeCode: 'SO' },
-            { typeDescription: 'Listener Cell', typeCode: 'LC' },
-          ],
           specialistCellTypes: [
             { typeDescription: 'Single occupancy', typeCode: 'SO' },
             { typeDescription: 'Listener Cell', typeCode: 'LC' },
@@ -561,10 +530,6 @@ describe('Select a cell', () => {
           noOfOccupants: 1,
           prisonId: 'MDI',
           workingCapacity: 5,
-          legacyAttributes: [
-            { typeDescription: 'Special Cell', typeCode: 'SPC' },
-            { typeDescription: 'Gated Cell', typeCode: 'GC' },
-          ],
           specialistCellTypes: [
             { typeDescription: 'Special Cell', typeCode: 'SPC' },
             { typeDescription: 'Gated Cell', typeCode: 'GC' },
@@ -578,7 +543,6 @@ describe('Select a cell', () => {
           prisonId: 'MDI',
           pathHierarchy: '1-1-1',
           workingCapacity: 3,
-          legacyAttributes: [{ typeDescription: 'Wheelchair Access', typeCode: 'WA' }],
           specialistCellTypes: [{ typeDescription: 'Wheelchair Access', typeCode: 'WA' }],
         },
       ] as CellLocation[])
@@ -597,7 +561,6 @@ describe('Select a cell', () => {
             prisonId: 'MDI',
             noOfOccupants: 1,
             maxCapacity: 2,
-            legacyAttributes: [{ typeDescription: 'Wheelchair Access', typeCode: 'WA' }],
             specialistCellTypes: [{ typeDescription: 'Wheelchair Access', typeCode: 'WA' }],
             prisonersInCell: [
               {
@@ -618,7 +581,6 @@ describe('Select a cell', () => {
             prisonId: 'MDI',
             noOfOccupants: 1,
             maxCapacity: 2,
-            legacyAttributes: [{ typeDescription: 'Wheelchair Access', typeCode: 'WA' }],
             specialistCellTypes: [{ typeDescription: 'Wheelchair Access', typeCode: 'WA' }],
             prisonersInCell: [
               {
@@ -638,7 +600,6 @@ describe('Select a cell', () => {
             prisonId: 'MDI',
             noOfOccupants: 1,
             maxCapacity: 2,
-            legacyAttributes: [{ typeDescription: 'Wheelchair Access', typeCode: 'WA' }],
             specialistCellTypes: [{ typeDescription: 'Wheelchair Access', typeCode: 'WA' }],
             prisonersInCell: [
               {
@@ -829,7 +790,6 @@ describe('Select a cell', () => {
           maxCapacity: 4,
           noOfOccupants: 1,
           pathHierarchy: '1-1-1',
-          legacyAttributes: [{ typeDescription: 'Wheelchair Access', typeCode: 'WA' }],
           specialistCellTypes: [{ typeDescription: 'Wheelchair Access', typeCode: 'WA' }],
           prisonersInCell: [
             {
@@ -911,10 +871,6 @@ describe('Select a cell', () => {
           workingCapacity: 4,
           pathHierarchy: '1-3',
           specialistCellTypes: [
-            { typeDescription: 'Single occupancy', typeCode: 'SO' },
-            { typeDescription: 'Listener Cell', typeCode: 'LC' },
-          ],
-          legacyAttributes: [
             { typeDescription: 'Single occupancy', typeCode: 'SO' },
             { typeDescription: 'Listener Cell', typeCode: 'LC' },
           ],

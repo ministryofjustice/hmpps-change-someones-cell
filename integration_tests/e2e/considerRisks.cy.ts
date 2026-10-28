@@ -15,10 +15,6 @@ const response = [
     pathHierarchy: '1-1-1',
     noOfOccupants: 0,
     prisonersInCell: [],
-    legacyAttributes: [
-      { type: 'LC', typeDescription: 'Listener Cell' },
-      { typeDescription: 'Gated Cell', type: 'GC' },
-    ],
   },
   {
     prisonId: 'MDI',
@@ -26,10 +22,6 @@ const response = [
     maxCapacity: 2,
     pathHierarchy: '1-1-2',
     noOfOccupants: 2,
-    legacyAttributes: [
-      { typeDescription: 'Special Cell', type: 'SPC' },
-      { typeDescription: 'Gated Cell', type: 'GC' },
-    ],
     prisonersInCell: [
       {
         prisonerNumber: 'A12345',
@@ -305,7 +297,6 @@ context('A user can see conflicts in cell', () => {
       },
     ])
     cy.task('stubGroups', { id: 'MDI' })
-    cy.task('stubActivePrisons')
     cy.task('stubCsraAssessments', {
       offenderNumbers: ['A12345'],
       assessments: [
@@ -498,7 +489,6 @@ context('A user can see conflicts in cell', () => {
       cy.task('stubOffenderBasicDetails', offenderBasicDetails)
       cy.task('stubOffenderFullDetails', offenderFullDetails)
       cy.task('stubGroups', { id: 'MDI' })
-      cy.task('stubActivePrisons')
       cy.task('stubGetPrisoner', {
         firstName: 'Bob',
         lastName: 'Doe',
@@ -572,7 +562,6 @@ context('A user can see conflicts in cell', () => {
       })
 
       it('should have a back button linking to the prisoner search page', () => {
-        cy.task('stubActivePrisons')
         cy.contains('Back').click()
         cy.contains('Select an available cell')
       })

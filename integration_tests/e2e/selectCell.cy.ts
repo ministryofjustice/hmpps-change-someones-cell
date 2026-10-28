@@ -56,7 +56,6 @@ context('A user can select a cell', () => {
       })
     })
     cy.task('stubGroups', { id: 'MDI' })
-    cy.task('stubActivePrisons', { activeAgencies: ['MDI'] })
     cy.task('stubGetPrisonerNonAssociations', {
       prisonerNumber: 'A12345',
       firstName: 'John',
@@ -94,10 +93,6 @@ context('A user can select a cell', () => {
   context('with cell data', () => {
     const response = [
       {
-        legacyAttributes: [
-          { typeDescription: 'Gated Cell', type: 'GC' },
-          { type: 'LC', typeDescription: 'Listener Cell' },
-        ],
         specialistCellTypes: [
           { typeDescription: 'Listener / crisis cell', type: 'LISTENER_CRISIS' },
           { typeDescription: 'Locate flat', type: 'LOCATE_FLAT_CELL' },
@@ -127,10 +122,6 @@ context('A user can select a cell', () => {
         ],
       },
       {
-        legacyAttributes: [
-          { typeDescription: 'Special Cell', type: 'SPC' },
-          { typeDescription: 'Gated Cell', type: 'GC' },
-        ],
         specialistCellTypes: [
           { typeDescription: 'Biohazard / dirty protest cell', type: 'BIOHAZARD_DIRTY_PROTEST' },
           { typeDescription: 'Accessible cell', type: 'ACCESSIBLE_CELL' },
