@@ -134,12 +134,6 @@ describe('Prisoner cell allocation service', () => {
       workingCapacity: 2,
       maxCapacity: 2,
       noOfOccupants: 1,
-      legacyAttributes: [
-        {
-          typeCode: 'LC',
-          typeDescription: 'Listener Cell',
-        },
-      ],
       specialistCellTypes: [
         {
           typeCode: 'CAT_A',

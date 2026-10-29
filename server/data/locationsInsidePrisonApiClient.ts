@@ -30,10 +30,6 @@ export interface CellLocation {
     typeCode: string
     typeDescription: string
   }[]
-  legacyAttributes: {
-    typeCode: string
-    typeDescription: string
-  }[]
   prisonersInCell?: Prisoner[]
 }
 
@@ -78,10 +74,6 @@ export interface Occupant {
   }[]
 }
 
-export interface LocationInfo {
-  activeAgencies: string[]
-}
-
 export default class LocationsInsidePrisonApiClient {
   constructor() {}
 
@@ -93,10 +85,6 @@ export default class LocationsInsidePrisonApiClient {
     return this.restClient(token).get<LocationGroup[]>({
       path: `/locations/prison/${prisonId}/groups`,
     })
-  }
-
-  getActiveAgenciesInLocationService(token: string): Promise<LocationInfo> {
-    return this.restClient(token).get<LocationInfo>({ path: `/info` })
   }
 
   getLocation(token: string, key: string): Promise<Location> {

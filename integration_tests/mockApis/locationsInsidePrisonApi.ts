@@ -1,5 +1,4 @@
 import { stubFor } from './wiremock'
-import { LocationInfo } from '../../server/data/locationsInsidePrisonApiClient'
 
 export const stubHealth = (status = 200) =>
   stubFor({
@@ -123,22 +122,6 @@ export const stubGroups = (caseload: { id: string }, status = 200) => {
   })
 }
 
-export const stubActivePrisons = (activeAgencies: LocationInfo) => {
-  return stubFor({
-    request: {
-      method: 'GET',
-      url: '/locations-inside-prison-api/info',
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: activeAgencies || { activeAgencies: [] },
-    },
-  })
-}
-
 export const stubLocation = (location?: object) => {
   return stubFor({
     request: {
@@ -246,6 +229,5 @@ export default {
   stubInmatesAtLocation,
   stubCellsWithCapacity,
   stubCellsWithCapacityByGroupName,
-  stubActivePrisons,
   stubReceptionOccupancy,
 }

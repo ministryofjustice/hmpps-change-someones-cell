@@ -76,7 +76,6 @@ context('Cell move history', () => {
       ],
     })
     cy.task('stubGroups', { id: 'MDI' })
-    cy.task('stubActivePrisons')
     cy.task('stubCellMoveReasons', [
       { code: 'ADM', description: 'Administrative', active: false },
       { code: 'BEH', description: 'Behaviour', active: false },
