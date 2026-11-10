@@ -5,6 +5,7 @@ import { putLastNameFirst, formatName, indefiniteArticle, hasLength, createStrin
 
 import getValueByType from '../../shared/getValueByType'
 import { translateCsra } from './cellMoveUtils'
+import { isHighCsra } from '../../shared/csraHelpers'
 import AnalyticsService from '../../services/analyticsService'
 import LocationService from '../../services/locationService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
@@ -83,11 +84,8 @@ export default ({
       }
       const currentOffenderWithOccupants = [currentOffenderDetails, ...currentOccupantsDetails]
 
-      const offendersCsraValues = currentOffenderWithOccupants
-        .filter(currentOccupant => currentOccupant.csraClassificationCode)
-        .map(currentOccupant => translateCsra(currentOccupant.csraClassificationCode))
-
-      const showOffendersNamesWithCsra = hasOccupants && offendersCsraValues.includes('High')
+      const showOffendersNamesWithCsra =
+        hasOccupants && currentOffenderWithOccupants.some(person => isHighCsra(person.csraClassificationCode))
 
       const currentOccupantsFormattedNames = currentOccupantsDetails.map(({ firstName, lastName }) =>
         formatName(firstName, lastName),
