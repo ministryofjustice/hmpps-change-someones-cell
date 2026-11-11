@@ -1,5 +1,6 @@
 import moment from 'moment'
-import { getNonAssociationsInEstablishment, getBackLinkData } from './cellMoveUtils'
+import { getNonAssociationsInEstablishment, getBackLinkData, translateCsra } from './cellMoveUtils'
+import { isHighCsra } from '../../shared/csraHelpers'
 import { PrisonerNonAssociation } from '../../data/nonAssociationsApiClient'
 
 jest.mock('../../services/prisonerDetailsService')
@@ -108,5 +109,36 @@ describe('Cell move utils', () => {
       const text = getBackLinkData('something else', 'A12345BC')
       expect(text.backLinkText).toBe('Return to select an available cell')
     })
+  })
+})
+
+describe('translateCsra', () => {
+  it.each([
+    ['HI', 'High'],
+    ['HI_GEN', 'High General'],
+    ['HI_SPFC', 'High Specific'],
+    ['STANDARD', 'Standard'],
+    ['MED', 'Medium'],
+    ['LOW', 'Low'],
+  ])('translates %s to %s', (code, expected) => {
+    expect(translateCsra(code)).toEqual(expected)
+  })
+
+  it('shows "not entered" when there is no code', () => {
+    expect(translateCsra(undefined)).toEqual('not entered')
+  })
+
+  it('shows an unrecognised code as it is rather than undefined', () => {
+    expect(translateCsra('NEW')).toEqual('NEW')
+  })
+})
+
+describe('isHighCsra', () => {
+  it.each(['HI', 'HI_GEN', 'HI_SPFC'])('treats %s as high', code => {
+    expect(isHighCsra(code)).toBe(true)
+  })
+
+  it.each(['STANDARD', 'MED', 'LOW', 'PEND', undefined])('does not treat %s as high', code => {
+    expect(isHighCsra(code)).toBe(false)
   })
 })
