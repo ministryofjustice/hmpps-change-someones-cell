@@ -138,21 +138,6 @@ export interface BedAssignment {
   offenderNo: string
 }
 
-export interface UserDetail {
-  staffId: number
-  username: string
-  firstName: string
-  lastName: string
-  thumbnailId: number
-  activeCaseLoadId: string
-  accountStatus: string
-  lockDate: string
-  expiryDate: string
-  lockedFlag: boolean
-  expiredFlag: boolean
-  active: boolean
-}
-
 export interface PrisonerDetailSearchCriteria {
   offenderNos?: string[]
   firstName?: string
@@ -242,25 +227,10 @@ export default class PrisonApiClient {
     return new RestClient('Prison Api Client', config.apis.prisonApi, token)
   }
 
-  /**
-   * @deprecated Use prisoner search to find prisoners
-   */
-  getImage(token: string, imageId: string) {
-    return PrisonApiClient.restClient(token).stream({ path: `/api/images/${imageId}/data` })
-  }
-
   getPrisonerImage(token: string, offenderNo: string, fullSizeImage = false) {
     return PrisonApiClient.restClient(token).stream({
       path: `/api/bookings/offenderNo/${offenderNo}/image/data?fullSizeImage=${fullSizeImage}`,
     })
-  }
-
-  setActiveCaseload(token: string, caseload: CaseLoad) {
-    return PrisonApiClient.restClient(token).put<CaseLoad>({ path: '/api/users/me/activeCaseLoad', data: caseload })
-  }
-
-  userCaseLoads(token: string) {
-    return PrisonApiClient.restClient(token).get<CaseLoad[]>({ path: '/api/users/me/caseLoads' })
   }
 
   /**
@@ -283,12 +253,6 @@ export default class PrisonApiClient {
   getHistoryByDate(token: string, agencyId: string, assignmentDate: string) {
     return PrisonApiClient.restClient(token).get<BedAssignment[]>({
       path: `/api/cell/${agencyId}/history/${assignmentDate}`,
-    })
-  }
-
-  getStaffDetails(token: string, username: string) {
-    return PrisonApiClient.restClient(token).get<UserDetail>({
-      path: `/api/users/${username}`,
     })
   }
 

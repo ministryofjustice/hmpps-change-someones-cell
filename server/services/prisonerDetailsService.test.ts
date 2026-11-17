@@ -20,17 +20,6 @@ describe('Prisoner details service', () => {
     prisonerDetailsService = new PrisonerDetailsService(prisonApiClient, prisonerSearchApiClient)
   })
 
-  describe('getImage', () => {
-    it('uses prison api to request image data', async () => {
-      prisonApiClient.getImage.mockResolvedValue(Readable.from('image data'))
-
-      const result = await prisonerDetailsService.getImage(token, '1234')
-
-      expect(prisonApiClient.getImage).toHaveBeenCalledWith(token, '1234')
-      expect(result.read()).toEqual('image data')
-    })
-  })
-
   describe('getPrisonerImage', () => {
     it('uses prison api to request image data', async () => {
       prisonApiClient.getPrisonerImage.mockResolvedValue(Readable.from('image data'))
