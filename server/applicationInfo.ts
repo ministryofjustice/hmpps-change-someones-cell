@@ -1,3 +1,5 @@
+import fs from 'fs'
+import path from 'path'
 import config from './config'
 
 const { buildNumber, gitRef, productId, branchName } = config
@@ -12,6 +14,7 @@ export type ApplicationInfo = {
 }
 
 export default (): ApplicationInfo => {
-  const applicationName = process.env.npm_package_name
+  const packageJson = path.join(__dirname, `${__dirname.endsWith('/dist/server') ? '../' : ''}../package.json`)
+  const { name: applicationName } = JSON.parse(fs.readFileSync(packageJson).toString())
   return { applicationName, buildNumber, gitRef, gitShortHash: gitRef.substring(0, 7), productId, branchName }
 }
