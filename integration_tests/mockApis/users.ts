@@ -60,6 +60,33 @@ export const stubUserMeRoles = (roles: string[] = []) =>
     body: roles.map(role => ({ roleCode: role })),
   })
 
+export const stubUserCaseloads = (
+  caseloads: { id: string; name: string }[] = [{ id: 'MDI', name: 'Moorland' }],
+  activeCaseloadId = 'MDI',
+) =>
+  getFor({
+    urlPath: '/users/users/me/caseloads',
+    body: {
+      username: 'ITAG_USER',
+      active: true,
+      accountType: 'GENERAL',
+      activeCaseload: caseloads.find(caseload => caseload.id === activeCaseloadId),
+      caseloads,
+    },
+  })
+
+export const stubStaff = (username: string, name = 'James Stuart') =>
+  getFor({
+    urlPath: `/users/users/${encodeURIComponent(username)}`,
+    body: {
+      username,
+      active: true,
+      name,
+      authSource: 'nomis',
+      userId: '231232',
+    },
+  })
+
 export const stubEmail = (username: string) =>
   stubFor({
     request: {
@@ -83,5 +110,7 @@ export default {
   stubUserMe,
   stubUserMeRoles,
   stubUser,
+  stubUserCaseloads,
+  stubStaff,
   stubEmail,
 }
