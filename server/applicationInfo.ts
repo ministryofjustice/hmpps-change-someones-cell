@@ -12,6 +12,6 @@ export type ApplicationInfo = {
 }
 
 export default (): ApplicationInfo => {
-  const applicationName = process.env.npm_package_name
+  const { name: applicationName } = JSON.parse(fs.readFileSync(packageJson).toString())
   return { applicationName, buildNumber, gitRef, gitShortHash: gitRef.substring(0, 7), productId, branchName }
 }
