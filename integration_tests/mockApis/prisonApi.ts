@@ -1,40 +1,5 @@
 import { stubFor } from './wiremock'
 
-export const stubUserCaseloads = (caseloads?: object[]) =>
-  stubFor({
-    request: {
-      method: 'GET',
-      url: '/api/users/me/caseLoads',
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: caseloads || [
-        {
-          caseLoadId: 'MDI',
-          description: 'Moorland',
-          currentlyActive: true,
-        },
-      ],
-    },
-  })
-
-export const stubUpdateCaseload = () =>
-  stubFor({
-    request: {
-      method: 'PUT',
-      url: '/api/users/me/activeCaseLoad',
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-    },
-  })
-
 export const stubStaffRoles = (roles = null) =>
   stubFor({
     request: {
@@ -226,28 +191,7 @@ export const stubCellMoveHistory = ({ assignmentDate, agencyId, cellMoves }) =>
     },
   })
 
-export const stubStaff = (staffId: string | number, details?: object) =>
-  stubFor({
-    request: {
-      method: 'GET',
-      url: `/api/users/${encodeURIComponent(staffId)}`,
-    },
-    response: {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json;charset=UTF-8',
-      },
-      jsonBody: details || {
-        firstName: 'JAMES',
-        lastName: 'STUART',
-        activeCaseLoadId: 'MDI',
-      },
-    },
-  })
-
 export default {
-  stubUserCaseloads,
-  stubUpdateCaseload,
   stubStaffRoles,
   stubUserLocations,
   stubHealth,
@@ -259,5 +203,4 @@ export default {
   stubPrisonerFullDetail,
   stubBookingDetails,
   stubCellMoveHistory,
-  stubStaff,
 }

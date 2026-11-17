@@ -46,4 +46,37 @@ describe('manageUsersApiClient', () => {
       expect(output).toEqual(['role1', 'role2'])
     })
   })
+
+  describe('getUserCaseloads', () => {
+    it('should return data from api', async () => {
+      const response = {
+        username: 'SGAMGEE_GEN',
+        active: true,
+        activeCaseload: { id: 'MDI', name: 'Moorland (HMP & YOI)' },
+        caseloads: [{ id: 'MDI', name: 'Moorland (HMP & YOI)' }],
+      }
+
+      fakeManageUsersApiClient
+        .get('/users/me/caseloads')
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, response)
+
+      const output = await manageUsersApiClient.getUserCaseloads(token.access_token)
+      expect(output).toEqual(response)
+    })
+  })
+
+  describe('getUserByUsername', () => {
+    it('should return data from api', async () => {
+      const response = { username: 'SGAMGEE_GEN', name: 'Sam Gamgee' }
+
+      fakeManageUsersApiClient
+        .get('/users/SGAMGEE_GEN')
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, response)
+
+      const output = await manageUsersApiClient.getUserByUsername(token.access_token, 'SGAMGEE_GEN')
+      expect(output).toEqual(response)
+    })
+  })
 })

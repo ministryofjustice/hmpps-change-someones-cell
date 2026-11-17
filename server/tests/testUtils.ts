@@ -4,7 +4,7 @@ import UserService from '../services/userService'
 
 export class MockUserService extends UserService {
   constructor() {
-    super(undefined, undefined)
+    super(undefined)
   }
 
   override async getUserRoles(_token: string) {
