@@ -37,7 +37,7 @@ export default defineConfig({
             auth.stubSignIn(username, caseload, roles),
             users.stubUserMe(username, 12345, 'James Stuart', caseload),
             users.stubUserMeRoles(roles),
-            prisonApi.stubUserCaseloads(caseloads),
+            users.stubUserCaseloads(caseloads),
             tokenVerification.stubVerifyToken(true),
           ]),
         stubAuthHealth: status => auth.stubHealth(status),
@@ -82,7 +82,7 @@ export default defineConfig({
           locationsInsidePrisonApi.stubCellsWithCapacity({ prisonId, response }),
         stubCellsWithCapacityByGroupName: ({ prisonId, groupName, response }) =>
           locationsInsidePrisonApi.stubCellsWithCapacityByGroupName({ prisonId, groupName, response }),
-        stubStaff: ({ staffId, details }) => Promise.all([prisonApi.stubStaff(staffId, details)]),
+        stubStaff: ({ username, name }) => users.stubStaff(username, name),
         stubGlobalAlerts: alertsApi.stubGlobalAlerts,
         stubReceptionOccupancy: reception => locationsInsidePrisonApi.stubReceptionOccupancy(reception),
       })

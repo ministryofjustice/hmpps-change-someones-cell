@@ -5,7 +5,7 @@ import logger from '../../logger'
 
 jest.mock('../../logger')
 
-const userService = new UserService(null, null) as jest.Mocked<UserService>
+const userService = new UserService(null) as jest.Mocked<UserService>
 
 describe('Current user', () => {
   let res

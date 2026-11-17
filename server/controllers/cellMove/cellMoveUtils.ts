@@ -76,5 +76,6 @@ export const cellAttributes = [
 
 export const translateCsra = (csraClassificationCode: string): string => {
   if (!csraClassificationCode) return 'not entered'
-  return csraTranslations[csraClassificationCode]
+  // Fall back to the code itself so an unrecognised level is still shown rather than 'undefined'
+  return csraTranslations[csraClassificationCode] ?? csraClassificationCode
 }

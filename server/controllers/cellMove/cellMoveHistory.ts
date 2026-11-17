@@ -1,5 +1,6 @@
 import moment from 'moment'
-import { formatName, formatLocation, stripAgencyPrefix, putLastNameFirst } from '../../utils'
+import { formatLocation, stripAgencyPrefix, putLastNameFirst } from '../../utils'
+import { convertToTitleCase } from '../../utils/utils'
 import LocationService from '../../services/locationService'
 import PrisonerCellAllocationService from '../../services/prisonerCellAllocationService'
 import PrisonerDetailsService from '../../services/prisonerDetailsService'
@@ -103,7 +104,7 @@ export default ({ locationService, prisonerCellAllocationService, prisonerDetail
 
     const historyByDate = cellMoveHistory.sort(sortByMostEarliestFirst).map(history => {
       const offender = offenders.find(o => o.prisonerNumber === history.offenderNo)
-      const staff = staffMembers.find(s => s.username === history.movementMadeBy)
+      const staff = staffMembers.find(s => s?.username === history.movementMadeBy)
       const movementReason = cellMoveTypes.find(type => type.code === history.assignmentReason)
       const assignmentTime = moment(history.assignmentDateTime, dateTimeFormat).format('HH:mm')
 
@@ -124,7 +125,7 @@ export default ({ locationService, prisonerCellAllocationService, prisonerDetail
           (movedFrom.length && formatLocationDescription(movedFrom[0]?.description, movedFrom[0]?.agencyId)) ||
           'No cell allocated',
         movedTo: formatLocationDescription(history.description, history.agencyId),
-        movedBy: formatName(staff?.firstName, staff?.lastName),
+        movedBy: convertToTitleCase(staff?.name),
         reason: movementReason?.description || 'Not entered',
         time: assignmentTime,
       }

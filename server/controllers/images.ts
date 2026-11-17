@@ -5,30 +5,6 @@ import PrisonerDetailsService from '../services/prisonerDetailsService'
 const placeHolderImagePath = '/assets/images/image-missing.jpg'
 
 export const imageFactory = (prisonerDetailsService: PrisonerDetailsService) => {
-  const image = asyncMiddleware(async (req, res) => {
-    const { imageId } = req.params
-
-    if (!imageId) {
-      res.redirect(placeHolderImagePath)
-    } else {
-      prisonerDetailsService
-        .getImage(res.locals.systemClientToken, imageId)
-        .then(data => {
-          res.type('image/jpeg')
-          data.pipe(res)
-        })
-        .catch(error => {
-          // Not Found 404 is an acceptable response.
-          // It has been logged as part of the client call,
-          // no need to repeat here.
-          if (error.status !== 404) {
-            log.error(error)
-          }
-          res.redirect(placeHolderImagePath)
-        })
-    }
-  })
-
   const prisonerImage = asyncMiddleware(async (req, res) => {
     const { offenderNo } = req.params
     const { fullSizeImage } = req.query
@@ -57,7 +33,6 @@ export const imageFactory = (prisonerDetailsService: PrisonerDetailsService) => 
   })
 
   return {
-    image,
     prisonerImage,
   }
 }
