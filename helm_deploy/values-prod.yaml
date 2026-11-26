@@ -28,6 +28,3 @@ generic-service:
       - moj_cloud_platform
       - prisons
       - private_prisons
-
-generic-prometheus-alerts:
-  alertSeverity: move-a-prisoner-alerts-prod
