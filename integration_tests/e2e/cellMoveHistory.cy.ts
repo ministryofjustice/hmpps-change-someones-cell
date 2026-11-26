@@ -81,7 +81,7 @@ context('Cell move history', () => {
       { code: 'BEH', description: 'Behaviour', active: false },
     ])
     cy.task('stubGetPrisoners', [{ prisonerNumber: 'A12345', firstName: 'BOB', lastName: 'DOE', bookingId: 1234 }])
-    cy.task('stubStaff', { staffId: 'SA', firstName: 'Pow', lastName: 'Now' })
+    cy.task('stubStaff', { username: 'SA', name: 'POW NOW' })
     cy.task('stubOffenderCellHistory', offenderCellHistory)
   })
 
@@ -103,7 +103,7 @@ context('Cell move history', () => {
         expect(cellMoves[1].name).to.contain('Doe, Bob')
         expect(cellMoves[1].movedFrom).to.eq('No cell allocated')
         expect(cellMoves[1].movedTo).to.eq('H-1-2')
-        expect(cellMoves[1].movedBy).to.contain('')
+        expect(cellMoves[1].movedBy).to.contain('Pow Now')
         expect(cellMoves[1].reason).to.contain('Administrative')
         expect(cellMoves[1].time).to.contain('11:00')
       })

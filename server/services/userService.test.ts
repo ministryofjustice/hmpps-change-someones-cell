@@ -1,24 +1,19 @@
 import UserService from './userService'
 import ManageUsersApiClient, { type User } from '../data/manageUsersApiClient'
-import { PrisonApiClient } from '../data'
 import { SanitisedError } from '../sanitisedError'
-import { UserDetail } from '../data/prisonApiClient'
 
 jest.mock('../data/manageUsersApiClient')
-jest.mock('../data/prisonApiClient')
 
 const token = 'some token'
 
 describe('User service', () => {
   let manageUsersApiClient: jest.Mocked<ManageUsersApiClient>
-  let prisonApiClient: jest.Mocked<PrisonApiClient>
   let userService: UserService
 
   describe('getUser', () => {
     beforeEach(() => {
       manageUsersApiClient = new ManageUsersApiClient() as jest.Mocked<ManageUsersApiClient>
-      prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
-      userService = new UserService(manageUsersApiClient, prisonApiClient)
+      userService = new UserService(manageUsersApiClient)
     })
 
     it('retrieves and formats user name', async () => {
@@ -39,55 +34,84 @@ describe('User service', () => {
   describe('userCaseLoads', () => {
     beforeEach(() => {
       manageUsersApiClient = new ManageUsersApiClient() as jest.Mocked<ManageUsersApiClient>
-      prisonApiClient = new PrisonApiClient() as jest.Mocked<PrisonApiClient>
-      userService = new UserService(manageUsersApiClient, prisonApiClient)
+      userService = new UserService(manageUsersApiClient)
     })
 
-    const caseLoads = [
-      {
-        caseLoadId: 'BXI',
-        description: 'Brixton (HMP)',
-        currentlyActive: true,
-      },
-    ]
-
-    it('retrieves user case loads', async () => {
-      prisonApiClient.userCaseLoads.mockResolvedValue(caseLoads)
+    it('maps Manage Users caseloads to the caseload shape the app uses', async () => {
+      manageUsersApiClient.getUserCaseloads.mockResolvedValue({
+        username: 'SGAMGEE_GEN',
+        active: true,
+        activeCaseload: { id: 'BXI', name: 'Brixton (HMP)' },
+        caseloads: [
+          { id: 'BXI', name: 'Brixton (HMP)' },
+          { id: 'MDI', name: 'Moorland (HMP & YOI)' },
+        ],
+      })
 
       const result = await userService.userCaseLoads(token)
 
-      expect(result).toEqual(caseLoads)
+      expect(result).toEqual([
+        { caseLoadId: 'BXI', description: 'Brixton (HMP)', currentlyActive: true },
+        { caseLoadId: 'MDI', description: 'Moorland (HMP & YOI)', currentlyActive: false },
+      ])
+    })
+
+    it('returns no caseloads when the user has none', async () => {
+      manageUsersApiClient.getUserCaseloads.mockResolvedValue({
+        username: 'SGAMGEE_GEN',
+        active: true,
+        caseloads: [],
+      })
+
+      const result = await userService.userCaseLoads(token)
+
+      expect(result).toEqual([])
     })
 
     it('propagates error', async () => {
-      prisonApiClient.userCaseLoads.mockRejectedValue(new Error('some error'))
+      manageUsersApiClient.getUserCaseloads.mockRejectedValue(new Error('some error'))
 
       await expect(userService.userCaseLoads(token)).rejects.toEqual(new Error('some error'))
     })
   })
 
   describe('getStaffDetails', () => {
-    const userDetail: UserDetail = {
-      staffId: 231232,
-      username: 'SGAMGEE_GEN',
-      firstName: 'John',
-      lastName: 'Smith',
-      thumbnailId: 2342341224,
-      activeCaseLoadId: 'MDI',
-      accountStatus: 'ACTIVE',
-      lockDate: '2021-07-05T10:35:17',
-      expiryDate: '2021-07-05T10:35:17',
-      lockedFlag: false,
-      expiredFlag: true,
-      active: true,
-    }
+    const staff: User = { username: 'SGAMGEE_GEN', name: 'Sam Gamgee' }
 
-    it('retrieves staff details', async () => {
-      prisonApiClient.getStaffDetails.mockResolvedValue(userDetail)
+    beforeEach(() => {
+      manageUsersApiClient = new ManageUsersApiClient() as jest.Mocked<ManageUsersApiClient>
+      userService = new UserService(manageUsersApiClient)
+    })
+
+    it('retrieves staff details from Manage Users', async () => {
+      manageUsersApiClient.getUserByUsername.mockResolvedValue(staff)
 
       const result = await userService.getStaffDetails(token, 'SGAMGEE_GEN')
 
-      expect(result).toEqual(userDetail)
+      expect(result).toEqual(staff)
+      expect(manageUsersApiClient.getUserByUsername).toHaveBeenCalledWith(token, 'SGAMGEE_GEN')
+    })
+
+    it('only calls Manage Users once for the same staff member', async () => {
+      manageUsersApiClient.getUserByUsername.mockResolvedValue(staff)
+
+      await userService.getStaffDetails(token, 'SGAMGEE_GEN')
+      const result = await userService.getStaffDetails(token, 'SGAMGEE_GEN')
+
+      expect(result).toEqual(staff)
+      expect(manageUsersApiClient.getUserByUsername).toHaveBeenCalledTimes(1)
+    })
+
+    it('calls Manage Users again once the cached entry has expired', async () => {
+      const now = jest.spyOn(Date, 'now').mockReturnValue(0)
+      manageUsersApiClient.getUserByUsername.mockResolvedValue(staff)
+
+      await userService.getStaffDetails(token, 'SGAMGEE_GEN')
+      now.mockReturnValue(60 * 60 * 1000 + 1)
+      await userService.getStaffDetails(token, 'SGAMGEE_GEN')
+
+      expect(manageUsersApiClient.getUserByUsername).toHaveBeenCalledTimes(2)
+      now.mockRestore()
     })
 
     it('returns null when not found', async () => {
@@ -98,7 +122,7 @@ describe('User service', () => {
         status: 404,
       }
 
-      prisonApiClient.getStaffDetails.mockRejectedValue(notFoundError)
+      manageUsersApiClient.getUserByUsername.mockRejectedValue(notFoundError)
 
       const result = await userService.getStaffDetails(token, 'SGAMGEE_GEN')
 
@@ -106,7 +130,7 @@ describe('User service', () => {
     })
 
     it('propagates other errors', async () => {
-      prisonApiClient.getStaffDetails.mockRejectedValue(new Error('some error'))
+      manageUsersApiClient.getUserByUsername.mockRejectedValue(new Error('some error'))
 
       await expect(userService.getStaffDetails(token, 'SGAMGEE_GEN')).rejects.toEqual(new Error('some error'))
     })

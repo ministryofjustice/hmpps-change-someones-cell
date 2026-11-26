@@ -18,6 +18,20 @@ export interface UserRole {
   roleCode: string
 }
 
+export interface PrisonCaseload {
+  id: string
+  name: string
+  function?: string
+}
+
+export interface UserCaseloads {
+  username: string
+  active: boolean
+  accountType?: string
+  activeCaseload?: PrisonCaseload
+  caseloads: PrisonCaseload[]
+}
+
 export default class ManageUsersApiClient {
   constructor() {}
 
@@ -34,5 +48,13 @@ export default class ManageUsersApiClient {
     return ManageUsersApiClient.restClient(token)
       .get<UserRole[]>({ path: '/users/me/roles' })
       .then(roles => roles.map(role => role.roleCode))
+  }
+
+  getUserCaseloads(token: string): Promise<UserCaseloads> {
+    return ManageUsersApiClient.restClient(token).get<UserCaseloads>({ path: '/users/me/caseloads' })
+  }
+
+  getUserByUsername(token: string, username: string): Promise<User> {
+    return ManageUsersApiClient.restClient(token).get<User>({ path: `/users/${encodeURIComponent(username)}` })
   }
 }

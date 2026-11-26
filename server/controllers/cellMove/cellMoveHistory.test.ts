@@ -16,7 +16,7 @@ describe('Cell move history', () => {
     new PrisonerCellAllocationService(undefined, undefined, undefined, undefined, undefined),
   )
   const prisonerDetailsService = jest.mocked(new PrisonerDetailsService(undefined, undefined))
-  const userService = jest.mocked(new UserService(undefined, undefined))
+  const userService = jest.mocked(new UserService(undefined))
 
   let req
   let res
@@ -109,9 +109,7 @@ describe('Cell move history', () => {
         .fn()
         .mockResolvedValue([{ bookingId: -34, offenderNo: 'A12345', firstName: 'BOB', lastName: 'LAST' }])
 
-      userService.getStaffDetails = jest
-        .fn()
-        .mockResolvedValue({ username: 'SA', firstName: 'LOU', lastName: 'Becker' })
+      userService.getStaffDetails = jest.fn().mockResolvedValue({ username: 'SA', name: 'LOU BECKER' })
     })
 
     it('should return defaults', async () => {
@@ -185,6 +183,23 @@ describe('Cell move history', () => {
           historyByDate: [
             expect.objectContaining({
               movedBy: 'Lou Becker',
+            }),
+          ],
+        }),
+      )
+    })
+
+    it('should leave the staff member blank when their account cannot be found', async () => {
+      userService.getStaffDetails = jest.fn().mockResolvedValue(null)
+
+      await controller(req, res)
+
+      expect(res.render).toHaveBeenCalledWith(
+        'cellMove/cellMoveHistory.njk',
+        expect.objectContaining({
+          historyByDate: [
+            expect.objectContaining({
+              movedBy: '',
             }),
           ],
         }),

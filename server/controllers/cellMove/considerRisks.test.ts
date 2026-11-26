@@ -575,6 +575,57 @@ describe('move validation', () => {
       )
     })
 
+    it.each([
+      ['HI_GEN', 'High General'],
+      ['HI_SPFC', 'High Specific'],
+    ])(
+      'Should show the CSRA warning, not skip the page, when an occupant is %s and there are no other risks',
+      async (csraClassificationCode, description) => {
+        nonAssociationsService.getNonAssociations = jest.fn().mockResolvedValue({})
+        prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue(occupants)
+        prisonerDetailsService.getDetails
+          .mockResolvedValueOnce({
+            ...offenderDetails,
+            categoryCode: 'C',
+            alerts: [],
+            csra: 'Standard',
+            csraClassificationCode: 'STANDARD',
+          })
+          .mockResolvedValueOnce({ ...occupantOneDetails, alerts: [], csraClassificationCode })
+          .mockResolvedValueOnce({ ...occupantTwoDetails, alerts: [], csraClassificationCode: 'STANDARD' })
+
+        await controller.index(req, res)
+
+        expect(res.redirect).not.toHaveBeenCalled()
+        expect(res.render).toHaveBeenCalledWith(
+          'cellMove/considerRisks.njk',
+          expect.objectContaining({
+            showOffendersNamesWithCsra: true,
+            offendersFormattedNamesWithCsra: [
+              'John Smith is CSRA Standard.',
+              `Occupant One is CSRA ${description}.`,
+              'Occupant Two is CSRA Standard.',
+            ],
+          }),
+        )
+      },
+    )
+
+    it('Should show the CSRA warning when the prisoner being moved is High Specific', async () => {
+      prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue(occupants)
+      prisonerDetailsService.getDetails
+        .mockResolvedValueOnce({ ...offenderDetails, csraClassificationCode: 'HI_SPFC' })
+        .mockResolvedValueOnce({ ...occupantOneDetails, csraClassificationCode: 'STANDARD' })
+        .mockResolvedValueOnce({ ...occupantTwoDetails, csraClassificationCode: 'STANDARD' })
+
+      await controller.index(req, res)
+
+      expect(res.render).toHaveBeenCalledWith(
+        'cellMove/considerRisks.njk',
+        expect.objectContaining({ showOffendersNamesWithCsra: true }),
+      )
+    })
+
     it('Should not show CSRA messages when both prisoner and occupants are standard', async () => {
       prisonerCellAllocationService.getInmatesAtLocation.mockResolvedValue(occupants)
 
